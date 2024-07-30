@@ -1,12 +1,4 @@
 ﻿<div class="@ComputeGridStyle()">
-    <div class="regions">
-        @for (int i = 0; i < Grid.GetLength(0) / RegionSize; i++)
-            @for (int j = 0; j < Grid.GetLength(0) / RegionSize; j++)
-        {
-            <div class="border border-secondary"></div>
-        }
-    </div>
-
     @for (int i = 0; i < Grid.GetLength(0); i++)
     {
         @for (int j = 0; j < Grid.GetLength(1); j++)
@@ -39,6 +31,14 @@
             </div>
         }
     }
+
+    <div class="regions">
+        @for (int i = 0; i < Grid.GetLength(0) / RegionSize; i++)
+            @for (int j = 0; j < Grid.GetLength(0) / RegionSize; j++)
+        {
+            <div class="border border-secondary"></div>
+        }
+    </div>
 
     <div class="rows">
         @for (int i = 0; i < Grid.GetLength(0); i++)
