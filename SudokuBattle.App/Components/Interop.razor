@@ -1,50 +1,40 @@
 ﻿@inject IJSRuntime JsRuntime;
 @implements IAsyncDisposable
 
-<script>
-    function keyupCallback(args) {
-        DotNet.invokeMethodAsync("SudokuBattle.App", "FireKeyupEvent", {
-            key: args.key,
-            code: args.code,
-            location: args.location,
-            repeat: args.repeat,
-            ctrlKey: args.ctrlKey,
-            shiftKey: args.shiftKey,
-            altKey: args.altKey,
-            metaKey: args.metaKey,
-            type: args.type,
-        }); 
-    }
-    
-    window.interopAddKeyupEventListener = () => window.addEventListener("keyup", keyupCallback);
-    window.interopRemoveEventListener = () => window.removeEventListener("keyup", keyupCallback)
-
-</script>
-
 @code {
 
-    private bool _subscribed;
+    private IJSObjectReference? _interopModule;
+    private IJSObjectReference? _interopInstance;
+    private string _interopKey = Guid.NewGuid().ToString();
+    private static Dictionary<string, Interop> _instances = new();
 
     [Parameter]
     public string[] Events { get; set; } = [];
 
-    public static event EventHandler<KeyboardEventArgs>? KeyupEvent;
+    public event EventHandler<KeyboardEventArgs>? KeyupEvent;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _instances.Add(_interopKey, this);
+        _interopModule ??= await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/Interop.razor.js");
+        _interopInstance = await _interopModule.InvokeAsync<IJSObjectReference>("createInteropInstance", _interopKey);
+
         IEnumerable<string> callbacks = Events.Select(GetAddListenerName).OfType<string>();
 
         foreach (string callback in callbacks)
         {
-            await JsRuntime.InvokeVoidAsync(callback);
+            await _interopInstance.InvokeVoidAsync(callback);
         }
-
-        _subscribed = true;
     }
 
     public async ValueTask DisposeAsync()
     {
-        if (!_subscribed)
+        if (_interopInstance == null)
         {
             return;
         }
@@ -53,28 +43,29 @@
 
         foreach (string callback in callbacks)
         {
-            await JsRuntime.InvokeVoidAsync(callback);
+            await _interopInstance.InvokeVoidAsync(callback);
         }
     }
 
     string? GetAddListenerName(string evt) =>
         evt switch
         {
-            "keyup" => "interopAddKeyupEventListener",
+            "keyup" => "addKeyupEventListener",
             _ => ""
         };
 
     string? GetRemoveListenerName(string evt) =>
         evt switch
         {
-            "keyup" => "interopRemoveKeyupEventListener",
+            "keyup" => "removeKeyupEventListener",
             _ => null
         };
 
     [JSInvokable]
-    public static Task FireKeyupEvent(KeyboardEventArgs args)
+    public static Task FireKeyupEvent(string key, KeyboardEventArgs args)
     {
-        KeyupEvent?.Invoke(null, args);
+        Interop? instance = _instances.GetValueOrDefault(key);
+        instance?.KeyupEvent?.Invoke(null, args);
         return Task.CompletedTask;
     }
 
