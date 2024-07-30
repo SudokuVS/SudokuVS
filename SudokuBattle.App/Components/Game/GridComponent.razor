@@ -1,0 +1,192 @@
+﻿<div class="@ComputeGridStyle()">
+    <div class="regions">
+        @for (int i = 0; i < Grid.GetLength(0) / RegionSize; i++)
+            @for (int j = 0; j < Grid.GetLength(0) / RegionSize; j++)
+        {
+            <div class="border border-secondary"></div>
+        }
+    </div>
+
+    @for (int i = 0; i < Grid.GetLength(0); i++)
+    {
+        @for (int j = 0; j < Grid.GetLength(1); j++)
+        {
+            int row = i;
+            int column = j;
+
+            <div class="@ComputeCellStyle(row, column)">
+
+                @Grid[row, column].Content
+
+                @if (Grid[row, column].Annotation != null || Grid[row, column].AnnotationIcon != null)
+                {
+                    <div class="@ComputeAnnotationStyle(row, column)">
+                        @if (Grid[row, column].AnnotationIcon != null)
+                        {
+                            <i class="bi bi-@Grid[row, column].AnnotationIcon"></i>
+                        }
+                        @if (Grid[row, column].Annotation != null)
+                        {
+                            @Grid[row, column].Annotation
+                        }
+                    </div>
+                }
+
+                @if (!Disabled)
+                {
+                    <a class="stretched-link" type="button" @onclick="async () => await CellClicked((row, column))"></a>
+                }
+            </div>
+        }
+    }
+
+    <div class="rows">
+        @for (int i = 0; i < Grid.GetLength(0); i++)
+        {
+            <div class="@ComputeRowStyle(i)"></div>
+        }
+    </div>
+
+    <div class="columns">
+        @for (int i = 0; i < Grid.GetLength(0); i++)
+        {
+            <div class="@ComputeColumnStyle(i)"></div>
+        }
+    </div>
+
+    <div class="regions">
+        @for (int i = 0; i < Grid.GetLength(0) / RegionSize; i++)
+            @for (int j = 0; j < Grid.GetLength(0) / RegionSize; j++)
+        {
+            <div class="@ComputeRegionStyle(i, j)"></div>
+        }
+    </div>
+</div>
+
+@code {
+    const int RegionSize = 3;
+
+    [Parameter]
+    public Cell[,] Grid { get; set; } = new Cell[0, 0];
+
+    [Parameter]
+    public Color[] RowBorderColor { get; set; } = [];
+
+    [Parameter]
+    public Color[] ColumnBorderColor { get; set; } = [];
+
+    [Parameter]
+    public Color[,] RegionBorderColor { get; set; } = new Color[0, 0];
+
+    [Parameter]
+    public Size GridSize { get; set; } = Size.Medium;
+
+    [Parameter]
+    public bool Disabled { get; set; } = false;
+
+    [Parameter]
+    public EventCallback<(int, int)> OnCellClicked { get; set; }
+
+    string ComputeGridStyle() => $"sudoku-grid {GetSizeStyle(GridSize)} position-relative";
+
+    string? ComputeRowStyle(int row) => row < RowBorderColor.Length ? GetBorderColorStyle(RowBorderColor[row]) : null;
+
+    string? ComputeColumnStyle(int row) => row < ColumnBorderColor.Length ? GetBorderColorStyle(ColumnBorderColor[row]) : null;
+
+    string? ComputeRegionStyle(int row, int column) => row < RegionBorderColor.GetLength(0) && column < RegionBorderColor.GetLength(1) ? GetBorderColorStyle(RegionBorderColor[row, column]) : null;
+
+    string ComputeCellStyle(int row, int column)
+    {
+        Cell cell = Grid[row, column];
+        return $"cell {GetSizeStyle(GridSize)} {GetBgColorStyle(cell.BackgroundColor)} {GetBorderColorStyle(cell.Border) ?? "border border-secondary-subtle"} position-relative";
+    }
+
+    string ComputeAnnotationStyle(int row, int column)
+    {
+        Cell cell = Grid[row, column];
+        return $"annotation {GetBgColorStyle(cell.AnnotationBackgroundColor)}";
+    }
+
+    static string GetSizeStyle(Size size) =>
+        size switch
+        {
+            Size.Small => "small",
+            Size.Medium => "medium",
+            Size.Big => "big",
+            _ => ""
+        };
+
+    string? GetBorderColorStyle(Color color) =>
+        color switch
+        {
+            Color.None => null,
+            Color.LightGrey => "border-light-grey",
+            Color.Grey => "border-grey",
+            Color.LightPink => "border-light-pink",
+            Color.Pink => "border-pink",
+            Color.LightBlue => "border-light-blue",
+            Color.Blue => "border-blue",
+            Color.Yellow => "border-yellow",
+            Color.Red => "border-red",
+            Color.Green => "border-green",
+            _ => null
+        };
+
+    static string GetBgColorStyle(Color color) =>
+        color switch
+        {
+            Color.None => "",
+            Color.LightGrey => "bg-light-grey",
+            Color.Grey => "bg-grey",
+            Color.LightPink => "bg-light-pink",
+            Color.Pink => "bg-pink",
+            Color.LightBlue => "bg-light-blue",
+            Color.Blue => "bg-blue",
+            Color.Yellow => "bg-yellow",
+            Color.Red => "bg-red",
+            Color.Green => "bg-green",
+            _ => ""
+        };
+
+    async Task CellClicked((int Row, int Column) cell)
+    {
+        if (Disabled)
+        {
+            return;
+        }
+
+        await OnCellClicked.InvokeAsync(cell);
+    }
+
+    public class Cell
+    {
+        public string? Content { get; set; }
+        public string? Annotation { get; set; }
+        public string? AnnotationIcon { get; set; }
+        public Color Border { get; set; }
+        public Color BackgroundColor { get; set; }
+        public Color AnnotationBackgroundColor { get; set; }
+    }
+
+    public enum Color
+    {
+        None,
+        LightGrey,
+        Grey,
+        LightPink,
+        Pink,
+        LightBlue,
+        Blue,
+        Yellow,
+        Red,
+        Green
+    }
+
+    public enum Size
+    {
+        Small,
+        Medium,
+        Big
+    }
+
+}

@@ -1,0 +1,55 @@
+﻿@inherits LayoutComponentBase
+
+<div class="h-100 d-flex flex-column">
+    <header class="bg-dark text-white d-flex align-items-center gap-2 px-2" style="height:64px;">
+        @if (PlayerName != null)
+        {
+            <div class="d-flex align-items-baseline gap-1">
+                <span>Player:</span>
+                <span class="d-flex align-items-center justify-content-center fs-4 fw-semibold">
+                    @PlayerName
+                </span>
+                <a class="small text-white" href="/setup">(edit)</a>
+            </div>
+        }
+    </header>
+
+    <hr class="p-0 m-0"/>
+
+    <main class="flex-grow-1">
+        <CascadingValue Value="PlayerName">
+            @Body
+        </CascadingValue>
+    </main>
+</div>
+
+@inject NavigationManager Navigation;
+@inject IJSRuntime JsRuntime;
+
+@code {
+
+    IJSObjectReference? _mainLayoutModule;
+
+    public string? PlayerName { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _mainLayoutModule ??= await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/Layout/MainLayout.razor.js");
+
+        PlayerName = await _mainLayoutModule.InvokeAsync<string?>("readName");
+
+        if (string.IsNullOrWhiteSpace(PlayerName))
+        {
+            Navigation.NavigateTo("/setup");
+            return;
+        }
+
+        StateHasChanged();
+    }
+
+}

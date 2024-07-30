@@ -1,0 +1,66 @@
+﻿@page "/"
+@using SudokuBattle.App.Models.Game
+@using SudokuBattle.App.Services
+@using SudokuBattle.Sudoku.Generators
+@using SudokuBattle.Sudoku.Models
+@inject NavigationManager Navigation;
+@inject SudokuGamesRepository Repository;
+@inject GameTokenService GameTokenService;
+
+<PageTitle>Sudoku Battle</PageTitle>
+
+<div class="h-100 container d-flex flex-column align-items-stretch justify-content-center p-4">
+    <div class="d-flex flex-column align-items-center justify-content-center py-4">
+        <button class="btn btn-primary btn-lg" @onclick="NewGame">New Game</button>
+        @if (_newGameError != null)
+        {
+            <div class="text-danger small">
+                @_newGameError
+            </div>
+        }
+    </div>
+
+    <hr/>
+
+    <div class="flex-grow-1">
+
+    </div>
+</div>
+
+@code {
+
+    [CascadingParameter]
+    public string? PlayerName { get; set; }
+
+    string? _newGameError;
+
+    void NewGame()
+    {
+        _newGameError = null;
+
+        if (PlayerName == null)
+        {
+            _newGameError = "Could not find player name";
+            StateHasChanged();
+            return;
+        }
+
+        SudokuLibGenerator generator = new();
+        SudokuGrid? grid = generator.Generate();
+        if (grid == null)
+        {
+            _newGameError = "Could not generate grid";
+            StateHasChanged();
+            return;
+        }
+        grid.LockNonEmptyCells();
+
+        SudokuGame game = new(grid);
+        Repository.Save(game);
+
+        game.Join(PlayerName, PlayerSide.Player1);
+        string token = GameTokenService.Generate(game.Id, PlayerSide.Player1);
+        Navigation.NavigateTo($"/game/{token}");
+    }
+
+}
