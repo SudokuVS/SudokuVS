@@ -10,7 +10,7 @@
         @State.PlayerName
     </div>
     <div class="d-flex flex-column align-items-center justify-content-center">
-        <GridComponent Grid="_displayGrid" GridSize="GridComponent.Size.Big" OnCellClicked="OnCellClicked" RowBorderColor="_rowBorderColors" ColumnBorderColor="_columnBorderColors" RegionBorderColor="_regionBorderColors"/>
+        <GridComponent Grid="_displayGrid" GridSize="GridComponent.Size.Big" OnCellClicked="OnCellClicked" OnCellRightClicked="OnCellRightClicked" RowBorderColor="_rowBorderColors" ColumnBorderColor="_columnBorderColors" RegionBorderColor="_regionBorderColors"/>
     </div>
     <div class="controls d-flex gap-2 align-items-center justify-content-center">
         @if (_selectedCell.HasValue)
@@ -258,14 +258,17 @@
 
     void OnCellClicked((int Row, int Column) cell)
     {
-        if (_selectedCell == cell || Grid[cell.Row, cell.Column].Locked)
-        {
-            _selectedCell = null;
-        }
-        else
-        {
-            _selectedCell = cell;
-        }
+        _selectedCell = cell;
+        _annotationMode = false;
+
+        UpdateGrid();
+        StateHasChanged();
+    }
+
+    void OnCellRightClicked((int Row, int Column) cell)
+    {
+        _selectedCell = cell;
+        _annotationMode = true;
 
         UpdateGrid();
         StateHasChanged();

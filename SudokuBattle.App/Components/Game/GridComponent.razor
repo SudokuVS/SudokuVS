@@ -26,7 +26,10 @@
 
                 @if (!Disabled)
                 {
-                    <a class="stretched-link" type="button" @onclick="async () => await CellClicked((row, column))"></a>
+                    <a class="stretched-link" type="button"
+                       @onclick="async () => await CellClicked(row, column)" @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                       @oncontextmenu="async () => await CellRightClicked(row, column)" @oncontextmenu:preventDefault="true" @oncontextmenu:stopPropagation="true">
+                    </a>
                 }
             </div>
         }
@@ -86,6 +89,9 @@
 
     [Parameter]
     public EventCallback<(int, int)> OnCellClicked { get; set; }
+
+    [Parameter]
+    public EventCallback<(int, int)> OnCellRightClicked { get; set; }
 
     string ComputeGridStyle() => $"sudoku-grid {GetSizeStyle(GridSize)} position-relative";
 
@@ -148,14 +154,24 @@
             _ => ""
         };
 
-    async Task CellClicked((int Row, int Column) cell)
+    async Task CellClicked(int row, int column)
     {
         if (Disabled)
         {
             return;
         }
 
-        await OnCellClicked.InvokeAsync(cell);
+        await OnCellClicked.InvokeAsync((row, column));
+    }
+
+    async Task CellRightClicked(int row, int column)
+    {
+        if (Disabled)
+        {
+            return;
+        }
+
+        await OnCellRightClicked.InvokeAsync((row, column));
     }
 
     public class Cell
