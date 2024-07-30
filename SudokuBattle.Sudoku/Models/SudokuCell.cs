@@ -4,7 +4,7 @@ using SudokuBattle.Sudoku.Models.Abstractions;
 
 namespace SudokuBattle.Sudoku.Models;
 
-public class SudokuCell : IReadOnlySudokuCell
+public class SudokuCell : IReadOnlySudokuCell, IHiddenSudokuCell
 {
     int? _element;
     readonly ObservableCollection<int> _annotations;
@@ -61,6 +61,8 @@ public class SudokuCell : IReadOnlySudokuCell
 
     [MemberNotNullWhen(false, nameof(Element))]
     public bool Empty => Element == null;
+
+    public bool HasAnnotations => Annotations.Count != 0;
 
     public event EventHandler? ValueChanged;
     public event EventHandler? AnnotationsChanged;

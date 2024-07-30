@@ -2,7 +2,7 @@
 
 namespace SudokuBattle.Sudoku.Models;
 
-public class SudokuColumn : IReadOnlySudokuColumn
+public class SudokuColumn : IReadOnlySudokuColumn, IHiddenSudokuColumn
 {
     readonly SudokuCell[,] _grid;
     readonly int _colIndex;
@@ -33,6 +33,9 @@ public class SudokuColumn : IReadOnlySudokuColumn
             return _grid[index, _colIndex];
         }
     }
+
+    IReadOnlySudokuCell IReadOnlySudokuColumn.this[int index] => this[index];
+    IHiddenSudokuCell IHiddenSudokuColumn.this[int index] => this[index];
 
     public void UpdateValidationState()
     {

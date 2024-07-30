@@ -2,7 +2,7 @@
 
 namespace SudokuBattle.Sudoku.Models;
 
-public class SudokuGrid : IReadOnlySudokuGrid
+public class SudokuGrid : IReadOnlySudokuGrid, IHiddenSudokuGrid
 {
     readonly SudokuCell[,] _grid;
 
@@ -16,7 +16,7 @@ public class SudokuGrid : IReadOnlySudokuGrid
         foreach (SudokuCell cell in grid)
         {
             cell.ValueChanged += (_, _) => OnCellValueChanged(cell);
-            cell.AnnotationsChanged += (_, _) => CellAnnotationChanged?.Invoke(this, cell);
+            cell.AnnotationsChanged += (_, _) => CellAnnotationChanged?.Invoke(this, (cell.Row, cell.Column));
         }
 
         Regions = Enumerable.Range(0, 9).Select(i => new SudokuRegion(_grid, i)).ToList();
@@ -26,18 +26,21 @@ public class SudokuGrid : IReadOnlySudokuGrid
 
     public IReadOnlyList<SudokuRegion> Regions { get; set; }
     IReadOnlyList<IReadOnlySudokuRegion> IReadOnlySudokuGrid.Regions => Regions;
+    IReadOnlyList<IHiddenSudokuRegion> IHiddenSudokuGrid.Regions => Regions;
 
     public IReadOnlyList<SudokuRow> Rows { get; set; }
     IReadOnlyList<IReadOnlySudokuRow> IReadOnlySudokuGrid.Rows => Rows;
+    IReadOnlyList<IHiddenSudokuRow> IHiddenSudokuGrid.Rows => Rows;
 
     public IReadOnlyList<SudokuColumn> Columns { get; set; }
     IReadOnlyList<IReadOnlySudokuColumn> IReadOnlySudokuGrid.Columns => Columns;
+    IReadOnlyList<IHiddenSudokuColumn> IHiddenSudokuGrid.Columns => Columns;
 
     public bool IsValid => Regions.All(r => r is { IsValid: true }) && Rows.All(r => r is { IsValid: true }) && Columns.All(c => c is { IsValid: true });
     public bool IsCompleted => Regions.All(r => r is { IsCompleted: true });
 
-    public event EventHandler<SudokuCell>? CellValueChanged;
-    public event EventHandler<SudokuCell>? CellAnnotationChanged;
+    public event EventHandler<(int Row, int Column)>? CellValueChanged;
+    public event EventHandler<(int Row, int Column)>? CellAnnotationChanged;
 
     public SudokuCell this[int rowIndex, int colIndex] {
         get {
@@ -54,6 +57,9 @@ public class SudokuGrid : IReadOnlySudokuGrid
             return _grid[rowIndex, colIndex];
         }
     }
+
+    IReadOnlySudokuCell IReadOnlySudokuGrid.this[int rowIndex, int colIndex] => this[rowIndex, colIndex];
+    IHiddenSudokuCell IHiddenSudokuGrid.this[int rowIndex, int colIndex] => this[rowIndex, colIndex];
 
     public void LockNonEmptyCells()
     {
@@ -75,13 +81,16 @@ public class SudokuGrid : IReadOnlySudokuGrid
         }
     }
 
+    IEnumerable<(int Row, int Column, IReadOnlySudokuCell Cell)> IReadOnlySudokuGrid.Enumerate() => Enumerate().Select(x => (x.Row, x.Column, (IReadOnlySudokuCell)x.Cell));
+    IEnumerable<(int Row, int Column, IHiddenSudokuCell Cell)> IHiddenSudokuGrid.Enumerate() => Enumerate().Select(x => (x.Row, x.Column, (IHiddenSudokuCell)x.Cell));
+
     void OnCellValueChanged(SudokuCell cell)
     {
         Rows[cell.Row].UpdateValidationState();
         Columns[cell.Column].UpdateValidationState();
         Regions[cell.Region].UpdateValidationState();
 
-        CellValueChanged?.Invoke(this, cell);
+        CellValueChanged?.Invoke(this, (cell.Row, cell.Column));
     }
 
     static int GetRegionIndex(int row, int column) => row / 3 * 3 + column / 3;

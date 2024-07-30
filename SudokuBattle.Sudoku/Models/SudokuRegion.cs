@@ -2,7 +2,7 @@
 
 namespace SudokuBattle.Sudoku.Models;
 
-public class SudokuRegion : IReadOnlySudokuRegion
+public class SudokuRegion : IReadOnlySudokuRegion, IHiddenSudokuRegion
 {
     readonly SudokuCell[,] _grid;
 
@@ -40,6 +40,9 @@ public class SudokuRegion : IReadOnlySudokuRegion
             return _grid[Row * 3 + rowIndex, Column * 3 + colIndex];
         }
     }
+
+    IReadOnlySudokuCell IReadOnlySudokuRegion.this[int rowIndex, int colIndex] => this[rowIndex, colIndex];
+    IHiddenSudokuCell IHiddenSudokuRegion.this[int rowIndex, int colIndex] => this[rowIndex, colIndex];
 
     public void UpdateValidationState()
     {

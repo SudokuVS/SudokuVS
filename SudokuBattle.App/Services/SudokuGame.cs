@@ -44,7 +44,7 @@ public class SudokuGame
         grid.CellValueChanged += (_, _) => OnCellValueChanged(side);
 
         PlayerState newState = new(this, grid, side, name);
-        OtherPlayerState otherPlayerState = new(new HiddenSudokuGrid(newState.Grid), side, name);
+        OtherPlayerState otherPlayerState = new(newState.Grid, side, name);
 
         switch (side)
         {

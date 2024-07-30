@@ -2,5 +2,5 @@
 
 public interface IReadOnlySudokuRegion
 {
-    SudokuCell this[int rowIndex, int colIndex] { get; }
+    IReadOnlySudokuCell this[int rowIndex, int colIndex] { get; }
 }

@@ -2,5 +2,5 @@
 
 public interface IReadOnlySudokuColumn
 {
-    SudokuCell this[int index] { get; }
+    IReadOnlySudokuCell this[int index] { get; }
 }
