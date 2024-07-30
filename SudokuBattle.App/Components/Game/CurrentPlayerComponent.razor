@@ -212,7 +212,7 @@
         foreach ((int row, int column, SudokuCell cell) in Grid.Enumerate())
         {
             _displayGrid[row, column].Content = $"{cell.Element}";
-            _displayGrid[row, column].Annotation = string.Join(", ", cell.Annotations);
+            _displayGrid[row, column].Annotation = cell.Element is null ? string.Join(", ", cell.Annotations) : null;
             _displayGrid[row, column].BackgroundColor = cell.Locked ? GridComponent.Color.LightGrey : GridComponent.Color.None;
             _displayGrid[row, column].Border = _selectedCell == (row, column) ? _annotationMode ? GridComponent.Color.Grey : GridComponent.Color.Yellow : GridComponent.Color.None;
         }

@@ -1,4 +1,5 @@
 ﻿@inject IJSRuntime JsRuntime;
+@using Serilog
 @implements IAsyncDisposable
 
 @code {
@@ -43,7 +44,14 @@
 
         foreach (string callback in callbacks)
         {
-            await _interopInstance.InvokeVoidAsync(callback);
+            try
+            {
+                await _interopInstance.InvokeVoidAsync(callback);
+            }
+            catch (Exception exn)
+            {
+                Log.Debug(exn, "Error while disposing Interop instance {key}", _interopKey);
+            }
         }
     }
 
