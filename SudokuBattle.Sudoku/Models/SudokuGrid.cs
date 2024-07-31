@@ -17,6 +17,7 @@ public class SudokuGrid : IReadOnlySudokuGrid, IHiddenSudokuGrid
         {
             cell.ValueChanged += (_, _) => OnCellValueChanged(cell);
             cell.AnnotationsChanged += (_, _) => CellAnnotationChanged?.Invoke(this, (cell.Row, cell.Column));
+            cell.LockChanged += (_, _) => CellLockChanged?.Invoke(this, (cell.Row, cell.Column));
         }
 
         Regions = Enumerable.Range(0, 9).Select(i => new SudokuRegion(_grid, i)).ToList();
@@ -41,6 +42,7 @@ public class SudokuGrid : IReadOnlySudokuGrid, IHiddenSudokuGrid
 
     public event EventHandler<(int Row, int Column)>? CellValueChanged;
     public event EventHandler<(int Row, int Column)>? CellAnnotationChanged;
+    public event EventHandler<(int Row, int Column)>? CellLockChanged;
 
     public SudokuCell this[int rowIndex, int colIndex] {
         get {

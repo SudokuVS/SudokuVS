@@ -99,8 +99,10 @@
     protected override void OnInitialized()
     {
         UpdateGrid();
-        Grid.CellValueChanged += OnCellValueChanged;
-        Grid.CellAnnotationChanged += OnCellValueChanged;
+        Grid.CellValueChanged += OnStateChanged;
+        Grid.CellAnnotationChanged += OnStateChanged;
+        Grid.CellLockChanged += OnStateChanged;
+        State.HintAdded += OnStateChanged;
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -171,19 +173,19 @@
             return;
         }
 
-        _ = InvokeAsync(
-            () =>
-            {
-                _annotationMode = !_annotationMode;
-                UpdateGrid();
-                StateHasChanged();
-            }
-        );
+        _annotationMode = !_annotationMode;
+        TriggerUpdate();
     }
 
     void SetSelectedCellElement(int? element)
     {
         if (Game.IsOver || !_selectedCell.HasValue)
+        {
+            return;
+        }
+
+        SudokuCell cell = Grid[_selectedCell.Value.Row, _selectedCell.Value.Column];
+        if (cell.Locked)
         {
             return;
         }
@@ -205,6 +207,12 @@
             return;
         }
 
+        SudokuCell cell = Grid[_selectedCell.Value.Row, _selectedCell.Value.Column];
+        if (cell.Locked)
+        {
+            return;
+        }
+
         State.ToggleAnnotation(_selectedCell.Value.Row, _selectedCell.Value.Column, element);
     }
 
@@ -215,12 +223,24 @@
             return;
         }
 
+        SudokuCell cell = Grid[_selectedCell.Value.Row, _selectedCell.Value.Column];
+        if (cell.Locked)
+        {
+            return;
+        }
+
         State.ClearAnnotation(_selectedCell.Value.Row, _selectedCell.Value.Column);
     }
 
     void UseHintAtSelectedCell()
     {
         if (Game.IsOver || !_selectedCell.HasValue)
+        {
+            return;
+        }
+
+        SudokuCell cell = Grid[_selectedCell.Value.Row, _selectedCell.Value.Column];
+        if (cell.Locked)
         {
             return;
         }
@@ -295,8 +315,16 @@
 
     void OnCellClicked((int Row, int Column) cell)
     {
-        _selectedCell = cell;
-        _annotationMode = false;
+        SudokuCell c = Grid[cell.Row, cell.Column];
+        if (c.Locked)
+        {
+            _selectedCell = null;
+        }
+        else
+        {
+            _selectedCell = cell;
+            _annotationMode = false;
+        }
 
         UpdateGrid();
         StateHasChanged();
@@ -304,14 +332,25 @@
 
     void OnCellRightClicked((int Row, int Column) cell)
     {
-        _selectedCell = cell;
-        _annotationMode = true;
+        SudokuCell c = Grid[cell.Row, cell.Column];
+        if (c.Locked)
+        {
+            _selectedCell = null;
+        }
+        else
+        {
+            _selectedCell = cell;
+            _annotationMode = true;
+        }
 
         UpdateGrid();
         StateHasChanged();
     }
 
-    void OnCellValueChanged(object? sender, (int, int) __) =>
+    void OnStateChanged(object? sender, (int, int) __) => TriggerUpdate();
+    void OnStateChanged(object? sender, EventArgs __) => TriggerUpdate();
+
+    void TriggerUpdate() =>
         _ = InvokeAsync(
             () =>
             {

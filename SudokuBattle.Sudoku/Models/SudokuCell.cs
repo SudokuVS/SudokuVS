@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using SudokuBattle.Sudoku.Models.Abstractions;
 
 namespace SudokuBattle.Sudoku.Models;
@@ -7,7 +6,8 @@ namespace SudokuBattle.Sudoku.Models;
 public class SudokuCell : IReadOnlySudokuCell, IHiddenSudokuCell
 {
     int? _element;
-    readonly ObservableCollection<int> _annotations;
+    readonly SudokuCellAnnotations _annotations;
+    bool _locked;
 
     internal SudokuCell(int row, int column, int region, int? element = null)
     {
@@ -36,7 +36,7 @@ public class SudokuCell : IReadOnlySudokuCell, IHiddenSudokuCell
         Region = region;
         Element = element == 0 ? null : element;
 
-        _annotations = [];
+        _annotations = new SudokuCellAnnotations(this);
         _annotations.CollectionChanged += (_, _) => AnnotationsChanged?.Invoke(this, EventArgs.Empty);
     }
 
@@ -52,12 +52,24 @@ public class SudokuCell : IReadOnlySudokuCell, IHiddenSudokuCell
                 throw new ArgumentOutOfRangeException(nameof(value), value, "Expected element to be between 1 and 9.");
             }
 
+            if (Locked)
+            {
+                throw new InvalidOperationException("Cell is locked");
+            }
+
             _element = value;
             ValueChanged?.Invoke(this, EventArgs.Empty);
         }
     }
     public ICollection<int> Annotations => _annotations;
-    public bool Locked { get; set; }
+    public bool Locked {
+        get => _locked;
+
+        set {
+            _locked = value;
+            LockChanged?.Invoke(this, EventArgs.Empty);
+        }
+    }
 
     [MemberNotNullWhen(false, nameof(Element))]
     public bool Empty => Element == null;
@@ -66,6 +78,7 @@ public class SudokuCell : IReadOnlySudokuCell, IHiddenSudokuCell
 
     public event EventHandler? ValueChanged;
     public event EventHandler? AnnotationsChanged;
+    public event EventHandler? LockChanged;
 
     public static SudokuCell Clone(SudokuCell cell) =>
         new(cell.Row, cell.Column, cell.Region, cell.Element)

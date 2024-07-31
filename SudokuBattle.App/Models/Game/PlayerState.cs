@@ -22,8 +22,9 @@ public class PlayerState
     public IReadOnlyCollection<(int Row, int Column)> Hints => _hints;
     public int RemainingHints => Math.Max(0, Game.Options.MaxHints - Hints.Count);
 
-    public void SetElement(int row, int column, int element) => Grid[row, column].Element = element;
+    public event EventHandler? HintAdded;
 
+    public void SetElement(int row, int column, int element) => Grid[row, column].Element = element;
     public void ClearElement(int row, int column) => Grid[row, column].Element = null;
 
     public void ToggleAnnotation(int row, int column, int element)
@@ -39,8 +40,10 @@ public class PlayerState
 
     public void UseHint(int row, int column)
     {
-        _hints.Add((row, column));
-        Grid[row, column].Locked = true;
         Grid[row, column].Element = Game.SolvedGrid[row, column].Element;
+        Grid[row, column].Locked = true;
+        _hints.Add((row, column));
+
+        HintAdded?.Invoke(this, EventArgs.Empty);
     }
 }
