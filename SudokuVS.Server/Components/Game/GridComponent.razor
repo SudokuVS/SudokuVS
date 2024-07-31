@@ -104,7 +104,7 @@
     string ComputeCellStyle(int row, int column)
     {
         Cell cell = Grid[row, column];
-        return $"cell {GetSizeStyle(GridSize)} {GetBgColorStyle(cell.BackgroundColor)} {GetBorderColorStyle(cell.Border) ?? "border border-secondary-subtle"} position-relative";
+        return $"cell {GetSizeStyle(GridSize)} {GetFontStyle(cell.FontStyle)} {GetBgColorStyle(cell.BackgroundColor)} {GetBorderColorStyle(cell.Border) ?? "border border-secondary-subtle"} position-relative";
     }
 
     string ComputeAnnotationStyle(int row, int column)
@@ -121,6 +121,19 @@
             Size.Big => "big",
             _ => ""
         };
+
+    static string GetFontStyle(FontStyle style)
+    {
+        List<string> result = [];
+
+        if (style.HasFlag(FontStyle.Bold))
+        {
+            result.Add("fw-bold");
+        }
+
+        return string.Join(" ", result);
+    }
+
 
     string? GetBorderColorStyle(Color color) =>
         color switch
@@ -179,6 +192,7 @@
         public string? Content { get; set; }
         public string? Annotation { get; set; }
         public string? AnnotationIcon { get; set; }
+        public FontStyle FontStyle { get; set; }
         public Color Border { get; set; }
         public Color BackgroundColor { get; set; }
         public Color AnnotationBackgroundColor { get; set; }
@@ -203,6 +217,13 @@
         Small,
         Medium,
         Big
+    }
+
+    [Flags]
+    public enum FontStyle
+    {
+        None = 0,
+        Bold = 1<<1
     }
 
 }
