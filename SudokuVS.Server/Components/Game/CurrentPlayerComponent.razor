@@ -30,7 +30,7 @@
         </div>
     </div>
     <div class="controls d-flex gap-2 align-items-center justify-content-center">
-        @if (_selectedCell.HasValue)
+        @if (_selectedCell.HasValue && !_selectedCellLocked)
         {
             @if (_annotationMode)
             {
@@ -87,6 +87,7 @@
     GridComponent.Color[]? _columnBorderColors;
     GridComponent.Color[,]? _regionBorderColors;
     (int Row, int Column)? _selectedCell;
+    bool _selectedCellLocked;
     bool _annotationMode;
 
     [Parameter]
@@ -121,7 +122,7 @@
     {
         string result = "btn ";
 
-        if (Game.IsOver || !_selectedCell.HasValue)
+        if (Game.IsOver || !_selectedCell.HasValue || _selectedCellLocked)
         {
             result += "disabled";
         }
@@ -145,7 +146,7 @@
     {
         string result = "btn ";
 
-        if (Game.IsOver || !_selectedCell.HasValue)
+        if (Game.IsOver || !_selectedCell.HasValue || _selectedCellLocked)
         {
             result += "disabled";
         }
@@ -178,13 +179,7 @@
 
     void SetSelectedCellElement(int? element)
     {
-        if (Game.IsOver || !_selectedCell.HasValue)
-        {
-            return;
-        }
-
-        SudokuCell cell = Grid[_selectedCell.Value.Row, _selectedCell.Value.Column];
-        if (cell.Locked)
+        if (Game.IsOver || !_selectedCell.HasValue || _selectedCellLocked)
         {
             return;
         }
@@ -201,13 +196,7 @@
 
     void ToggleSelectedCellAnnotation(int element)
     {
-        if (Game.IsOver || !_selectedCell.HasValue)
-        {
-            return;
-        }
-
-        SudokuCell cell = Grid[_selectedCell.Value.Row, _selectedCell.Value.Column];
-        if (cell.Locked)
+        if (Game.IsOver || !_selectedCell.HasValue || _selectedCellLocked)
         {
             return;
         }
@@ -217,13 +206,7 @@
 
     void ClearSelectedCellAnnotations()
     {
-        if (Game.IsOver || !_selectedCell.HasValue)
-        {
-            return;
-        }
-
-        SudokuCell cell = Grid[_selectedCell.Value.Row, _selectedCell.Value.Column];
-        if (cell.Locked)
+        if (Game.IsOver || !_selectedCell.HasValue || _selectedCellLocked)
         {
             return;
         }
@@ -233,13 +216,7 @@
 
     void UseHintAtSelectedCell()
     {
-        if (Game.IsOver || !_selectedCell.HasValue)
-        {
-            return;
-        }
-
-        SudokuCell cell = Grid[_selectedCell.Value.Row, _selectedCell.Value.Column];
-        if (cell.Locked)
+        if (Game.IsOver || !_selectedCell.HasValue || _selectedCellLocked)
         {
             return;
         }
@@ -263,12 +240,14 @@
         {
             _displayGrid[row, column].Content = $"{cell.Element}";
             _displayGrid[row, column].Annotation = cell.Element is null ? string.Join(", ", cell.Annotations) : null;
+            _displayGrid[row, column].FontStyle = _selectedCell.HasValue && Grid[_selectedCell.Value.Row, _selectedCell.Value.Column].Element == cell.Element ? GridComponent.FontStyle.Bold : GridComponent.FontStyle.None;
             _displayGrid[row, column].BackgroundColor = IsHint(cell.Row, cell.Column)
                 ? GridComponent.Color.Yellow
                 : cell.Locked
                     ? GridComponent.Color.LightGrey
                     : GridComponent.Color.None;
             _displayGrid[row, column].Border = _selectedCell == (row, column) ? _annotationMode ? GridComponent.Color.Grey : GridComponent.Color.Yellow : GridComponent.Color.None;
+
         }
 
         if (_rowBorderColors == null)
@@ -314,16 +293,8 @@
 
     void OnCellClicked((int Row, int Column) cell)
     {
-        SudokuCell c = Grid[cell.Row, cell.Column];
-        if (c.Locked)
-        {
-            _selectedCell = null;
-        }
-        else
-        {
-            _selectedCell = cell;
-            _annotationMode = false;
-        }
+        SelectCell(cell);
+        _annotationMode = false;
 
         UpdateGrid();
         StateHasChanged();
@@ -331,19 +302,19 @@
 
     void OnCellRightClicked((int Row, int Column) cell)
     {
-        SudokuCell c = Grid[cell.Row, cell.Column];
-        if (c.Locked)
-        {
-            _selectedCell = null;
-        }
-        else
-        {
-            _selectedCell = cell;
-            _annotationMode = true;
-        }
+        SelectCell(cell);
+        _annotationMode = true;
 
         UpdateGrid();
         StateHasChanged();
+    }
+
+    void SelectCell((int Row, int Column) cell)
+    {
+
+        SudokuCell c = Grid[cell.Row, cell.Column];
+        _selectedCell = cell;
+        _selectedCellLocked = c.Locked;
     }
 
     void OnStateChanged(object? sender, (int, int) __) => TriggerUpdate();
