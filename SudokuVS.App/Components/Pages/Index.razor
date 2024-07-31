@@ -1,0 +1,86 @@
+﻿@page "/"
+@using SudokuVS.App.Services
+@using SudokuVS.Game
+@inject NavigationManager Navigation;
+@inject ISudokuGamesRepository Repository;
+@inject GameTokenService GameTokenService;
+
+<PageTitle>Sudoku Battle</PageTitle>
+
+<div class="h-100 container d-flex flex-column align-items-stretch justify-content-center p-4">
+    <div class="border rounded p-4">
+        <h2>New Game</h2>
+        <EditForm class="w-100 d-flex flex-column align-items-start justify-content-center py-4" Model="_model" OnSubmit="NewGame">
+            <div class="row gap-2 mb-3">
+                <label for="name" class="col-2 col-form-label">Name</label>
+                <div class="col">
+                    <InputText id="name" class="form-control" @bind-Value="_model!.Name" placeholder="(auto)"></InputText>
+                </div>
+            </div>
+            <div class="row gap-2 mb-3">
+                <label for="hints" class="col-2 col-form-label">Hints</label>
+                <div class="col">
+                    <InputNumber id="hints" class="form-control" @bind-Value="_model!.Hints"></InputNumber>
+                </div>
+            </div>
+            <button class="btn btn-primary">Create</button>
+        </EditForm>
+
+        @if (_newGameError != null)
+        {
+            <div class="text-danger small">
+                @_newGameError
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+
+    [CascadingParameter]
+    public string? PlayerName { get; set; }
+
+    Model? _model;
+    string? _newGameError;
+
+    protected override void OnInitialized() => _model ??= new Model();
+
+    void NewGame()
+    {
+        _newGameError = null;
+
+        if (PlayerName == null)
+        {
+            _newGameError = "Could not find player name";
+            StateHasChanged();
+            return;
+        }
+
+        string? name = string.IsNullOrWhiteSpace(_model?.Name) ? null : _model.Name;
+        SudokuGameOptions options = new()
+        {
+            MaxHints = _model is not { Hints: > 0 } ? 0 : _model.Hints
+        };
+
+        SudokuGame? game = SudokuGame.Create(name, options);
+        if (game == null)
+        {
+            _newGameError = "Could not generate grid";
+            StateHasChanged();
+            return;
+        }
+
+        Repository.Save(game);
+
+        game.Join(PlayerName, PlayerSide.Player1);
+        string token = GameTokenService.Generate(game.Id, PlayerSide.Player1);
+        Navigation.NavigateTo($"/game/{token}");
+    }
+
+    class Model
+    {
+        public string? Name { get; set; }
+        public int Hints { get; set; } = 3;
+    }
+
+}

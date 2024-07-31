@@ -1,0 +1,86 @@
+﻿@page "/Setup"
+@layout EmptyLayout
+@using System.ComponentModel.DataAnnotations
+@using SudokuVS.App.Components.Layout
+@using SudokuVS.App.Validation
+@implements IDisposable
+@inject NavigationManager Navigation;
+@inject IJSRuntime JsRuntime;
+
+<PageTitle>Sudoku Battle - Setup</PageTitle>
+
+<div class="container h-100">
+    <EditForm class="h-100 d-flex flex-column align-items-center justify-content-center" EditContext="_context" OnValidSubmit="Submit">
+        <DataAnnotationsValidator/>
+        <div class="mb-3">
+            <label for="name" class="form-label">How should we call you?</label>
+            <InputText id="name" class="form-control" @bind-Value="_model!.Username"></InputText>
+            <div class="invalid-feedback">
+                <ValidationMessage For="() => _model.Username"></ValidationMessage>
+            </div>
+        </div>
+        <button class="btn btn-primary" disabled="@_formInvalid">Confirm</button>
+    </EditForm>
+</div>
+
+@code {
+
+    SetupModel? _model;
+    EditContext? _context;
+    bool _formInvalid;
+
+    IJSObjectReference? _mainLayoutModule;
+
+    protected override void OnInitialized()
+    {
+        _model ??= new SetupModel();
+        _context = new EditContext(_model);
+        _context.SetFieldCssClassProvider(new BootstrapValidationFieldClassProvider());
+        _context.OnFieldChanged += HandleFieldChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _mainLayoutModule ??= await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/Layout/MainLayout.razor.js");
+
+        _model!.Username = await _mainLayoutModule.InvokeAsync<string?>("readName");
+
+        _formInvalid = !_context!.Validate();
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        if (_context is not null)
+        {
+            _context.OnFieldChanged -= HandleFieldChanged;
+        }
+    }
+
+    private void HandleFieldChanged(object? sender, FieldChangedEventArgs e)
+    {
+        if (_context is not null)
+        {
+            _formInvalid = !_context.Validate();
+            StateHasChanged();
+        }
+    }
+
+    async Task Submit()
+    {
+        await _mainLayoutModule!.InvokeAsync<string?>("setName", _model!.Username);
+        Navigation.NavigateTo("/");
+    }
+
+    class SetupModel
+    {
+        [Required(AllowEmptyStrings = false)]
+        public string? Username { get; set; }
+    }
+
+}
