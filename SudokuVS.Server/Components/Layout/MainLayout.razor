@@ -1,4 +1,5 @@
-﻿@inherits LayoutComponentBase
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inherits LayoutComponentBase
 
 <div class="h-100 d-flex flex-column">
     <header class="text-bg-dark d-flex align-items-center gap-2 px-2" style="height:64px;">
@@ -35,11 +36,10 @@
             </div>
 
             <div class="d-flex align-items-baseline gap-1 px-4">
-                <span>Player:</span>
-                <span class="d-flex align-items-center justify-content-center fs-4 fw-semibold">
+                <span class="d-flex align-items-center justify-content-center fs-5 fw-semibold">
                     @PlayerName
                 </span>
-                <a class="small text-white" href="/setup">(edit)</a>
+                <a class="small text-white" href="MicrosoftIdentity/Account/SignOut">(logout)</a>
             </div>
         }
     </header>
@@ -53,43 +53,24 @@
     </main>
 </div>
 
-@inject NavigationManager Navigation;
-@inject IJSRuntime JsRuntime;
+@inject AuthenticationStateProvider Provider
 
 @code {
 
-    IJSObjectReference? _mainLayoutModule;
     string? _version;
     bool _isDebugVersion;
     string? _prereleaseIdentifier;
 
     public string? PlayerName { get; set; }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         _version = Metadata.Version != null ? $"v{Metadata.Version.Major}.{Metadata.Version.Minor}.{Metadata.Version.Patch}" : null;
         _isDebugVersion = Metadata.Version?.IsDebug() ?? false;
         _prereleaseIdentifier = Metadata.Version?.PrereleaseIdentifier().ToUpper() ?? "";
-    }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (!firstRender)
-        {
-            return;
-        }
-
-        _mainLayoutModule ??= await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/Layout/MainLayout.razor.js");
-
-        PlayerName = await _mainLayoutModule.InvokeAsync<string?>("readName");
-
-        if (string.IsNullOrWhiteSpace(PlayerName))
-        {
-            Navigation.NavigateTo("/setup");
-            return;
-        }
-
-        StateHasChanged();
+        AuthenticationState state = await Provider.GetAuthenticationStateAsync();
+        PlayerName = state.User.Identity?.Name;
     }
 
 }

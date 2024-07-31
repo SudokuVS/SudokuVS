@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SudokuVS.Game;
 using SudokuVS.Game.Persistence;
 using SudokuVS.RestApi.Models;
 
 namespace SudokuVS.RestApi.Games;
 
-[Route("/api/game")]
+[Route("/api/games")]
+[Authorize]
 [ApiController]
 public class GameController : ControllerBase
 {
@@ -23,6 +25,18 @@ public class GameController : ControllerBase
         {
             yield return game.ToSummaryDto();
         }
+    }
+
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<SudokuGameSummaryDto>> GetGame(Guid id)
+    {
+        SudokuGame? game = await _repository.Get(id);
+        if (game == null)
+        {
+            return NotFound();
+        }
+
+        return game.ToSummaryDto();
     }
 
     [HttpPost]
