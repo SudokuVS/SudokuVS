@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using SudokuBattle.Sudoku.Generators;
 using SudokuBattle.Sudoku.Models;
 using SudokuBattle.Sudoku.Solvers;
 
@@ -6,8 +7,8 @@ namespace SudokuBattle.Game;
 
 public class SudokuGame
 {
-    OtherPlayerState? _otherPlayer1Cached;
-    OtherPlayerState? _otherPlayer2Cached;
+    HiddenPlayerState? _otherPlayer1Cached;
+    HiddenPlayerState? _otherPlayer2Cached;
 
     SudokuGame(Guid id, SudokuGrid initialGrid, SudokuGrid solvedGrid, SudokuGameOptions? options = null)
     {
@@ -49,7 +50,7 @@ public class SudokuGame
         grid.CellValueChanged += (_, _) => OnCellValueChanged(side);
 
         PlayerState newState = new(this, grid, side, name);
-        OtherPlayerState otherPlayerState = new(newState);
+        HiddenPlayerState otherPlayerState = new(newState);
 
         switch (side)
         {
@@ -83,11 +84,11 @@ public class SudokuGame
             _ => null
         };
 
-    public OtherPlayerState? GetOtherPlayerState(PlayerSide side) =>
+    public HiddenPlayerState? GetOtherPlayerState(PlayerSide side) =>
         side switch
         {
-            PlayerSide.Player1 => Player2 == null ? null : _otherPlayer2Cached ??= new OtherPlayerState(Player2),
-            PlayerSide.Player2 => Player1 == null ? null : _otherPlayer1Cached ??= new OtherPlayerState(Player1),
+            PlayerSide.Player1 => Player2 == null ? null : _otherPlayer2Cached ??= new HiddenPlayerState(Player2),
+            PlayerSide.Player2 => Player1 == null ? null : _otherPlayer1Cached ??= new HiddenPlayerState(Player1),
             _ => null
         };
 
@@ -118,8 +119,16 @@ public class SudokuGame
         GameOver?.Invoke(this, side);
     }
 
-    public static SudokuGame Create(SudokuGrid grid)
+    public static SudokuGame? Create(SudokuGameOptions? options = null)
     {
+        SudokuLibGenerator generator = new();
+        SudokuGrid? grid = generator.Generate();
+        if (grid == null)
+        {
+            return null;
+        }
+        grid.LockNonEmptyCells();
+
         SudokuLibSolver solver = new();
         SudokuGrid? solvedGrid = solver.Solve(grid);
         if (solvedGrid == null)
@@ -129,7 +138,7 @@ public class SudokuGame
 
         solvedGrid.LockNonEmptyCells();
 
-        return new SudokuGame(Guid.NewGuid(), grid, solvedGrid);
+        return new SudokuGame(Guid.NewGuid(), grid, solvedGrid, options);
     }
 
     internal static SudokuGame Load(Guid id, SudokuGrid grid, SudokuGrid solvedGrid, SudokuGameOptions options) => new(id, grid, solvedGrid, options);

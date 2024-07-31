@@ -2,11 +2,11 @@
 
 namespace SudokuBattle.Game;
 
-public class OtherPlayerState
+public class HiddenPlayerState : IHiddenPlayerState
 {
     readonly PlayerState _state;
 
-    public OtherPlayerState(PlayerState state)
+    public HiddenPlayerState(PlayerState state)
     {
         _state = state;
     }
@@ -15,4 +15,5 @@ public class OtherPlayerState
     public IHiddenSudokuGrid Grid => _state.Grid;
     public PlayerSide Side => _state.Side;
     public IReadOnlyCollection<(int Row, int Column)> Hints => _state.Hints;
+    public int RemainingHints => _state.RemainingHints;
 }

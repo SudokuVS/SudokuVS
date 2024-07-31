@@ -27,7 +27,7 @@
     GridComponent.Cell[,]? _displayGrid;
 
     [Parameter]
-    public required OtherPlayerState State { get; set; }
+    public required HiddenPlayerState State { get; set; }
 
     IHiddenSudokuGrid Grid => State.Grid;
 

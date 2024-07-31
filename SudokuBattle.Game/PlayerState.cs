@@ -1,8 +1,9 @@
 ﻿using SudokuBattle.Sudoku.Models;
+using SudokuBattle.Sudoku.Models.Abstractions;
 
 namespace SudokuBattle.Game;
 
-public class PlayerState
+public class PlayerState : IHiddenPlayerState
 {
     readonly List<(int Row, int Column)> _hints = [];
 
@@ -16,6 +17,7 @@ public class PlayerState
 
     public SudokuGame Game { get; }
     public SudokuGrid Grid { get; }
+    IHiddenSudokuGrid IHiddenPlayerState.Grid => Grid;
     public PlayerSide Side { get; }
     public string PlayerName { get; }
     public IReadOnlyCollection<(int Row, int Column)> Hints => _hints;
