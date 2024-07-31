@@ -13,15 +13,17 @@
 
     <ItemGroup>
         <PackageReference Include="MinVer" Version="5.0.0">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="Semver" Version="2.3.0" />
         <PackageReference Include="Serilog.AspNetCore" Version="8.0.1"/>
         <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.1"/>
     </ItemGroup>
 
     <PropertyGroup>
         <MinVerTagPrefix>v</MinVerTagPrefix>
+        <MinVerBuildMetadata Condition="'$(Configuration)' == 'Debug'">DEBUG</MinVerBuildMetadata>
     </PropertyGroup>
-    
+
 </Project>
