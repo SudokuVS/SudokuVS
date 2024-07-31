@@ -1,4 +1,4 @@
-﻿namespace SudokuBattle.App.Services;
+﻿namespace SudokuBattle.Game;
 
 public class SudokuGameOptions
 {

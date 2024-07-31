@@ -1,9 +1,8 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using SudokuBattle.App.Models.Game;
 using SudokuBattle.Sudoku.Models;
 using SudokuBattle.Sudoku.Solvers;
 
-namespace SudokuBattle.App.Services;
+namespace SudokuBattle.Game;
 
 public class SudokuGame
 {

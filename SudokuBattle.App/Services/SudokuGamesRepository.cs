@@ -1,5 +1,5 @@
 ﻿using SudokuBattle.App.Exceptions;
-using SudokuBattle.App.Models.Game;
+using SudokuBattle.Game;
 
 namespace SudokuBattle.App.Services;
 

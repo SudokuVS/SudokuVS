@@ -1,7 +1,6 @@
 ﻿using System.Collections;
-using SudokuBattle.Sudoku.Models;
 
-namespace SudokuBattle.Sudoku;
+namespace SudokuBattle.Sudoku.Models;
 
 public class SudokuCellAnnotations : ICollection<int>
 {

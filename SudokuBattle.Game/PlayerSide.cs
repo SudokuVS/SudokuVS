@@ -1,4 +1,4 @@
-﻿namespace SudokuBattle.App.Models.Game;
+﻿namespace SudokuBattle.Game;
 
 public enum PlayerSide
 {

@@ -1,6 +1,6 @@
 ﻿using SudokuBattle.Sudoku.Models.Abstractions;
 
-namespace SudokuBattle.App.Models.Game;
+namespace SudokuBattle.Game;
 
 public class OtherPlayerState
 {

@@ -1,7 +1,6 @@
-﻿using SudokuBattle.App.Services;
-using SudokuBattle.Sudoku.Models;
+﻿using SudokuBattle.Sudoku.Models;
 
-namespace SudokuBattle.App.Models.Game;
+namespace SudokuBattle.Game;
 
 public class PlayerState
 {
