@@ -52,11 +52,13 @@
 
         foreach ((int row, int column, IHiddenSudokuCell cell) in Grid.Enumerate())
         {
-            _displayGrid[row, column].BackgroundColor = cell.Locked
-                ? GridComponent.Color.LightGrey
-                : !cell.Empty
-                    ? GridComponent.Color.LightBlue
-                    : GridComponent.Color.None;
+            _displayGrid[row, column].BackgroundColor = State.Hints.Contains((cell.Row, cell.Column))
+                ? GridComponent.Color.Yellow
+                : cell.Locked
+                    ? GridComponent.Color.LightGrey
+                    : !cell.Empty
+                        ? GridComponent.Color.LightBlue
+                        : GridComponent.Color.None;
 
             _displayGrid[row, column].AnnotationIcon = cell.HasAnnotations ? "three-dots" : null;
         }

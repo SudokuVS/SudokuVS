@@ -4,14 +4,15 @@ namespace SudokuBattle.App.Models.Game;
 
 public class OtherPlayerState
 {
-    public OtherPlayerState(IHiddenSudokuGrid grid, PlayerSide side, string playerName)
+    readonly PlayerState _state;
+
+    public OtherPlayerState(PlayerState state)
     {
-        Grid = grid;
-        Side = side;
-        PlayerName = playerName;
+        _state = state;
     }
 
-    public IHiddenSudokuGrid Grid { get; }
-    public PlayerSide Side { get; }
-    public string PlayerName { get; }
+    public string PlayerName => _state.PlayerName;
+    public IHiddenSudokuGrid Grid => _state.Grid;
+    public PlayerSide Side => _state.Side;
+    public IReadOnlyCollection<(int Row, int Column)> Hints => _state.Hints;
 }

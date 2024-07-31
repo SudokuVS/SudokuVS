@@ -50,7 +50,6 @@
                         </button>
                     </div>
                 </div>
-
             }
             else
             {
@@ -69,6 +68,13 @@
                 </div>
 
                 <button class="btn btn-lg btn-outline-secondary" @onclick="ToggleAnnotationMode">Annotations</button>
+            }
+
+            @if (Game.Options.MaxHints > 0 && !IsHint(_selectedCell.Value.Row, _selectedCell.Value.Column))
+            {
+                <button class="btn btn-lg btn-outline-secondary" @onclick="UseHintAtSelectedCell" disabled="@(State.RemainingHints <= 0)">
+                    Hint @State.RemainingHints / @Game.Options.MaxHints
+                </button>
             }
         }
     </div>
@@ -182,8 +188,14 @@
             return;
         }
 
-        SudokuCell selectedCell = Grid[_selectedCell.Value.Row, _selectedCell.Value.Column];
-        selectedCell.Element = element;
+        if (element.HasValue)
+        {
+            State.SetElement(_selectedCell.Value.Row, _selectedCell.Value.Column, element.Value);
+        }
+        else
+        {
+            State.ClearElement(_selectedCell.Value.Row, _selectedCell.Value.Column);
+        }
     }
 
     void ToggleSelectedCellAnnotation(int element)
@@ -193,15 +205,7 @@
             return;
         }
 
-        SudokuCell selectedCell = Grid[_selectedCell.Value.Row, _selectedCell.Value.Column];
-        if (selectedCell.Annotations.Contains(element))
-        {
-            selectedCell.Annotations.Remove(element);
-        }
-        else
-        {
-            selectedCell.Annotations.Add(element);
-        }
+        State.ToggleAnnotation(_selectedCell.Value.Row, _selectedCell.Value.Column, element);
     }
 
     void ClearSelectedCellAnnotations()
@@ -211,8 +215,17 @@
             return;
         }
 
-        SudokuCell selectedCell = Grid[_selectedCell.Value.Row, _selectedCell.Value.Column];
-        selectedCell.Annotations.Clear();
+        State.ClearAnnotation(_selectedCell.Value.Row, _selectedCell.Value.Column);
+    }
+
+    void UseHintAtSelectedCell()
+    {
+        if (Game.IsOver || !_selectedCell.HasValue)
+        {
+            return;
+        }
+
+        State.UseHint(_selectedCell.Value.Row, _selectedCell.Value.Column);
     }
 
     void UpdateGrid()
@@ -231,7 +244,11 @@
         {
             _displayGrid[row, column].Content = $"{cell.Element}";
             _displayGrid[row, column].Annotation = cell.Element is null ? string.Join(", ", cell.Annotations) : null;
-            _displayGrid[row, column].BackgroundColor = cell.Locked ? GridComponent.Color.LightGrey : GridComponent.Color.None;
+            _displayGrid[row, column].BackgroundColor = IsHint(cell.Row, cell.Column)
+                ? GridComponent.Color.Yellow
+                : cell.Locked
+                    ? GridComponent.Color.LightGrey
+                    : GridComponent.Color.None;
             _displayGrid[row, column].Border = _selectedCell == (row, column) ? _annotationMode ? GridComponent.Color.Grey : GridComponent.Color.Yellow : GridComponent.Color.None;
         }
 
@@ -273,6 +290,8 @@
             _regionBorderColors[region.Row, region.Column] = region is { IsCompleted: true, IsValid: false } ? GridComponent.Color.Red : GridComponent.Color.None;
         }
     }
+
+    bool IsHint(int row, int column) => State.Hints.Contains((row, column));
 
     void OnCellClicked((int Row, int Column) cell)
     {

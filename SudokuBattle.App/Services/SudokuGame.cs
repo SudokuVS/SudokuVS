@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using SudokuBattle.App.Models.Game;
 using SudokuBattle.Sudoku.Models;
+using SudokuBattle.Sudoku.Solvers;
 
 namespace SudokuBattle.App.Services;
 
@@ -9,13 +10,18 @@ public class SudokuGame
     OtherPlayerState? _otherPlayer1Cached;
     OtherPlayerState? _otherPlayer2Cached;
 
-    public SudokuGame(SudokuGrid initialGrid)
+    SudokuGame(SudokuGrid initialGrid, SudokuGrid solvedGrid, SudokuGameOptions? options = null)
     {
         InitialGrid = initialGrid;
+        SolvedGrid = solvedGrid;
+        Options = options ?? new SudokuGameOptions();
     }
+
 
     public Guid Id { get; } = Guid.NewGuid();
     public SudokuGrid InitialGrid { get; }
+    public SudokuGameOptions Options { get; }
+    public SudokuGrid SolvedGrid { get; }
     public PlayerState? Player1 { get; private set; }
     public PlayerState? Player2 { get; private set; }
 
@@ -44,7 +50,7 @@ public class SudokuGame
         grid.CellValueChanged += (_, _) => OnCellValueChanged(side);
 
         PlayerState newState = new(this, grid, side, name);
-        OtherPlayerState otherPlayerState = new(newState.Grid, side, name);
+        OtherPlayerState otherPlayerState = new(newState);
 
         switch (side)
         {
@@ -102,5 +108,17 @@ public class SudokuGame
         Winner = side;
         EndDate = DateTime.Now;
         GameOver?.Invoke(this, side);
+    }
+
+    public static SudokuGame Create(SudokuGrid grid)
+    {
+        SudokuLibSolver solver = new();
+        SudokuGrid? solvedGrid = solver.Solve(grid);
+        if (solvedGrid == null)
+        {
+            throw new InvalidOperationException("Could not solve grid");
+        }
+
+        return new SudokuGame(grid, solvedGrid);
     }
 }

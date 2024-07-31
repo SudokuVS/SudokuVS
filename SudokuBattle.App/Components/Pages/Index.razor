@@ -55,7 +55,7 @@
         }
         grid.LockNonEmptyCells();
 
-        SudokuGame game = new(grid);
+        SudokuGame game = SudokuGame.Create(grid);
         Repository.Save(game);
 
         game.Join(PlayerName, PlayerSide.Player1);
