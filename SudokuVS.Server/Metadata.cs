@@ -2,7 +2,7 @@
 using System.Reflection;
 using Semver;
 
-namespace SudokuVS.App;
+namespace SudokuVS.Server;
 
 public static class Metadata
 {

@@ -1,6 +1,6 @@
 ﻿using SudokuVS.Game;
 
-namespace SudokuVS.App.Services;
+namespace SudokuVS.Server.Services;
 
 public interface ISudokuGamesRepository
 {

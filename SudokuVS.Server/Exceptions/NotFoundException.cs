@@ -1,4 +1,4 @@
-﻿namespace SudokuVS.App.Exceptions;
+﻿namespace SudokuVS.Server.Exceptions;
 
 public class NotFoundException : Exception
 {

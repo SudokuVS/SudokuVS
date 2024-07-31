@@ -1,7 +1,7 @@
 ﻿using SudokuVS.Game;
-using SudokuVS.App.Exceptions;
+using SudokuVS.Server.Exceptions;
 
-namespace SudokuVS.App.Services;
+namespace SudokuVS.Server.Services;
 
 public class SudokuGamesInMemory : ISudokuGamesRepository
 {

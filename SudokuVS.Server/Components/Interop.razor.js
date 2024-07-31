@@ -15,7 +15,7 @@
     }
 
     keyupCallback(args) {
-        DotNet.invokeMethodAsync("SudokuVS.App", "FireKeyupEvent", this.interopKey, {
+        DotNet.invokeMethodAsync("SudokuVS.Server", "FireKeyupEvent", this.interopKey, {
             key: args.key,
             code: args.code,
             location: args.location,

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Concurrent;
-using SudokuVS.App.Exceptions;
 using SudokuVS.Game;
 using SudokuVS.Game.Serialization;
+using SudokuVS.Server.Exceptions;
 
-namespace SudokuVS.App.Services;
+namespace SudokuVS.Server.Services;
 
 public class SudokuGamesOnDisk : ISudokuGamesRepository
 {

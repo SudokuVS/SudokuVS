@@ -3,7 +3,7 @@ using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using SudokuVS.Game;
 
-namespace SudokuVS.App.Services;
+namespace SudokuVS.Server.Services;
 
 public class GameTokenService
 {

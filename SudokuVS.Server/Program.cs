@@ -1,8 +1,8 @@
 using System.Security.Cryptography;
 using Serilog;
 using Serilog.Events;
-using SudokuVS.App.Components;
-using SudokuVS.App.Services;
+using SudokuVS.Server.Components;
+using SudokuVS.Server.Services;
 
 Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateBootstrapLogger();
 
