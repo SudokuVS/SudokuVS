@@ -1,6 +1,8 @@
 using System.Security.Cryptography;
 using Serilog;
 using Serilog.Events;
+using SudokuVS.Game.Persistence;
+using SudokuVS.RestApi;
 using SudokuVS.Server.Components;
 using SudokuVS.Server.Services;
 
@@ -8,6 +10,8 @@ Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateBootstrapLogger()
 
 try
 {
+    Log.Logger.Information("Hello!");
+
     WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
     builder.Services.AddSerilog(
@@ -19,6 +23,7 @@ try
 
     // Add services to the container.
     builder.Services.AddRazorComponents().AddInteractiveServerComponents();
+    builder.Services.AddRestApi();
 
     builder.Services.AddSingleton<ISudokuGamesRepository, SudokuGamesOnDisk>(
         services =>
@@ -33,6 +38,8 @@ try
 
     WebApplication app = builder.Build();
 
+    app.UseRestApi();
+
     if (!app.Environment.IsDevelopment())
     {
         app.UseExceptionHandler("/Error", true);
@@ -40,11 +47,16 @@ try
     }
 
     app.UseStaticFiles();
+    app.UseRouting();
+
     app.UseAntiforgery();
 
     app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
+    app.MapDefaultControllerRoute();
 
     app.Run();
+
+    Log.Information("Bye!");
 }
 catch (Exception exn)
 {

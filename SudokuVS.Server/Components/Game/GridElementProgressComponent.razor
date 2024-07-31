@@ -35,8 +35,8 @@
         return $"{percent}%";
     }
 
-    int GetValue() => Grid == null ? 0 : Grid.Enumerate().Count(x => !x.Cell.Locked && x.Cell.Element == Element);
-    int GetTotalValue() => Grid == null ? 0 : Grid.Enumerate().Count(x => x.Cell is { Locked: false, Empty: false });
-    int GetMaxValue() => Grid == null ? 0 : 9 - Grid.Enumerate().Count(x => x.Cell.Locked && x.Cell.Element == Element);
+    int GetValue() => Grid == null ? 0 : Grid.Enumerate().Count(x => !x.Cell.IsLocked && x.Cell.Element == Element);
+    int GetTotalValue() => Grid == null ? 0 : Grid.Enumerate().Count(x => x.Cell is { IsLocked: false, IsEmpty: false });
+    int GetMaxValue() => Grid == null ? 0 : 9 - Grid.Enumerate().Count(x => x.Cell.IsLocked && x.Cell.Element == Element);
 
 }

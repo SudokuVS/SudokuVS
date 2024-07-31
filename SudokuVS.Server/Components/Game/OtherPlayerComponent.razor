@@ -54,9 +54,9 @@
         {
             _displayGrid[row, column].BackgroundColor = State.Hints.Contains((cell.Row, cell.Column))
                 ? GridComponent.Color.Yellow
-                : cell.Locked
+                : cell.IsLocked
                     ? GridComponent.Color.LightGrey
-                    : !cell.Empty
+                    : !cell.IsEmpty
                         ? GridComponent.Color.LightBlue
                         : GridComponent.Color.None;
 

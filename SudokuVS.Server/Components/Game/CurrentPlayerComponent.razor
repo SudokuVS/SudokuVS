@@ -243,7 +243,7 @@
             _displayGrid[row, column].FontStyle = _selectedCell.HasValue && Grid[_selectedCell.Value.Row, _selectedCell.Value.Column].Element == cell.Element ? GridComponent.FontStyle.Bold : GridComponent.FontStyle.None;
             _displayGrid[row, column].BackgroundColor = IsHint(cell.Row, cell.Column)
                 ? GridComponent.Color.Yellow
-                : cell.Locked
+                : cell.IsLocked
                     ? GridComponent.Color.LightGrey
                     : GridComponent.Color.None;
             _displayGrid[row, column].Border = _selectedCell == (row, column) ? _annotationMode ? GridComponent.Color.Grey : GridComponent.Color.Yellow : GridComponent.Color.None;
@@ -314,7 +314,7 @@
 
         SudokuCell c = Grid[cell.Row, cell.Column];
         _selectedCell = cell;
-        _selectedCellLocked = c.Locked;
+        _selectedCellLocked = c.IsLocked;
     }
 
     void OnStateChanged(object? sender, (int, int) __) => TriggerUpdate();

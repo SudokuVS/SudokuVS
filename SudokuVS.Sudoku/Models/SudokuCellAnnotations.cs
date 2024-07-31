@@ -2,7 +2,7 @@
 
 namespace SudokuVS.Sudoku.Models;
 
-public class SudokuCellAnnotations : ICollection<int>
+public class SudokuCellAnnotations : ICollection<int>, IReadOnlyCollection<int>
 {
     readonly HashSet<int> _collectionImplementation = [];
 
@@ -51,7 +51,7 @@ public class SudokuCellAnnotations : ICollection<int>
 
     void AssertUnlocked()
     {
-        if (Cell.Locked)
+        if (Cell.IsLocked)
         {
             throw new InvalidOperationException("Cell is locked");
         }

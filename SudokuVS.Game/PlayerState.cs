@@ -42,7 +42,7 @@ public class PlayerState : IHiddenPlayerState
     public void UseHint(int row, int column)
     {
         Grid[row, column].Element = Game.SolvedGrid[row, column].Element;
-        Grid[row, column].Locked = true;
+        Grid[row, column].IsLocked = true;
         _hints.Add((row, column));
 
         HintAdded?.Invoke(this, EventArgs.Empty);
