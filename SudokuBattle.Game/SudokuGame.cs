@@ -9,24 +9,24 @@ public class SudokuGame
     OtherPlayerState? _otherPlayer1Cached;
     OtherPlayerState? _otherPlayer2Cached;
 
-    SudokuGame(SudokuGrid initialGrid, SudokuGrid solvedGrid, SudokuGameOptions? options = null)
+    SudokuGame(Guid id, SudokuGrid initialGrid, SudokuGrid solvedGrid, SudokuGameOptions? options = null)
     {
+        Id = id;
         InitialGrid = initialGrid;
         SolvedGrid = solvedGrid;
         Options = options ?? new SudokuGameOptions();
     }
 
-
-    public Guid Id { get; } = Guid.NewGuid();
+    public Guid Id { get; }
     public SudokuGrid InitialGrid { get; }
     public SudokuGameOptions Options { get; }
     public SudokuGrid SolvedGrid { get; }
     public PlayerState? Player1 { get; private set; }
     public PlayerState? Player2 { get; private set; }
 
-    public DateTime? StartDate { get; set; }
-    public DateTime? EndDate { get; set; }
-    public PlayerSide? Winner { get; set; }
+    public DateTime? StartDate { get; private set; }
+    public DateTime? EndDate { get; private set; }
+    public PlayerSide? Winner { get; private set; }
 
     [MemberNotNullWhen(true, nameof(StartDate))]
     public bool IsStarted => StartDate.HasValue;
@@ -86,10 +86,19 @@ public class SudokuGame
     public OtherPlayerState? GetOtherPlayerState(PlayerSide side) =>
         side switch
         {
-            PlayerSide.Player1 => _otherPlayer2Cached,
-            PlayerSide.Player2 => _otherPlayer1Cached,
+            PlayerSide.Player1 => Player2 == null ? null : _otherPlayer2Cached ??= new OtherPlayerState(Player2),
+            PlayerSide.Player2 => Player1 == null ? null : _otherPlayer1Cached ??= new OtherPlayerState(Player1),
             _ => null
         };
+
+    internal void Restore(PlayerState? player1, PlayerState? player2, DateTime? startDate, DateTime? endDate, PlayerSide? winner)
+    {
+        Player1 = player1;
+        Player2 = player2;
+        StartDate = startDate;
+        EndDate = endDate;
+        Winner = winner;
+    }
 
     void OnCellValueChanged(PlayerSide side)
     {
@@ -118,6 +127,10 @@ public class SudokuGame
             throw new InvalidOperationException("Could not solve grid");
         }
 
-        return new SudokuGame(grid, solvedGrid);
+        solvedGrid.LockNonEmptyCells();
+
+        return new SudokuGame(Guid.NewGuid(), grid, solvedGrid);
     }
+
+    internal static SudokuGame Load(Guid id, SudokuGrid grid, SudokuGrid solvedGrid, SudokuGameOptions options) => new(id, grid, solvedGrid, options);
 }

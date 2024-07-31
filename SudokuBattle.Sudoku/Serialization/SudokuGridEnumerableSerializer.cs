@@ -2,16 +2,9 @@
 
 namespace SudokuBattle.Sudoku.Serialization;
 
-public class SudokuArraySerializer
+public class SudokuGridEnumerableSerializer
 {
-    public IEnumerable<int> ToEnumerable(SudokuGrid grid)
-    {
-        for (int i = 0; i < 9; i++)
-        for (int j = 0; j < 9; j++)
-        {
-            yield return grid[i, j].Element ?? 0;
-        }
-    }
+    public IEnumerable<int> ToEnumerable(SudokuGrid grid) => Enumerable.Range(0, 9).SelectMany(i => Enumerable.Range(0, 9).Select(j => grid[i, j].Element ?? 0));
 
     public SudokuGrid FromEnumerable(IEnumerable<int> values)
     {

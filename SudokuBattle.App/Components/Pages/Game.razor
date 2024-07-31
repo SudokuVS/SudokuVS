@@ -1,7 +1,7 @@
 ﻿@page "/game/{Token?}"
 @inject NavigationManager Navigation
 @inject IJSRuntime JsRuntime
-@inject SudokuGamesRepository Repository
+@inject ISudokuGamesRepository Repository
 @inject GameTokenService GameTokenService
 @using SudokuBattle.App.Components.Game
 @using SudokuBattle.App.Services
@@ -96,14 +96,14 @@ else
 
     IJSObjectReference? _gameModule;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         if (Token == null || !GameTokenService.Validate(Token, out Guid gameId, out PlayerSide playerSide))
         {
             return;
         }
 
-        _instance = Repository.Get(gameId);
+        _instance = await Repository.Get(gameId);
         if (_instance == null)
         {
             return;

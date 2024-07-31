@@ -9,7 +9,7 @@ public class SudokuCell : IReadOnlySudokuCell, IHiddenSudokuCell
     readonly SudokuCellAnnotations _annotations;
     bool _locked;
 
-    internal SudokuCell(int row, int column, int region, int? element = null)
+    public SudokuCell(int row, int column, int? element = null)
     {
         if (Row is < 0 or > 8)
         {
@@ -33,7 +33,7 @@ public class SudokuCell : IReadOnlySudokuCell, IHiddenSudokuCell
 
         Row = row;
         Column = column;
-        Region = region;
+        Region = GetRegionIndex(row, column);
         Element = element == 0 ? null : element;
 
         _annotations = new SudokuCellAnnotations(this);
@@ -81,8 +81,10 @@ public class SudokuCell : IReadOnlySudokuCell, IHiddenSudokuCell
     public event EventHandler? LockChanged;
 
     public static SudokuCell Clone(SudokuCell cell) =>
-        new(cell.Row, cell.Column, cell.Region, cell.Element)
+        new(cell.Row, cell.Column, cell.Element)
         {
             Locked = cell.Locked
         };
+
+    static int GetRegionIndex(int row, int column) => row / 3 * 3 + column / 3;
 }

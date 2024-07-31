@@ -8,7 +8,7 @@ namespace SudokuBattle.Sudoku.Solvers;
 public class SudokuLibSolver : ISudokuSolver
 {
     readonly Solver _solver = new(HistoryType.None, SolveMethod.FindFirst);
-    readonly SudokuArraySerializer _serializer = new();
+    readonly SudokuGridEnumerableSerializer _serializer = new();
 
     public SudokuGrid? Solve(SudokuGrid grid)
     {

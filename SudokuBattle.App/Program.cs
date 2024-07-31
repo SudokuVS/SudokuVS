@@ -10,12 +10,25 @@ try
 {
     WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-    builder.Services.AddSerilog(c => c.WriteTo.Console().MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning).ReadFrom.Configuration(builder.Configuration));
+    builder.Services.AddSerilog(
+        c => c.WriteTo.Console()
+            .MinimumLevel.Is(builder.Environment.IsDevelopment() ? LogEventLevel.Debug : LogEventLevel.Information)
+            .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+            .ReadFrom.Configuration(builder.Configuration)
+    );
 
     // Add services to the container.
     builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
-    builder.Services.AddSingleton<SudokuGamesRepository>();
+    builder.Services.AddSingleton<ISudokuGamesRepository, SudokuGamesOnDisk>(
+        services =>
+        {
+            const string relativePath = "%LOCALAPPDATA%/SudokuBattle/repository/games";
+            string path = Path.GetFullPath(Environment.ExpandEnvironmentVariables(relativePath));
+            Log.Logger.Information("Game repository path: {path}", path);
+            return new SudokuGamesOnDisk(path, services.GetRequiredService<ILogger<SudokuGamesOnDisk>>());
+        }
+    );
     builder.Services.AddSingleton<GameTokenService>(_ => new GameTokenService(RandomNumberGenerator.GetBytes(64)));
 
     WebApplication app = builder.Build();

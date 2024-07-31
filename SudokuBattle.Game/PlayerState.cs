@@ -45,4 +45,10 @@ public class PlayerState
 
         HintAdded?.Invoke(this, EventArgs.Empty);
     }
+
+    internal void Restore(IEnumerable<(int, int)> hints)
+    {
+        _hints.Clear();
+        _hints.AddRange(hints);
+    }
 }

@@ -7,13 +7,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\SudokuBattle.Game\SudokuBattle.Game.csproj" />
-      <ProjectReference Include="..\SudokuBattle.Sudoku\SudokuBattle.Sudoku.csproj" />
+        <ProjectReference Include="..\SudokuBattle.Game\SudokuBattle.Game.csproj"/>
+        <ProjectReference Include="..\SudokuBattle.Sudoku\SudokuBattle.Sudoku.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
-      <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.1" />
+        <PackageReference Include="Serilog.AspNetCore" Version="8.0.1"/>
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.1"/>
     </ItemGroup>
 
 </Project>

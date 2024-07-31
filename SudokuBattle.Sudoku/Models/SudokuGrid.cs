@@ -6,11 +6,11 @@ public class SudokuGrid : IReadOnlySudokuGrid, IHiddenSudokuGrid
 {
     readonly SudokuCell[,] _grid;
 
-    internal SudokuGrid(int[,] grid) : this(BuildCellGridFromValues(grid))
+    public SudokuGrid(int[,] grid) : this(BuildCellGridFromValues(grid))
     {
     }
 
-    SudokuGrid(SudokuCell[,] grid)
+    public SudokuGrid(SudokuCell[,] grid)
     {
         _grid = grid;
         foreach (SudokuCell cell in grid)
@@ -95,8 +95,6 @@ public class SudokuGrid : IReadOnlySudokuGrid, IHiddenSudokuGrid
         CellValueChanged?.Invoke(this, (cell.Row, cell.Column));
     }
 
-    static int GetRegionIndex(int row, int column) => row / 3 * 3 + column / 3;
-
     public static SudokuGrid CreateEmpty() => new(new int[9, 9]);
 
     public static SudokuGrid Clone(SudokuGrid grid)
@@ -118,7 +116,7 @@ public class SudokuGrid : IReadOnlySudokuGrid, IHiddenSudokuGrid
         for (int j = 0; j < 9; j++)
         {
             int element = grid[i, j];
-            SudokuCell cell = new(i, j, GetRegionIndex(i, j), element == 0 ? null : element);
+            SudokuCell cell = new(i, j, element == 0 ? null : element);
             result[i, j] = cell;
         }
         return result;

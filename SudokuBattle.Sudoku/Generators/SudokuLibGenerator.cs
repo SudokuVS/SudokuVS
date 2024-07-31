@@ -11,7 +11,7 @@ namespace SudokuBattle.Sudoku.Generators;
 public class SudokuLibGenerator : ISudokuGenerator
 {
     readonly Generator _generator = new();
-    readonly SudokuArraySerializer _serializer = new();
+    readonly SudokuGridEnumerableSerializer _serializer = new();
     readonly int _clues;
 
     public SudokuLibGenerator(int clues = 30)
