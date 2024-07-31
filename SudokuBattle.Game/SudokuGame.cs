@@ -10,15 +10,17 @@ public class SudokuGame
     HiddenPlayerState? _otherPlayer1Cached;
     HiddenPlayerState? _otherPlayer2Cached;
 
-    SudokuGame(Guid id, SudokuGrid initialGrid, SudokuGrid solvedGrid, SudokuGameOptions? options = null)
+    SudokuGame(Guid id, string name, SudokuGrid initialGrid, SudokuGrid solvedGrid, SudokuGameOptions? options = null)
     {
         Id = id;
+        Name = name;
         InitialGrid = initialGrid;
         SolvedGrid = solvedGrid;
         Options = options ?? new SudokuGameOptions();
     }
 
     public Guid Id { get; }
+    public string Name { get; }
     public SudokuGrid InitialGrid { get; }
     public SudokuGameOptions Options { get; }
     public SudokuGrid SolvedGrid { get; }
@@ -121,6 +123,18 @@ public class SudokuGame
 
     public static SudokuGame? Create(SudokuGameOptions? options = null)
     {
+        Guid id = Guid.NewGuid();
+        return Create(id, id.ToString(), options);
+    }
+
+    public static SudokuGame? Create(string? name, SudokuGameOptions? options = null)
+    {
+        Guid id = Guid.NewGuid();
+        return Create(id, name, options);
+    }
+
+    static SudokuGame? Create(Guid id, string? name, SudokuGameOptions? options = null)
+    {
         SudokuLibGenerator generator = new();
         SudokuGrid? grid = generator.Generate();
         if (grid == null)
@@ -138,8 +152,8 @@ public class SudokuGame
 
         solvedGrid.LockNonEmptyCells();
 
-        return new SudokuGame(Guid.NewGuid(), grid, solvedGrid, options);
+        return new SudokuGame(id, name ?? id.ToString(), grid, solvedGrid, options);
     }
 
-    internal static SudokuGame Load(Guid id, SudokuGrid grid, SudokuGrid solvedGrid, SudokuGameOptions options) => new(id, grid, solvedGrid, options);
+    internal static SudokuGame Load(Guid id, string name, SudokuGrid grid, SudokuGrid solvedGrid, SudokuGameOptions options) => new(id, name, grid, solvedGrid, options);
 }

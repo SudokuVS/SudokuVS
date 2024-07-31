@@ -21,6 +21,7 @@ public class SudokuGameJsonSerializer
         SerializedSudokuGame serialized = new()
         {
             Id = game.Id,
+            Name = game.Name,
             Options = game.Options,
             InitialGrid = _gridSerializer.ToEnumerable(game.InitialGrid).ToArray(),
             SolvedGrid = _gridSerializer.ToEnumerable(game.SolvedGrid).ToArray(),
@@ -48,7 +49,7 @@ public class SudokuGameJsonSerializer
         SudokuGrid solvedGrid = _gridSerializer.FromEnumerable(deserialized.SolvedGrid);
         solvedGrid.LockNonEmptyCells();
 
-        SudokuGame game = SudokuGame.Load(deserialized.Id, initialGrid, solvedGrid, deserialized.Options);
+        SudokuGame game = SudokuGame.Load(deserialized.Id, deserialized.Name, initialGrid, solvedGrid, deserialized.Options);
 
         PlayerState? player1 = deserialized.Player1 == null ? null : Deserialize(game, PlayerSide.Player1, deserialized.Player1);
         PlayerState? player2 = deserialized.Player2 == null ? null : Deserialize(game, PlayerSide.Player2, deserialized.Player2);
@@ -126,6 +127,7 @@ public class SudokuGameJsonSerializer
     class SerializedSudokuGame
     {
         public required Guid Id { get; init; }
+        public required string Name { get; init; }
         public required SudokuGameOptions Options { get; init; }
         public required int[] InitialGrid { get; init; }
         public required int[] SolvedGrid { get; init; }
