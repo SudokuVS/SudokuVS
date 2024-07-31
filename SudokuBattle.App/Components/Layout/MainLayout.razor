@@ -3,7 +3,13 @@
 <div class="h-100 d-flex flex-column">
     <header class="text-bg-dark d-flex align-items-center gap-2 px-2" style="height:64px;">
         <div class="h-100 d-flex align-items-center justify-content-center px-4 position-relative">
-            <span class="fs-4 fw-semibold">Sudoku Battles</span>
+            <div>
+                <span class="fs-4 fw-semibold">Sudoku Battles</span>
+                @if (_version != null)
+                {
+                    <span class="ms-1 small">@_version</span>
+                }
+            </div>
             <a class="stretched-link" href="/"></a>
         </div>
 
@@ -40,8 +46,11 @@
 @code {
 
     IJSObjectReference? _mainLayoutModule;
+    string? _version;
 
     public string? PlayerName { get; set; }
+
+    protected override void OnInitialized() => _version = Metadata.Version != null ? $"v{Metadata.Version}" : null;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
