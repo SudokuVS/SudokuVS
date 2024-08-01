@@ -1,7 +1,7 @@
 ﻿using SudokuVS.Game;
 using SudokuVS.Sudoku.Models.Abstractions;
 
-namespace SudokuVS.RestApi.Models;
+namespace SudokuVS.WebApi.Models;
 
 /// <summary>
 ///     Cell as seen by a player.

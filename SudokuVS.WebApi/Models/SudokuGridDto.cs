@@ -1,7 +1,7 @@
 ﻿using SudokuVS.Game;
 using SudokuVS.Sudoku.Models;
 
-namespace SudokuVS.RestApi.Models;
+namespace SudokuVS.WebApi.Models;
 
 /// <summary>
 ///     Sparse representation of a sudoku grid.

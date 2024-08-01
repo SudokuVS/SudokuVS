@@ -1,7 +1,7 @@
 ﻿using SudokuVS.Sudoku.Models;
 using SudokuVS.Sudoku.Serialization;
 
-namespace SudokuVS.RestApi.Models;
+namespace SudokuVS.WebApi.Models;
 
 /// <summary>
 ///     Flat representation of a sudoku grid.

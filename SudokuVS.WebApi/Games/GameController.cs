@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using SudokuVS.Game;
 using SudokuVS.Game.Persistence;
-using SudokuVS.RestApi.Models;
+using SudokuVS.WebApi.Models;
 
-namespace SudokuVS.RestApi.Games;
+namespace SudokuVS.WebApi.Games;
 
 [Route("/api/games")]
 [Authorize]

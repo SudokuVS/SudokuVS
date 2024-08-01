@@ -1,6 +1,6 @@
 ﻿using SudokuVS.Game;
 
-namespace SudokuVS.RestApi.Models;
+namespace SudokuVS.WebApi.Models;
 
 /// <summary>
 ///     Summary of a game.

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using SudokuVS.Game.Users;
 
-namespace SudokuVS.RestApi.Models;
+namespace SudokuVS.WebApi.Models;
 
 public class UserIdentityDto
 {

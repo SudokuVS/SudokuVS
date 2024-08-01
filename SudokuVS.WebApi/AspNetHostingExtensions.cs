@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace SudokuVS.RestApi;
+namespace SudokuVS.WebApi;
 
 public static class AspNetHostingExtensions
 {
