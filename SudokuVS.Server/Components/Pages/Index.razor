@@ -5,6 +5,7 @@
 @using System.Web
 @using SudokuVS.Game
 @using SudokuVS.Game.Persistence
+@using SudokuVS.Game.Users
 @using SudokuVS.Server.Services
 @inject NavigationManager Navigation;
 @inject IJSRuntime JsRuntime; 
@@ -113,7 +114,8 @@ else
     {
         _newGameError = null;
 
-        if (AuthenticatedUser?.Identity?.Name == null)
+        UserIdentity? userIdentity = AuthenticatedUser?.GetUserIdentity();
+        if (userIdentity == null)
         {
             _newGameError = "Could not find player name";
             StateHasChanged();
@@ -136,7 +138,7 @@ else
 
         Repository.Save(game);
 
-        game.Join(AuthenticatedUser.Identity.Name, PlayerSide.Player1);
+        game.Join(userIdentity, PlayerSide.Player1);
         string token = GameTokenService.Generate(game.Id, PlayerSide.Player1);
         Navigation.NavigateTo($"/game/{token}");
     }

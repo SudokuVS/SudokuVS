@@ -1,4 +1,5 @@
-﻿using SudokuVS.Sudoku.Models.Abstractions;
+﻿using SudokuVS.Game.Users;
+using SudokuVS.Sudoku.Models.Abstractions;
 
 namespace SudokuVS.Game;
 
@@ -11,7 +12,7 @@ public class HiddenPlayerState : IHiddenPlayerState
         _state = state;
     }
 
-    public string PlayerName => _state.PlayerName;
+    public UserIdentity User => _state.User;
     public IHiddenSudokuGrid Grid => _state.Grid;
     public PlayerSide Side => _state.Side;
     public IReadOnlyCollection<(int Row, int Column)> Hints => _state.Hints;

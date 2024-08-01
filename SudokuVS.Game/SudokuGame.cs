@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using SudokuVS.Game.Users;
 using SudokuVS.Sudoku.Generators;
 using SudokuVS.Sudoku.Models;
 using SudokuVS.Sudoku.Solvers;
@@ -40,7 +41,7 @@ public class SudokuGame
     public event EventHandler<PlayerSide>? PlayerJoined;
     public event EventHandler<PlayerSide>? GameOver;
 
-    public PlayerState Join(string name, PlayerSide side)
+    public PlayerState Join(UserIdentity user, PlayerSide side)
     {
         PlayerState? existing = GetPlayerState(side);
         if (existing != null)
@@ -51,7 +52,7 @@ public class SudokuGame
         SudokuGrid grid = SudokuGrid.Clone(InitialGrid);
         grid.CellValueChanged += (_, _) => OnCellValueChanged(side);
 
-        PlayerState newState = new(this, grid, side, name);
+        PlayerState newState = new(this, grid, side, user);
         HiddenPlayerState otherPlayerState = new(newState);
 
         switch (side)

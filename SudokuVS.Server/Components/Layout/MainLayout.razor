@@ -1,6 +1,7 @@
 ﻿@using System.Net
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Components.Authorization
+@using SudokuVS.Game.Users
 @inherits LayoutComponentBase
 
 <div class="h-100 d-flex flex-column">
@@ -35,7 +36,7 @@
             @if (AuthenticatedUser?.Identity?.IsAuthenticated ?? false)
             {
                 <span class="fs-5 fw-semibold">
-                    @(AuthenticatedUser.Identity.Name)
+                    @(AuthenticatedUser.GetName())
                 </span>
                 <a class="small text-white" href="MicrosoftIdentity/Account/SignOut">(logout)</a>
             }

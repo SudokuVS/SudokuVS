@@ -3,8 +3,10 @@
 @inject IJSRuntime JsRuntime
 @inject ISudokuGamesRepository Repository
 @inject GameTokenService GameTokenService
+@using System.Security.Claims
 @using SudokuVS.Game
 @using SudokuVS.Game.Persistence
+@using SudokuVS.Game.Users
 @using SudokuVS.Server.Components.Game
 @using SudokuVS.Server.Services
 @implements IDisposable
@@ -100,6 +102,9 @@ else
     [Parameter]
     public string? Token { get; set; }
 
+    [CascadingParameter]
+    public ClaimsPrincipal? AuthenticatedUser { get; set; }
+
     SudokuGame? _instance;
     PlayerState? _playerState;
     HiddenPlayerState? _otherPlayerState;
@@ -115,6 +120,12 @@ else
             return;
         }
 
+        UserIdentity? user = AuthenticatedUser?.GetUserIdentity();
+        if (user == null)
+        {
+            return;
+        }
+
         _instance = await Repository.Get(gameId);
         if (_instance == null)
         {
@@ -123,7 +134,7 @@ else
 
         _instance.PlayerJoined += OnPlayerJoined;
         _instance.GameOver += OnGameOver;
-        _playerState = _instance.GetPlayerState(playerSide) ?? _instance.Join("Tata", playerSide);
+        _playerState = _instance.GetPlayerState(playerSide) ?? _instance.Join(user, playerSide);
         _timer = new Timer(__ => _ = InvokeAsync(StateHasChanged), null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
 
         TryLoadOpponent();

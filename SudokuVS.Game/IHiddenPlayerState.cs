@@ -1,10 +1,11 @@
-﻿using SudokuVS.Sudoku.Models.Abstractions;
+﻿using SudokuVS.Game.Users;
+using SudokuVS.Sudoku.Models.Abstractions;
 
 namespace SudokuVS.Game;
 
 public interface IHiddenPlayerState
 {
-    string PlayerName { get; }
+    UserIdentity User { get; }
     IHiddenSudokuGrid Grid { get; }
     PlayerSide Side { get; }
     IReadOnlyCollection<(int Row, int Column)> Hints { get; }

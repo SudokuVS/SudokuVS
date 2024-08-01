@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+using SudokuVS.Game.Users;
 using SudokuVS.Sudoku.Models;
 using SudokuVS.Sudoku.Serialization;
 
@@ -62,7 +63,8 @@ public class SudokuGameJsonSerializer
     static SerializedPlayerState Serialize(PlayerState player) =>
         new()
         {
-            PlayerName = player.PlayerName,
+            PlayerId = player.User.Id,
+            PlayerName = player.User.Name,
             Grid = Serialize(player.Grid),
             Hints = player.Hints.Select(x => ComputeFlatIndex(x.Row, x.Column)).ToArray()
         };
@@ -83,7 +85,7 @@ public class SudokuGameJsonSerializer
     static PlayerState Deserialize(SudokuGame game, PlayerSide side, SerializedPlayerState player)
     {
         SudokuGrid grid = Deserialize(player.Grid);
-        PlayerState state = new(game, grid, side, player.PlayerName);
+        PlayerState state = new(game, grid, side, new UserIdentity { Id = player.PlayerId, Name = player.PlayerName });
 
         IEnumerable<(int Row, int Column)> hints = player.Hints.Select(ComputeCoordinates);
         state.Restore(hints);
@@ -140,6 +142,7 @@ public class SudokuGameJsonSerializer
 
     class SerializedPlayerState
     {
+        public required Guid PlayerId { get; init; }
         public required string PlayerName { get; init; }
         public required Dictionary<int, SerializedCell> Grid { get; init; }
         public required int[] Hints { get; init; }

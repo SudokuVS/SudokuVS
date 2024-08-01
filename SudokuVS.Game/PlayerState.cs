@@ -1,4 +1,5 @@
-﻿using SudokuVS.Sudoku.Models;
+﻿using SudokuVS.Game.Users;
+using SudokuVS.Sudoku.Models;
 using SudokuVS.Sudoku.Models.Abstractions;
 
 namespace SudokuVS.Game;
@@ -7,19 +8,19 @@ public class PlayerState : IHiddenPlayerState
 {
     readonly List<(int Row, int Column)> _hints = [];
 
-    public PlayerState(SudokuGame game, SudokuGrid grid, PlayerSide side, string playerName)
+    public PlayerState(SudokuGame game, SudokuGrid grid, PlayerSide side, UserIdentity user)
     {
         Game = game;
         Grid = grid;
         Side = side;
-        PlayerName = playerName;
+        User = user;
     }
 
     public SudokuGame Game { get; }
     public SudokuGrid Grid { get; }
     IHiddenSudokuGrid IHiddenPlayerState.Grid => Grid;
     public PlayerSide Side { get; }
-    public string PlayerName { get; }
+    public UserIdentity User { get; }
     public IReadOnlyCollection<(int Row, int Column)> Hints => _hints;
     public int RemainingHints => Math.Max(0, Game.Options.MaxHints - Hints.Count);
 

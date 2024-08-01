@@ -25,12 +25,12 @@ public class SudokuGameSummaryDto
     /// <summary>
     ///     The name of the first player.
     /// </summary>
-    public required string? Player1Name { get; init; }
+    public required UserIdentityDto? Player1 { get; init; }
 
     /// <summary>
     ///     The name of the second player.
     /// </summary>
-    public required string? Player2Name { get; init; }
+    public required UserIdentityDto? Player2 { get; init; }
 
     /// <summary>
     ///     Is the game started yet. The game starts once the both players have joined.
@@ -66,8 +66,8 @@ public static class SudokuGameSummaryMappingExtensions
             Id = game.Id,
             Name = game.Name,
             Grid = game.InitialGrid.ToSimpleDto(),
-            Player1Name = game.Player1?.PlayerName,
-            Player2Name = game.Player2?.PlayerName,
+            Player1 = game.Player1?.User.ToDto(),
+            Player2 = game.Player2?.User.ToDto(),
             IsStarted = game.IsStarted,
             StartDate = game.StartDate,
             IsOver = game.IsOver,
