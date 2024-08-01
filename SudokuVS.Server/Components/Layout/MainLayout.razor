@@ -29,25 +29,28 @@
 
         <div class="flex-grow-1"></div>
 
-        @if (PlayerName != null)
-        {
-            <div class="h-100 py-2">
-                <div class="h-100 vr"></div>
-            </div>
-
-            <div class="d-flex align-items-baseline gap-1 px-4">
-                <span class="d-flex align-items-center justify-content-center fs-5 fw-semibold">
-                    @PlayerName
+        <div class="h-100 d-flex align-items-center gap-1 px-4 position-relative">
+            @if (_isAuthenticated)
+            {
+                <span class="fs-5 fw-semibold">
+                    @(_playerName ?? "???")
                 </span>
                 <a class="small text-white" href="MicrosoftIdentity/Account/SignOut">(logout)</a>
-            </div>
-        }
+            }
+            else
+            {
+                <span class="fs-5 fw-semibold">
+                    Login
+                </span>
+                <a class="stretched-link" href="MicrosoftIdentity/Account/SignIn"></a>
+            }
+        </div>
     </header>
 
     <hr class="p-0 m-0"/>
 
     <main class="flex-grow-1">
-        <CascadingValue Value="PlayerName">
+        <CascadingValue Value="_playerName">
             @Body
         </CascadingValue>
     </main>
@@ -60,8 +63,9 @@
     string? _version;
     bool _isDebugVersion;
     string? _prereleaseIdentifier;
+    bool _isAuthenticated;
+    string? _playerName;
 
-    public string? PlayerName { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -70,7 +74,8 @@
         _prereleaseIdentifier = Metadata.Version?.PrereleaseIdentifier().ToUpper() ?? "";
 
         AuthenticationState state = await Provider.GetAuthenticationStateAsync();
-        PlayerName = state.User.Identity?.Name;
+        _isAuthenticated = state.User.Identity?.IsAuthenticated ?? false;
+        _playerName = state.User.Identity?.Name;
     }
 
 }

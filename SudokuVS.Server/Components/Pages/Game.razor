@@ -11,11 +11,11 @@
 
 @if (_instance == null)
 {
-    <PageTitle>Sudoku Battle - Game</PageTitle>
+    <PageTitle>@Constants.ProductName - Game</PageTitle>
 }
 else
 {
-    <PageTitle>Sudoku Battle - @_instance.Name</PageTitle>
+    <PageTitle>@Constants.ProductName - @_instance.Name</PageTitle>
 }
 
 @if (_instance != null && _playerState != null)
