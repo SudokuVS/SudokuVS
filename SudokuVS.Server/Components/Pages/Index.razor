@@ -6,11 +6,9 @@
 @using SudokuVS.Game
 @using SudokuVS.Game.Persistence
 @using SudokuVS.Game.Users
-@using SudokuVS.Server.Services
 @inject NavigationManager Navigation;
 @inject IJSRuntime JsRuntime; 
 @inject ISudokuGamesRepository Repository;
-@inject GameTokenService GameTokenService;
 @inject ILogger<Index> Logger;
 @attribute [AllowAnonymous]
 
@@ -139,8 +137,7 @@ else
         Repository.Save(game);
 
         game.Join(userIdentity, PlayerSide.Player1);
-        string token = GameTokenService.Generate(game.Id, PlayerSide.Player1);
-        Navigation.NavigateTo($"/game/{token}");
+        Navigation.NavigateTo($"/game/{game.Id}");
     }
 
     class Model

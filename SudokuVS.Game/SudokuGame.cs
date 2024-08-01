@@ -87,13 +87,43 @@ public class SudokuGame
             _ => null
         };
 
-    public HiddenPlayerState? GetOtherPlayerState(PlayerSide side) =>
+    public IHiddenPlayerState? GetHiddenPlayerState(PlayerSide side) =>
         side switch
         {
-            PlayerSide.Player1 => Player2 == null ? null : _otherPlayer2Cached ??= new HiddenPlayerState(Player2),
-            PlayerSide.Player2 => Player1 == null ? null : _otherPlayer1Cached ??= new HiddenPlayerState(Player1),
+            PlayerSide.Player1 => Player1 == null ? null : _otherPlayer1Cached ??= new HiddenPlayerState(Player1),
+            PlayerSide.Player2 => Player2 == null ? null : _otherPlayer2Cached ??= new HiddenPlayerState(Player2),
             _ => null
         };
+
+    public PlayerState? GetPlayerState(Guid playerId)
+    {
+        if (Player1 != null && Player1.User.Id == playerId)
+        {
+            return Player1;
+        }
+
+        if (Player2 != null && Player2.User.Id == playerId)
+        {
+            return Player2;
+        }
+
+        return null;
+    }
+
+    public IHiddenPlayerState? GetOtherPlayerState(Guid playerId)
+    {
+        if (Player1 != null && Player1.User.Id == playerId)
+        {
+            return GetHiddenPlayerState(PlayerSide.Player2);
+        }
+
+        if (Player2 != null && Player2.User.Id == playerId)
+        {
+            return GetHiddenPlayerState(PlayerSide.Player1);
+        }
+
+        return null;
+    }
 
     internal void Restore(PlayerState? player1, PlayerState? player2, DateTime? startDate, DateTime? endDate, PlayerSide? winner)
     {

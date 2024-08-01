@@ -10,22 +10,40 @@
     </div>
     <div class="w-100 d-flex align-items-start gap-4 px-4">
         <div class="flex-grow-1">
+            @if (!RightToLeft)
+            {
+                <div class="fs-4 mb-3">
+                    Progress
+                </div>
+                <div class="mb-1">
+                    <GridTotalProgressComponent Grid="Grid" ProgressBarColor="GridTotalProgressComponent.Color.Blue"/>
+                </div>
+                @for (int i = 1; i <= 9; i++)
+                {
+                    <div class="mb-1">
+                        <GridElementProgressComponent Grid="Grid" Element="i"/>
+                    </div>
+                }
+            }
         </div>
         <div>
             <GridComponent Grid="_displayGrid" GridSize="GridComponent.Size.Big" OnCellClicked="OnCellClicked" OnCellRightClicked="OnCellRightClicked" RowBorderColor="_rowBorderColors" ColumnBorderColor="_columnBorderColors" RegionBorderColor="_regionBorderColors"/>
         </div>
         <div class="flex-grow-1 d-flex flex-column">
-            <div class="fs-4 mb-3">
-                Progress
-            </div>
-            <div class="mb-1">
-                <GridTotalProgressComponent Grid="Grid" ProgressBarColor="GridTotalProgressComponent.Color.Blue"/>
-            </div>
-            @for (int i = 1; i <= 9; i++)
+            @if (RightToLeft)
             {
-                <div class="mb-1">
-                    <GridElementProgressComponent Grid="Grid" Element="i"/>
+                <div class="fs-4 mb-3">
+                    Progress
                 </div>
+                <div class="mb-1">
+                    <GridTotalProgressComponent Grid="Grid" ProgressBarColor="GridTotalProgressComponent.Color.Blue"/>
+                </div>
+                @for (int i = 1; i <= 9; i++)
+                {
+                    <div class="mb-1">
+                        <GridElementProgressComponent Grid="Grid" Element="i"/>
+                    </div>
+                }
             }
         </div>
     </div>
@@ -92,6 +110,9 @@
 
     [Parameter]
     public required PlayerState State { get; set; }
+
+    [Parameter]
+    public bool RightToLeft { get; set; }
 
     SudokuGame Game => State.Game;
     SudokuGrid Grid => State.Grid;
