@@ -31,7 +31,7 @@ public class GamesController : ControllerBase
     }
 
     [HttpGet("{id:guid}/summary")]
-    public async Task<SudokuGameSummaryDto> GetGame(Guid id)
+    public async Task<SudokuGameSummaryDto> GetGameSummary(Guid id)
     {
         SudokuGame? game = await _repository.Get(id);
         if (game == null)
