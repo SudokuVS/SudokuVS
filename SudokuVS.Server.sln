@@ -6,8 +6,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SudokuVS.Sudoku", "SudokuVS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SudokuVS.Game", "SudokuVS.Game\SudokuVS.Game.csproj", "{5932EEF4-FEF7-40AD-95AA-F7D411CE34F5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SudokuVS.RestApi", "SudokuVS.RestApi\SudokuVS.RestApi.csproj", "{F8F3DA61-4182-4B77-BC17-E5081B104526}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
