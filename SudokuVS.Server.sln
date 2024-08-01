@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SudokuVS.Game", "SudokuVS.G
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SudokuVS.WebApi", "SudokuVS.WebApi\SudokuVS.WebApi.csproj", "{F8F3DA61-4182-4B77-BC17-E5081B104526}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SudokuVS.Apps.Common", "SudokuVS.Apps.Common\SudokuVS.Apps.Common.csproj", "{4894C8F1-09C8-40E8-AD05-8E8266BD96B0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{F8F3DA61-4182-4B77-BC17-E5081B104526}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F8F3DA61-4182-4B77-BC17-E5081B104526}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F8F3DA61-4182-4B77-BC17-E5081B104526}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4894C8F1-09C8-40E8-AD05-8E8266BD96B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4894C8F1-09C8-40E8-AD05-8E8266BD96B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4894C8F1-09C8-40E8-AD05-8E8266BD96B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4894C8F1-09C8-40E8-AD05-8E8266BD96B0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -1,12 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 using SudokuVS.Game;
 using SudokuVS.Game.Persistence;
 using SudokuVS.WebApi.Models;
 
-namespace SudokuVS.WebApi.Games;
+namespace SudokuVS.WebApi.Controllers.Games;
 
 [Route("/api/games")]
+[OpenApiTag("Games")]
 [Authorize]
 [ApiController]
 public class GamesController : ControllerBase
@@ -27,7 +29,7 @@ public class GamesController : ControllerBase
         }
     }
 
-    [HttpGet("{id:guid}")]
+    [HttpGet("{id:guid}/summary")]
     public async Task<ActionResult<SudokuGameSummaryDto>> GetGame(Guid id)
     {
         SudokuGame? game = await _repository.Get(id);

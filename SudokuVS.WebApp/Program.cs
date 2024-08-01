@@ -6,15 +6,12 @@ using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using Microsoft.IdentityModel.Logging;
 using Serilog;
-using Serilog.Events;
+using SudokuVS.Apps.Common.Logging;
+using SudokuVS.Apps.Common.Persistence;
 using SudokuVS.Game.Persistence;
 using SudokuVS.WebApp.Components;
-using SudokuVS.WebApp.Services;
 
-const LogEventLevel infrastructureLoggingLevel = LogEventLevel.Warning;
-const string serilogTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} ({SourceContext}){NewLine}{Exception}";
-
-Log.Logger = new LoggerConfiguration().WriteTo.Console(outputTemplate: serilogTemplate).Enrich.WithProperty("SourceContext", "Bootstrap").CreateBootstrapLogger();
+Log.Logger = Logging.CreateBootstrapLogger();
 
 try
 {
@@ -22,26 +19,10 @@ try
 
     WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-    if (builder.Environment.IsDevelopment())
-    {
-        IdentityModelEventSource.ShowPII = true;
-    }
-
-    builder.Services.AddSerilog(
-        c => c.WriteTo.Console(outputTemplate: serilogTemplate)
-            .Enrich.WithProperty("SourceContext", "Bootstrap")
-            .MinimumLevel.Is(builder.Environment.IsDevelopment() ? LogEventLevel.Debug : LogEventLevel.Information)
-            .MinimumLevel.Override("System.Net.Http.HttpClient", infrastructureLoggingLevel)
-            .MinimumLevel.Override("Microsoft.Extensions.Http", infrastructureLoggingLevel)
-            .MinimumLevel.Override("Microsoft.AspNetCore", infrastructureLoggingLevel)
-            .MinimumLevel.Override("Microsoft.Identity", infrastructureLoggingLevel)
-            .MinimumLevel.Override("Microsoft.IdentityModel", infrastructureLoggingLevel)
-            .ReadFrom.Configuration(builder.Configuration)
-    );
-
-    // Add services to the container.
-    builder.Services.AddRazorComponents().AddInteractiveServerComponents().AddMicrosoftIdentityConsentHandler();
+    builder.ConfigureSerilog();
     ConfigureMicrosoftEntra(builder);
+
+    builder.Services.AddRazorComponents().AddInteractiveServerComponents().AddMicrosoftIdentityConsentHandler();
 
     builder.Services.AddSingleton<ISudokuGamesRepository, SudokuGamesOnDisk>(
         services =>
@@ -59,6 +40,10 @@ try
     {
         app.UseExceptionHandler("/Error", true);
         app.UseHsts();
+    }
+    else
+    {
+        IdentityModelEventSource.ShowPII = true;
     }
 
     app.UseStaticFiles();

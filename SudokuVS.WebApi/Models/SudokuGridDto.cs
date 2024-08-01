@@ -1,5 +1,5 @@
 ﻿using SudokuVS.Game;
-using SudokuVS.Sudoku.Models;
+using SudokuVS.Sudoku.Models.Abstractions;
 
 namespace SudokuVS.WebApi.Models;
 
@@ -16,7 +16,7 @@ public class SudokuGridDto
 
 public static class SudokuGridMappingExtensions
 {
-    public static SudokuGridDto ToDto(this SudokuGrid grid, PlayerState state) =>
+    public static SudokuGridDto ToDto(this IReadOnlySudokuGrid grid, PlayerState state) =>
         new()
         {
             Cells = grid.Enumerate()

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace SudokuVS.WebApi;
+namespace SudokuVS.WebApi.Controllers;
 
 [Route("/api/ping")]
 [AllowAnonymous]

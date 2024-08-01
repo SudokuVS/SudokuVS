@@ -1,11 +1,11 @@
 ﻿using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Logging;
 using SudokuVS.Game;
 using SudokuVS.Game.Persistence;
 using SudokuVS.Game.Serialization;
-using SudokuVS.WebApp.Exceptions;
 
-namespace SudokuVS.WebApp.Services;
+namespace SudokuVS.Apps.Common.Persistence;
 
 public class SudokuGamesOnDisk : ISudokuGamesRepository
 {
@@ -49,9 +49,6 @@ public class SudokuGamesOnDisk : ISudokuGamesRepository
 
     public async Task<SudokuGame?> Get(Guid id, CancellationToken cancellationToken = default) =>
         await _cache.Get(id, cancellationToken) ?? await LoadFromDisk(id, cancellationToken);
-
-    public async Task<SudokuGame> Require(Guid id, CancellationToken cancellationToken = default) =>
-        await Get(id, cancellationToken) ?? throw new NotFoundException<SudokuGame>(id);
 
     public async Task<bool> Exists(Guid id, CancellationToken cancellationToken = default) =>
         await _cache.Exists(id, cancellationToken) || await ExistsOnDisk(id, cancellationToken);

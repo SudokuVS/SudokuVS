@@ -2,9 +2,8 @@
 using System.Runtime.CompilerServices;
 using SudokuVS.Game;
 using SudokuVS.Game.Persistence;
-using SudokuVS.WebApp.Exceptions;
 
-namespace SudokuVS.WebApp.Services;
+namespace SudokuVS.Apps.Common.Persistence;
 
 public class SudokuGamesInMemory : ISudokuGamesRepository
 {
@@ -19,9 +18,6 @@ public class SudokuGamesInMemory : ISudokuGamesRepository
     }
 
     public Task<SudokuGame?> Get(Guid id, CancellationToken _ = default) => Task.FromResult(_games.GetValueOrDefault(id));
-
-    public async Task<SudokuGame> Require(Guid id, CancellationToken cancellationToken = default) =>
-        await Get(id, cancellationToken) ?? throw new NotFoundException<SudokuGame>(id);
 
     public Task<bool> Exists(Guid id, CancellationToken _ = default) => Task.FromResult(_games.ContainsKey(id));
 

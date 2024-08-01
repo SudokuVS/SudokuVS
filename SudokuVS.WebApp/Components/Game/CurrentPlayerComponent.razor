@@ -232,7 +232,7 @@
             return;
         }
 
-        State.ClearAnnotation(_selectedCell.Value.Row, _selectedCell.Value.Column);
+        State.ClearAnnotations(_selectedCell.Value.Row, _selectedCell.Value.Column);
     }
 
     void UseHintAtSelectedCell()
@@ -242,7 +242,7 @@
             return;
         }
 
-        State.UseHint(_selectedCell.Value.Row, _selectedCell.Value.Column);
+        State.TryUseHint(_selectedCell.Value.Row, _selectedCell.Value.Column);
     }
 
     void UpdateGrid()

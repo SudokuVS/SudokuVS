@@ -1,4 +1,4 @@
-﻿using SudokuVS.Sudoku.Models;
+﻿using SudokuVS.Sudoku.Models.Abstractions;
 using SudokuVS.Sudoku.Serialization;
 
 namespace SudokuVS.WebApi.Models;
@@ -16,7 +16,7 @@ public class SudokuSimpleGridDto
 
 public static class SudokuSimpleGridMappingExtensions
 {
-    public static SudokuSimpleGridDto ToSimpleDto(this SudokuGrid grid) =>
+    public static SudokuSimpleGridDto ToSimpleDto(this IReadOnlySudokuGrid grid) =>
         new()
         {
             Cells = new SudokuGridEnumerableSerializer().ToEnumerable(grid).ToArray()
