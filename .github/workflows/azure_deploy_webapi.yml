@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy ASP.Net Core app to Azure Web App - SudokuVS API
+name: SudokuVS API - Build and deploy 
 
 on:
   release:
@@ -21,7 +21,7 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Build with dotnet
-        run: dotnet build SudokuVs.WebApi --configuration Release
+        run: dotnet build SudokuVs.WebApi/SudokuVs.WebApi.csproj --configuration Release
 
       - name: dotnet publish
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
