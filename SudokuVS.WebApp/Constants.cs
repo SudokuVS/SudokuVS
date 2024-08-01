@@ -1,4 +1,4 @@
-﻿namespace SudokuVS.Server;
+﻿namespace SudokuVS.WebApp;
 
 static class Constants
 {

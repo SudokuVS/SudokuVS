@@ -8,8 +8,8 @@ using Microsoft.IdentityModel.Logging;
 using Serilog;
 using Serilog.Events;
 using SudokuVS.Game.Persistence;
-using SudokuVS.Server.Components;
-using SudokuVS.Server.Services;
+using SudokuVS.WebApp.Components;
+using SudokuVS.WebApp.Services;
 
 const LogEventLevel infrastructureLoggingLevel = LogEventLevel.Warning;
 const string serilogTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} ({SourceContext}){NewLine}{Exception}";

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components.Forms;
 
-namespace SudokuVS.Server.Validation;
+namespace SudokuVS.WebApp.Validation;
 
 public class BootstrapValidationFieldClassProvider : FieldCssClassProvider
 {

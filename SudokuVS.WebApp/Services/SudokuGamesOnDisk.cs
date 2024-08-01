@@ -3,9 +3,9 @@ using System.Runtime.CompilerServices;
 using SudokuVS.Game;
 using SudokuVS.Game.Persistence;
 using SudokuVS.Game.Serialization;
-using SudokuVS.Server.Exceptions;
+using SudokuVS.WebApp.Exceptions;
 
-namespace SudokuVS.Server.Services;
+namespace SudokuVS.WebApp.Services;
 
 public class SudokuGamesOnDisk : ISudokuGamesRepository
 {

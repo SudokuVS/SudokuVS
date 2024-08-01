@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SudokuVS.Server", "SudokuVS.Server\SudokuVS.Server.csproj", "{0B0B0689-65B6-4BB3-AE86-B0DE4F2765BC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SudokuVS.WebApp", "SudokuVS.WebApp\SudokuVS.WebApp.csproj", "{0B0B0689-65B6-4BB3-AE86-B0DE4F2765BC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SudokuVS.Sudoku", "SudokuVS.Sudoku\SudokuVS.Sudoku.csproj", "{9C0C32B5-7C21-4D1F-BF3C-95BF357BA2F6}"
 EndProject

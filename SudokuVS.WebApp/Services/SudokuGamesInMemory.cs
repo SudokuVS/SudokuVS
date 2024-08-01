@@ -2,9 +2,9 @@
 using System.Runtime.CompilerServices;
 using SudokuVS.Game;
 using SudokuVS.Game.Persistence;
-using SudokuVS.Server.Exceptions;
+using SudokuVS.WebApp.Exceptions;
 
-namespace SudokuVS.Server.Services;
+namespace SudokuVS.WebApp.Services;
 
 public class SudokuGamesInMemory : ISudokuGamesRepository
 {
