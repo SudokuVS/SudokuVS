@@ -1,11 +1,22 @@
-﻿using SudokuVS.Game;
+﻿using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
+using SudokuVS.Game;
+using SudokuVS.Game.Persistence;
 using SudokuVS.Server.Exceptions;
 
 namespace SudokuVS.Server.Services;
 
 public class SudokuGamesInMemory : ISudokuGamesRepository
 {
-    readonly Dictionary<Guid, SudokuGame> _games = new();
+    readonly ConcurrentDictionary<Guid, SudokuGame> _games = new();
+
+    public async IAsyncEnumerable<SudokuGame> GetAll([EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        foreach (SudokuGame value in _games.Values)
+        {
+            yield return value;
+        }
+    }
 
     public Task<SudokuGame?> Get(Guid id, CancellationToken _ = default) => Task.FromResult(_games.GetValueOrDefault(id));
 
@@ -16,7 +27,12 @@ public class SudokuGamesInMemory : ISudokuGamesRepository
 
     public Task Save(SudokuGame game, CancellationToken _ = default)
     {
-        _games[game.Id] = game;
+        SudokuGame existingGame = _games.GetOrAdd(game.Id, game);
+        if (existingGame != game)
+        {
+            throw new InvalidOperationException("Two different games with the same id were added concurrently");
+        }
+
         return Task.CompletedTask;
     }
 }

@@ -67,9 +67,9 @@ public class SudokuGrid : IReadOnlySudokuGrid, IHiddenSudokuGrid
     {
         foreach (SudokuCell cell in _grid)
         {
-            if (!cell.Empty)
+            if (!cell.IsEmpty)
             {
-                cell.Locked = true;
+                cell.IsLocked = true;
             }
         }
     }

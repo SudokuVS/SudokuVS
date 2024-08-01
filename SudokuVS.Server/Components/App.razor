@@ -23,6 +23,11 @@
 <body>
 <Routes @rendermode="InteractiveServer"/>
 <script src="_framework/blazor.web.js"></script>
+<script>
+    window.localStorageGetItem = name => localStorage.getItem(name);
+    window.localStorageSetItem = (name, value) => localStorage.setItem(name, value);
+    window.localStorageRemoveItem = name => localStorage.removeItem(name);
+</script>
 </body>
 
 </html>

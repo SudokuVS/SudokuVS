@@ -10,4 +10,8 @@
       <ProjectReference Include="..\SudokuVS.Sudoku\SudokuVS.Sudoku.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Identity.Web.TokenAcquisition" Version="3.0.1" />
+    </ItemGroup>
+
 </Project>

@@ -4,7 +4,7 @@ using Semver;
 
 namespace SudokuVS.Server;
 
-public static class Metadata
+static class Metadata
 {
     public static SemVersion? Version { get; private set; }
 
@@ -16,7 +16,7 @@ public static class Metadata
     }
 }
 
-public static class MetadataVersionExtensions
+static class MetadataVersionExtensions
 {
     public static bool IsDebug(this SemVersion version) => version.MetadataIdentifiers.Any(m => string.Equals(m.Value, "debug", StringComparison.InvariantCultureIgnoreCase));
 

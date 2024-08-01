@@ -1,5 +1,7 @@
 ﻿using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
 using SudokuVS.Game;
+using SudokuVS.Game.Persistence;
 using SudokuVS.Game.Serialization;
 using SudokuVS.Server.Exceptions;
 
@@ -7,6 +9,8 @@ namespace SudokuVS.Server.Services;
 
 public class SudokuGamesOnDisk : ISudokuGamesRepository
 {
+    const string SaveFileExtension = "save";
+
 #if DEBUG
     readonly SudokuGameJsonSerializer _serializer = new(true);
 #else
@@ -15,17 +19,32 @@ public class SudokuGamesOnDisk : ISudokuGamesRepository
     readonly SudokuGamesInMemory _cache = new();
     readonly HashSet<Guid> _subscribedTo = [];
     readonly string _directory;
+    readonly string _directoryFullPath;
     readonly ILogger<SudokuGamesOnDisk> _logger;
 
     public SudokuGamesOnDisk(string directory, ILogger<SudokuGamesOnDisk> logger)
     {
-        if (!Path.Exists(directory))
+        string directoryFullPath = Path.GetFullPath(directory);
+        if (!Path.Exists(directoryFullPath))
         {
-            Directory.CreateDirectory(directory);
+            Directory.CreateDirectory(directoryFullPath);
         }
 
         _directory = directory;
+        _directoryFullPath = directoryFullPath;
         _logger = logger;
+    }
+
+    public async IAsyncEnumerable<SudokuGame> GetAll([EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        foreach (Guid id in ListIds(cancellationToken))
+        {
+            SudokuGame? game = await Get(id, cancellationToken);
+            if (game != null)
+            {
+                yield return game;
+            }
+        }
     }
 
     public async Task<SudokuGame?> Get(Guid id, CancellationToken cancellationToken = default) =>
@@ -42,6 +61,17 @@ public class SudokuGamesOnDisk : ISudokuGamesRepository
         await SaveToDisk(game, cancellationToken);
         await _cache.Save(game, cancellationToken);
         SubscribeToChanges(game);
+    }
+
+    IEnumerable<Guid> ListIds(CancellationToken cancellationToken)
+    {
+        foreach (string file in Directory.EnumerateFiles(_directory))
+        {
+            if (IsSaveFilePath(file, out Guid id))
+            {
+                yield return id;
+            }
+        }
     }
 
     async Task<SudokuGame?> LoadFromDisk(Guid id, CancellationToken cancellationToken)
@@ -120,7 +150,27 @@ public class SudokuGamesOnDisk : ISudokuGamesRepository
         state.Grid.CellLockChanged += (_, _) => SaveToDiskDebounced(game);
     }
 
-    string GetSaveFilePath(Guid id) => Path.Join(_directory, $"{id}.save");
+    string GetSaveFilePath(Guid id) => Path.Join(_directoryFullPath, $"{id}.{SaveFileExtension}");
+
+    bool IsSaveFilePath(string path, out Guid id)
+    {
+        string extension = Path.GetExtension(path);
+        if (extension != $".{SaveFileExtension}")
+        {
+            id = default;
+            return false;
+        }
+
+        string absolutePath = Path.GetFullPath(path);
+        if (!absolutePath.StartsWith(_directoryFullPath))
+        {
+            id = default;
+            return false;
+        }
+
+        string fileName = Path.GetFileNameWithoutExtension(path);
+        return Guid.TryParse(fileName, out id);
+    }
 
     #region Save with debounce
 

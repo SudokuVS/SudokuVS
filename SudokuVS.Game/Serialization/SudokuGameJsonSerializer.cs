@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+using SudokuVS.Game.Users;
 using SudokuVS.Sudoku.Models;
 using SudokuVS.Sudoku.Serialization;
 
@@ -62,28 +63,29 @@ public class SudokuGameJsonSerializer
     static SerializedPlayerState Serialize(PlayerState player) =>
         new()
         {
-            PlayerName = player.PlayerName,
+            PlayerId = player.User.Id,
+            PlayerName = player.User.Name,
             Grid = Serialize(player.Grid),
             Hints = player.Hints.Select(x => ComputeFlatIndex(x.Row, x.Column)).ToArray()
         };
 
     static Dictionary<int, SerializedCell> Serialize(SudokuGrid grid) =>
         grid.Enumerate()
-            .Where(x => x.Cell.Element.HasValue || x.Cell.Annotations.Count > 0 || x.Cell.Locked)
+            .Where(x => x.Cell.Element.HasValue || x.Cell.Annotations.Count > 0 || x.Cell.IsLocked)
             .ToDictionary(
                 x => ComputeFlatIndex(x.Row, x.Column),
                 x => new SerializedCell
                 {
                     Elements = x.Cell.Element,
                     Annotations = x.Cell.Annotations.Count == 0 ? null : x.Cell.Annotations.ToArray(),
-                    Locked = x.Cell.Locked ? true : null
+                    IsLocked = x.Cell.IsLocked ? true : null
                 }
             );
 
     static PlayerState Deserialize(SudokuGame game, PlayerSide side, SerializedPlayerState player)
     {
         SudokuGrid grid = Deserialize(player.Grid);
-        PlayerState state = new(game, grid, side, player.PlayerName);
+        PlayerState state = new(game, grid, side, new UserIdentity { Id = player.PlayerId, Name = player.PlayerName });
 
         IEnumerable<(int Row, int Column)> hints = player.Hints.Select(ComputeCoordinates);
         state.Restore(hints);
@@ -115,7 +117,7 @@ public class SudokuGameJsonSerializer
                 }
             }
 
-            cells[i, j].Locked = cell.Locked ?? false;
+            cells[i, j].IsLocked = cell.IsLocked ?? false;
         }
 
         return new SudokuGrid(cells);
@@ -140,6 +142,7 @@ public class SudokuGameJsonSerializer
 
     class SerializedPlayerState
     {
+        public required Guid PlayerId { get; init; }
         public required string PlayerName { get; init; }
         public required Dictionary<int, SerializedCell> Grid { get; init; }
         public required int[] Hints { get; init; }
@@ -149,6 +152,6 @@ public class SudokuGameJsonSerializer
     {
         public int? Elements { get; init; }
         public int[]? Annotations { get; init; }
-        public bool? Locked { get; init; }
+        public bool? IsLocked { get; init; }
     }
 }

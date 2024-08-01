@@ -1,9 +1,8 @@
-﻿using SudokuVS.Game;
-
-namespace SudokuVS.Server.Services;
+﻿namespace SudokuVS.Game.Persistence;
 
 public interface ISudokuGamesRepository
 {
+    IAsyncEnumerable<SudokuGame> GetAll(CancellationToken cancellationToken = default);
     Task<SudokuGame?> Get(Guid id, CancellationToken cancellationToken = default);
     Task<SudokuGame> Require(Guid id, CancellationToken cancellationToken = default);
     Task<bool> Exists(Guid id, CancellationToken cancellationToken = default);

@@ -1,12 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿namespace SudokuVS.Sudoku.Models.Abstractions;
 
-namespace SudokuVS.Sudoku.Models.Abstractions;
-
-public interface IReadOnlySudokuCell
+public interface IReadOnlySudokuCell : IHiddenSudokuCell
 {
     int? Element { get; }
-    bool Locked { get; }
-
-    [MemberNotNullWhen(false, nameof(Element))]
-    bool Empty { get; }
+    IReadOnlyCollection<int> Annotations { get; }
 }
