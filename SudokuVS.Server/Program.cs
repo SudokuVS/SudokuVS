@@ -34,34 +34,14 @@ try
             .MinimumLevel.Override("System.Net.Http.HttpClient", infrastructureLoggingLevel)
             .MinimumLevel.Override("Microsoft.Extensions.Http", infrastructureLoggingLevel)
             .MinimumLevel.Override("Microsoft.AspNetCore", infrastructureLoggingLevel)
-            .MinimumLevel.Override("Microsoft.Identity", LogEventLevel.Debug)
-            .MinimumLevel.Override("Microsoft.IdentityModel", LogEventLevel.Debug)
+            .MinimumLevel.Override("Microsoft.Identity", infrastructureLoggingLevel)
+            .MinimumLevel.Override("Microsoft.IdentityModel", infrastructureLoggingLevel)
             .ReadFrom.Configuration(builder.Configuration)
     );
 
     // Add services to the container.
     builder.Services.AddRazorComponents().AddInteractiveServerComponents().AddMicrosoftIdentityConsentHandler();
-    builder.Services.AddControllersWithViews(
-            options =>
-            {
-                AuthorizationPolicy policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
-                options.Filters.Add(new AuthorizeFilter(policy));
-            }
-        )
-        .AddMicrosoftIdentityUI();
-
-    // This is required to be instantiated before the OpenIdConnectOptions starts getting configured.
-    // By default, the claims mapping will map claim names in the old format to accommodate older SAML applications.
-    // For instance, 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role' instead of 'roles' claim.
-    // This flag ensures that the ClaimsIdentity claims collection will be built from the claims in the token
-    JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
-
-    // Sign-in users with the Microsoft identity platform
-    builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-        .AddMicrosoftIdentityWebApp(builder.Configuration)
-        .EnableTokenAcquisitionToCallDownstreamApi()
-        .AddDownstreamApi("GraphApi", builder.Configuration.GetSection("GraphApi"))
-        .AddInMemoryTokenCaches();
+    ConfigureMicrosoftEntra(builder);
 
     builder.Services.AddSingleton<ISudokuGamesRepository, SudokuGamesOnDisk>(
         services =>
@@ -102,4 +82,40 @@ catch (Exception exn)
 finally
 {
     await Log.CloseAndFlushAsync();
+}
+
+return;
+
+static void ConfigureMicrosoftEntra(WebApplicationBuilder builder)
+{
+    string? clientId = builder.Configuration.GetValue<string>("AzureAd:ClientId", "");
+    if (string.IsNullOrWhiteSpace(clientId))
+    {
+        Log.Information("Microsoft Entra application not configured, please set configurations AzureAd:ClientId and AzureAd:ClientCredentials:0:ClientSecret properly.");
+        return;
+    }
+
+    Log.Information("Found Microsoft Entra application {client-id}.", clientId);
+
+    builder.Services.AddControllersWithViews(
+            options =>
+            {
+                AuthorizationPolicy policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+                options.Filters.Add(new AuthorizeFilter(policy));
+            }
+        )
+        .AddMicrosoftIdentityUI();
+
+    // This is required to be instantiated before the OpenIdConnectOptions starts getting configured.
+    // By default, the claims mapping will map claim names in the old format to accommodate older SAML applications.
+    // For instance, 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role' instead of 'roles' claim.
+    // This flag ensures that the ClaimsIdentity claims collection will be built from the claims in the token
+    JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
+
+    // Sign-in users with the Microsoft identity platform
+    builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+        .AddMicrosoftIdentityWebApp(builder.Configuration)
+        .EnableTokenAcquisitionToCallDownstreamApi()
+        .AddDownstreamApi("GraphApi", builder.Configuration.GetSection("GraphApi"))
+        .AddInMemoryTokenCaches();
 }
