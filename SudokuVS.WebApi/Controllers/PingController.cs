@@ -8,6 +8,9 @@ namespace SudokuVS.WebApi.Controllers;
 [ApiController]
 public class PingController : ControllerBase
 {
+    /// <summary>
+    ///     Ping
+    /// </summary>
     [HttpGet]
     public string Ping() => "pong";
 }

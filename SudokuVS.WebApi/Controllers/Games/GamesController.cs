@@ -21,6 +21,9 @@ public class GamesController : ControllerBase
         _repository = repository;
     }
 
+    /// <summary>
+    ///     Search games
+    /// </summary>
     [HttpGet]
     public async IAsyncEnumerable<SudokuGameSummaryDto> SearchGames()
     {
@@ -30,6 +33,9 @@ public class GamesController : ControllerBase
         }
     }
 
+    /// <summary>
+    ///     Get game summary
+    /// </summary>
     [HttpGet("{id:guid}/summary")]
     public async Task<SudokuGameSummaryDto> GetGameSummary(Guid id)
     {
