@@ -75,7 +75,7 @@ public class GameplayController : ControllerBase
 
         if (!playerState.TryUseHint(cellIndex))
         {
-            throw new BadRequest();
+            throw new BadRequestException();
         }
 
         return game.ToPlayerGameDto(playerState);

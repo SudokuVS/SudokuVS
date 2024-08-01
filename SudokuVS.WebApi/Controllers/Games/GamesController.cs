@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using SudokuVS.Game;
 using SudokuVS.Game.Persistence;
+using SudokuVS.WebApi.Exceptions;
 using SudokuVS.WebApi.Models;
 
 namespace SudokuVS.WebApi.Controllers.Games;
@@ -30,19 +31,19 @@ public class GamesController : ControllerBase
     }
 
     [HttpGet("{id:guid}/summary")]
-    public async Task<ActionResult<SudokuGameSummaryDto>> GetGame(Guid id)
+    public async Task<SudokuGameSummaryDto> GetGame(Guid id)
     {
         SudokuGame? game = await _repository.Get(id);
         if (game == null)
         {
-            return NotFound();
+            throw new NotFoundException();
         }
 
         return game.ToSummaryDto();
     }
 
     [HttpPost]
-    public ActionResult<SudokuGameSummaryDto> CreateGame(CreateGameRequest request)
+    public SudokuGameSummaryDto CreateGame(CreateGameRequest request)
     {
         SudokuGame? game = SudokuGame.Create(
             request.Name,
@@ -54,7 +55,7 @@ public class GamesController : ControllerBase
 
         if (game == null)
         {
-            return Problem(title: "Failed to create game.");
+            throw new InternalErrorException("Failed to create game.");
         }
 
         return game.ToSummaryDto();
