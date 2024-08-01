@@ -1,5 +1,4 @@
 using System.IdentityModel.Tokens.Jwt;
-using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -9,7 +8,6 @@ using Microsoft.IdentityModel.Logging;
 using Serilog;
 using Serilog.Events;
 using SudokuVS.Game.Persistence;
-using SudokuVS.RestApi;
 using SudokuVS.Server.Components;
 using SudokuVS.Server.Services;
 
@@ -43,15 +41,6 @@ try
 
     // Add services to the container.
     builder.Services.AddRazorComponents().AddInteractiveServerComponents().AddMicrosoftIdentityConsentHandler();
-    builder.Services.AddControllers()
-        .AddApplicationPart(typeof(PingController).Assembly)
-        .AddJsonOptions(
-            opt =>
-            {
-                opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                opt.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-            }
-        );
     builder.Services.AddControllersWithViews(
             options =>
             {
@@ -84,11 +73,7 @@ try
         }
     );
 
-    builder.AddSwagger();
-
     WebApplication app = builder.Build();
-
-    app.UseSwagger();
 
     if (!app.Environment.IsDevelopment())
     {

@@ -9,7 +9,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\SudokuVS.Game\SudokuVS.Game.csproj" />
-        <ProjectReference Include="..\SudokuVS.RestApi\SudokuVS.RestApi.csproj" />
         <ProjectReference Include="..\SudokuVS.Sudoku\SudokuVS.Sudoku.csproj" />
     </ItemGroup>
 
