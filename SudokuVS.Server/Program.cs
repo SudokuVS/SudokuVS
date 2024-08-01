@@ -15,8 +15,9 @@ using SudokuVS.Server.Components;
 using SudokuVS.Server.Services;
 
 const LogEventLevel infrastructureLoggingLevel = LogEventLevel.Warning;
+const string serilogTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} ({SourceContext}){NewLine}{Exception}";
 
-Log.Logger = new LoggerConfiguration().WriteTo.Console().Enrich.WithProperty("SourceContext", "Bootstrap").CreateBootstrapLogger();
+Log.Logger = new LoggerConfiguration().WriteTo.Console(outputTemplate: serilogTemplate).Enrich.WithProperty("SourceContext", "Bootstrap").CreateBootstrapLogger();
 
 try
 {
@@ -30,13 +31,14 @@ try
     }
 
     builder.Services.AddSerilog(
-        c => c.WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} ({SourceContext}){NewLine}{Exception}")
+        c => c.WriteTo.Console(outputTemplate: serilogTemplate)
+            .Enrich.WithProperty("SourceContext", "Bootstrap")
             .MinimumLevel.Is(builder.Environment.IsDevelopment() ? LogEventLevel.Debug : LogEventLevel.Information)
             .MinimumLevel.Override("System.Net.Http.HttpClient", infrastructureLoggingLevel)
             .MinimumLevel.Override("Microsoft.Extensions.Http", infrastructureLoggingLevel)
             .MinimumLevel.Override("Microsoft.AspNetCore", infrastructureLoggingLevel)
-            .MinimumLevel.Override("Microsoft.Identity", infrastructureLoggingLevel)
-            .MinimumLevel.Override("Microsoft.IdentityModel", infrastructureLoggingLevel)
+            .MinimumLevel.Override("Microsoft.Identity", LogEventLevel.Debug)
+            .MinimumLevel.Override("Microsoft.IdentityModel", LogEventLevel.Debug)
             .ReadFrom.Configuration(builder.Configuration)
     );
 
@@ -68,7 +70,7 @@ try
 
     // Sign-in users with the Microsoft identity platform
     builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-        .AddMicrosoftIdentityWebApp(builder.Configuration, "AzureAd")
+        .AddMicrosoftIdentityWebApp(builder.Configuration)
         .EnableTokenAcquisitionToCallDownstreamApi()
         .AddDownstreamApi("GraphApi", builder.Configuration.GetSection("GraphApi"))
         .AddInMemoryTokenCaches();

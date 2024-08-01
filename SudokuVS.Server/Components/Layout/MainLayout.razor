@@ -1,4 +1,5 @@
-﻿@using System.Security.Claims
+﻿@using System.Net
+@using System.Security.Claims
 @using Microsoft.AspNetCore.Components.Authorization
 @inherits LayoutComponentBase
 
@@ -50,6 +51,7 @@
     </main>
 </div>
 
+@inject NavigationManager Navigation 
 @inject AuthenticationStateProvider Provider 
 
 @code {
@@ -67,7 +69,20 @@
         _prereleaseIdentifier = Metadata.Version?.PrereleaseIdentifier().ToUpper() ?? "";
 
         AuthenticationState state = await Provider.GetAuthenticationStateAsync();
-        AuthenticatedUser = state.User.Identity?.IsAuthenticated == true ? state.User : null;
+
+        if (state.User.Identity?.IsAuthenticated == true)
+        {
+            AuthenticatedUser = state.User;
+        }
+        else
+        {
+            AuthenticatedUser = null;
+            Uri uri = new(Navigation.Uri);
+            if (uri.AbsolutePath != "/")
+            {
+                Navigation.NavigateTo($"/?post-login-redirect={WebUtility.UrlEncode(uri.PathAndQuery)}");
+            }
+        }
     }
 
 }

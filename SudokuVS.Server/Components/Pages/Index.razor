@@ -1,11 +1,16 @@
 ﻿@page "/"
+@using System.Collections.Specialized
+@using System.Net
 @using System.Security.Claims
+@using System.Web
 @using SudokuVS.Game
 @using SudokuVS.Game.Persistence
 @using SudokuVS.Server.Services
 @inject NavigationManager Navigation;
+@inject IJSRuntime JsRuntime; 
 @inject ISudokuGamesRepository Repository;
 @inject GameTokenService GameTokenService;
+@inject ILogger<Index> Logger;
 @attribute [AllowAnonymous]
 
 <PageTitle>@Constants.ProductName</PageTitle>
@@ -13,7 +18,7 @@
 @if (AuthenticatedUser == null)
 {
     <div class="w-100 h-100 d-flex align-items-center justify-content-center">
-        <a class="btn btn-primary btn-lg" href="MicrosoftIdentity/Account/SignIn">Login</a>
+        <button class="btn btn-primary btn-lg" @onclick="Login">Login</button>
     </div>
 }
 else
@@ -56,6 +61,53 @@ else
     string? _newGameError;
 
     protected override void OnInitialized() => _model ??= new Model();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Login with redirection flow:
+        // - The unauthenticated user navigates to /some/path
+        // - The MainLayout redirects the user to /?post-login-redirect=/some/path
+        // - The Index saves the post-login-redirect to the local storage of the user
+        // - The Index navigates to / (no query params) because it is the redirect URI of the OAuth2 provider
+        // - The Index waits for the user to press Login
+        // - The Index navigates to the /MicrosoftIdentity/Account/SignIn page (Microsoft Identity Web UI)
+        // - The SignIn page redirects to Microsoft Identity
+        // - Microsoft Identity performs authentication and returns to the Index
+        // - The Index finds an authenticated user and a post-login-redirect item in the local storage and redirects to that URI 
+
+        if (AuthenticatedUser != null)
+        {
+            string postLoginRedirect = await JsRuntime.InvokeAsync<string>("localStorageGetItem", "post-login-redirect");
+            if (!string.IsNullOrWhiteSpace(postLoginRedirect))
+            {
+                await JsRuntime.InvokeVoidAsync("localStorageRemoveItem", "post-login-redirect");
+
+                if (postLoginRedirect.StartsWith("/"))
+                {
+                    Navigation.NavigateTo(postLoginRedirect, false, true);
+                }
+                else
+                {
+                    Logger.LogWarning("Redirection failed, expected url to start with '/': {url}", postLoginRedirect);
+                }
+
+            }
+        }
+    }
+
+    async Task Login()
+    {
+        Uri uri = new(Navigation.Uri);
+        NameValueCollection queryParams = HttpUtility.ParseQueryString(uri.Query);
+        string? postLoginRedirectInQueryParams = queryParams.Get("post-login-redirect"); // set by the MainLayout when redirecting to index
+        if (!string.IsNullOrWhiteSpace(postLoginRedirectInQueryParams))
+        {
+            string uriDecoded = WebUtility.UrlDecode(postLoginRedirectInQueryParams);
+            await JsRuntime.InvokeVoidAsync("localStorageSetItem", "post-login-redirect", uriDecoded);
+        }
+
+        Navigation.NavigateTo("/MicrosoftIdentity/Account/SignIn", true);
+    }
 
     void NewGame()
     {
