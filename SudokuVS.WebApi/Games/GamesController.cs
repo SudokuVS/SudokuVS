@@ -9,11 +9,11 @@ namespace SudokuVS.WebApi.Games;
 [Route("/api/games")]
 [Authorize]
 [ApiController]
-public class GameController : ControllerBase
+public class GamesController : ControllerBase
 {
     readonly ISudokuGamesRepository _repository;
 
-    public GameController(ISudokuGamesRepository repository)
+    public GamesController(ISudokuGamesRepository repository)
     {
         _repository = repository;
     }
