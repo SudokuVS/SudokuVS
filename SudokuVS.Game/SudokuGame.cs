@@ -188,3 +188,9 @@ public class SudokuGame
 
     internal static SudokuGame Load(Guid id, string name, SudokuGrid grid, SudokuGrid solvedGrid, SudokuGameOptions options) => new(id, name, grid, solvedGrid, options);
 }
+
+public static class SudokuGameExtensions
+{
+    public static bool InvolvesPlayer(this SudokuGame game, Guid userId) =>
+        game.Player1 != null && game.Player1.User.Id == userId || game.Player2 != null && game.Player2.User.Id == userId;
+}

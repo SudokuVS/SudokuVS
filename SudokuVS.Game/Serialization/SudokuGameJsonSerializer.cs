@@ -66,14 +66,14 @@ public class SudokuGameJsonSerializer
             PlayerId = player.User.Id,
             PlayerName = player.User.Name,
             Grid = Serialize(player.Grid),
-            Hints = player.Hints.Select(x => ComputeFlatIndex(x.Row, x.Column)).ToArray()
+            Hints = player.Hints.Select(x => SudokuGridCoordinates.ComputeFlatIndex(x.Row, x.Column)).ToArray()
         };
 
     static Dictionary<int, SerializedCell> Serialize(SudokuGrid grid) =>
         grid.Enumerate()
             .Where(x => x.Cell.Element.HasValue || x.Cell.Annotations.Count > 0 || x.Cell.IsLocked)
             .ToDictionary(
-                x => ComputeFlatIndex(x.Row, x.Column),
+                x => SudokuGridCoordinates.ComputeFlatIndex(x.Row, x.Column),
                 x => new SerializedCell
                 {
                     Elements = x.Cell.Element,
@@ -87,7 +87,7 @@ public class SudokuGameJsonSerializer
         SudokuGrid grid = Deserialize(player.Grid);
         PlayerState state = new(game, grid, side, new UserIdentity { Id = player.PlayerId, Name = player.PlayerName });
 
-        IEnumerable<(int Row, int Column)> hints = player.Hints.Select(ComputeCoordinates);
+        IEnumerable<(int Row, int Column)> hints = player.Hints.Select(SudokuGridCoordinates.ComputeCoordinates);
         state.Restore(hints);
 
         return state;
@@ -101,7 +101,7 @@ public class SudokuGameJsonSerializer
         {
             cells[i, j] = new SudokuCell(i, j);
 
-            int flatIndex = ComputeFlatIndex(i, j);
+            int flatIndex = SudokuGridCoordinates.ComputeFlatIndex(i, j);
             if (!grid.TryGetValue(flatIndex, out SerializedCell? cell))
             {
                 continue;
@@ -122,9 +122,6 @@ public class SudokuGameJsonSerializer
 
         return new SudokuGrid(cells);
     }
-
-    static int ComputeFlatIndex(int row, int column) => row * 9 + column;
-    static (int Row, int Column) ComputeCoordinates(int index) => (index / 9, index % 9);
 
     class SerializedSudokuGame
     {

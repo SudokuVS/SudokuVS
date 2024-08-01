@@ -1,10 +1,11 @@
 ﻿using SudokuVS.Sudoku.Models;
+using SudokuVS.Sudoku.Models.Abstractions;
 
 namespace SudokuVS.Sudoku.Serialization;
 
 public class SudokuGridEnumerableSerializer
 {
-    public IEnumerable<int> ToEnumerable(SudokuGrid grid) => Enumerable.Range(0, 9).SelectMany(i => Enumerable.Range(0, 9).Select(j => grid[i, j].Element ?? 0));
+    public IEnumerable<int> ToEnumerable(IReadOnlySudokuGrid grid) => Enumerable.Range(0, 9).SelectMany(i => Enumerable.Range(0, 9).Select(j => grid[i, j].Element ?? 0));
 
     public SudokuGrid FromEnumerable(IEnumerable<int> values)
     {

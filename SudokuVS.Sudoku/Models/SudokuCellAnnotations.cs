@@ -20,7 +20,11 @@ public class SudokuCellAnnotations : ICollection<int>, IReadOnlyCollection<int>
     public void Add(int item)
     {
         AssertUnlocked();
-        _collectionImplementation.Add(item);
+
+        if (!_collectionImplementation.Add(item))
+        {
+            return;
+        }
 
         CollectionChanged?.Invoke(this, EventArgs.Empty);
     }
@@ -28,11 +32,15 @@ public class SudokuCellAnnotations : ICollection<int>, IReadOnlyCollection<int>
     public bool Remove(int item)
     {
         AssertUnlocked();
-        bool result = _collectionImplementation.Remove(item);
+
+        if (!_collectionImplementation.Remove(item))
+        {
+            return false;
+        }
 
         CollectionChanged?.Invoke(this, EventArgs.Empty);
+        return true;
 
-        return result;
     }
 
     public void Clear()
