@@ -41,25 +41,6 @@ public class GamesController : ControllerBase
 
         return game.ToSummaryDto();
     }
-
-    [HttpPost]
-    public SudokuGameSummaryDto CreateGame(CreateGameRequest request)
-    {
-        SudokuGame? game = SudokuGame.Create(
-            request.Name,
-            new SudokuGameOptions
-            {
-                MaxHints = request.Hints
-            }
-        );
-
-        if (game == null)
-        {
-            throw new InternalErrorException("Failed to create game.");
-        }
-
-        return game.ToSummaryDto();
-    }
 }
 
 public class CreateGameRequest

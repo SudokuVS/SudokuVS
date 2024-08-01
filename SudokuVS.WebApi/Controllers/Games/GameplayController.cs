@@ -3,12 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using SudokuVS.Game;
 using SudokuVS.Game.Persistence;
+using SudokuVS.Game.Users;
 using SudokuVS.WebApi.Exceptions;
 using SudokuVS.WebApi.Models;
 
 namespace SudokuVS.WebApi.Controllers.Games;
 
-[Route("/api/games/{gameId:guid}")]
+[Route("/api/games")]
 [OpenApiTag("Gameplay")]
 [Authorize]
 [ApiController]
@@ -21,14 +22,49 @@ public class GameplayController : ControllerBase
         _repository = repository;
     }
 
-    [HttpGet]
+    [HttpPost]
+    public async Task<SudokuPlayerGameDto> CreateGame(CreateGameRequest request)
+    {
+        UserIdentity user = ControllerContext.HttpContext.User.GetUserIdentity() ?? throw new AccessDeniedException();
+
+        SudokuGame? game = SudokuGame.Create(
+            request.Name,
+            new SudokuGameOptions
+            {
+                MaxHints = request.Hints
+            }
+        );
+
+        if (game == null)
+        {
+            throw new InternalErrorException("Failed to create game.");
+        }
+
+        await _repository.Save(game);
+        PlayerState playerState = game.Join(user, PlayerSide.Player1);
+
+        return game.ToPlayerGameDto(playerState);
+    }
+
+    [HttpGet("{gameId:guid}")]
     public async Task<SudokuPlayerGameDto> GetGame(Guid gameId, CancellationToken cancellationToken)
     {
         (SudokuGame game, PlayerState playerState) = await GetGameAndPlayerState(gameId, cancellationToken);
         return game.ToPlayerGameDto(playerState);
     }
 
-    [HttpPut("cell/{cellIndex:int}/element/{element:int}")]
+    [HttpPost("{gameId:guid}")]
+    public async Task<SudokuPlayerGameDto> JoinGame(Guid gameId, SudokuGamePlayerSideDto side, CancellationToken cancellationToken)
+    {
+        UserIdentity user = ControllerContext.HttpContext.User.GetUserIdentity() ?? throw new AccessDeniedException();
+        (SudokuGame game, PlayerState playerState) = await GetGameAndPlayerState(gameId, cancellationToken);
+
+        game.Join(user, side.FromDto());
+
+        return game.ToPlayerGameDto(playerState);
+    }
+
+    [HttpPut("{gameId:guid}/cell/{cellIndex:int}/element/{element:int}")]
     public async Task<SudokuPlayerGameDto> SetElement(Guid gameId, int cellIndex, int element, CancellationToken cancellationToken)
     {
         (SudokuGame game, PlayerState playerState) = await GetGameAndPlayerState(gameId, cancellationToken);
@@ -36,7 +72,7 @@ public class GameplayController : ControllerBase
         return game.ToPlayerGameDto(playerState);
     }
 
-    [HttpDelete("cell/{cellIndex:int}/element")]
+    [HttpDelete("{gameId:guid}/cell/{cellIndex:int}/element")]
     public async Task<SudokuPlayerGameDto> ClearElement(Guid gameId, int cellIndex, CancellationToken cancellationToken)
     {
         (SudokuGame game, PlayerState playerState) = await GetGameAndPlayerState(gameId, cancellationToken);
@@ -44,7 +80,7 @@ public class GameplayController : ControllerBase
         return game.ToPlayerGameDto(playerState);
     }
 
-    [HttpPut("cell/{cellIndex:int}/annotations/{annotation:int}")]
+    [HttpPut("{gameId:guid}/cell/{cellIndex:int}/annotations/{annotation:int}")]
     public async Task<SudokuPlayerGameDto> AddAnnotation(Guid gameId, int cellIndex, int annotation, CancellationToken cancellationToken)
     {
         (SudokuGame game, PlayerState playerState) = await GetGameAndPlayerState(gameId, cancellationToken);
@@ -52,7 +88,7 @@ public class GameplayController : ControllerBase
         return game.ToPlayerGameDto(playerState);
     }
 
-    [HttpDelete("cell/{cellIndex:int}/annotations/{annotation:int}")]
+    [HttpDelete("{gameId:guid}/cell/{cellIndex:int}/annotations/{annotation:int}")]
     public async Task<SudokuPlayerGameDto> RemoveAnnotation(Guid gameId, int cellIndex, int annotation, CancellationToken cancellationToken)
     {
         (SudokuGame game, PlayerState playerState) = await GetGameAndPlayerState(gameId, cancellationToken);
@@ -60,7 +96,7 @@ public class GameplayController : ControllerBase
         return game.ToPlayerGameDto(playerState);
     }
 
-    [HttpDelete("cell/{cellIndex:int}/annotations")]
+    [HttpDelete("{gameId:guid}/cell/{cellIndex:int}/annotations")]
     public async Task<SudokuPlayerGameDto> ClearAnnotations(Guid gameId, int cellIndex, CancellationToken cancellationToken)
     {
         (SudokuGame game, PlayerState playerState) = await GetGameAndPlayerState(gameId, cancellationToken);
@@ -68,7 +104,7 @@ public class GameplayController : ControllerBase
         return game.ToPlayerGameDto(playerState);
     }
 
-    [HttpPost("cell/{cellIndex:int}/hint")]
+    [HttpPost("{gameId:guid}/cell/{cellIndex:int}/hint")]
     public async Task<SudokuPlayerGameDto> UseHint(Guid gameId, int cellIndex, CancellationToken cancellationToken)
     {
         (SudokuGame game, PlayerState playerState) = await GetGameAndPlayerState(gameId, cancellationToken);

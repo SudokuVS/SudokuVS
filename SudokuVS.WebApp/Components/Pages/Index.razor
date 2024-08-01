@@ -108,7 +108,7 @@ else
         Navigation.NavigateTo("/MicrosoftIdentity/Account/SignIn", true);
     }
 
-    void NewGame()
+    async Task NewGame()
     {
         _newGameError = null;
 
@@ -134,7 +134,7 @@ else
             return;
         }
 
-        Repository.Save(game);
+        await Repository.Save(game);
 
         game.Join(userIdentity, PlayerSide.Player1);
         Navigation.NavigateTo($"/game/{game.Id}");
