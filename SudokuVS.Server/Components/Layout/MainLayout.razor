@@ -1,4 +1,5 @@
-﻿@using Microsoft.AspNetCore.Components.Authorization
+﻿@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
 @inherits LayoutComponentBase
 
 <div class="h-100 d-flex flex-column">
@@ -30,19 +31,12 @@
         <div class="flex-grow-1"></div>
 
         <div class="h-100 d-flex align-items-center gap-1 px-4 position-relative">
-            @if (_isAuthenticated)
+            @if (AuthenticatedUser?.Identity?.IsAuthenticated ?? false)
             {
                 <span class="fs-5 fw-semibold">
-                    @(_playerName ?? "???")
+                    @(AuthenticatedUser.Identity.Name)
                 </span>
                 <a class="small text-white" href="MicrosoftIdentity/Account/SignOut">(logout)</a>
-            }
-            else
-            {
-                <span class="fs-5 fw-semibold">
-                    Login
-                </span>
-                <a class="stretched-link" href="MicrosoftIdentity/Account/SignIn"></a>
             }
         </div>
     </header>
@@ -50,22 +44,21 @@
     <hr class="p-0 m-0"/>
 
     <main class="flex-grow-1">
-        <CascadingValue Value="_playerName">
+        <CascadingValue Value="AuthenticatedUser">
             @Body
         </CascadingValue>
     </main>
 </div>
 
-@inject AuthenticationStateProvider Provider
+@inject AuthenticationStateProvider Provider 
 
 @code {
 
     string? _version;
     bool _isDebugVersion;
     string? _prereleaseIdentifier;
-    bool _isAuthenticated;
-    string? _playerName;
 
+    public ClaimsPrincipal? AuthenticatedUser { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -74,8 +67,7 @@
         _prereleaseIdentifier = Metadata.Version?.PrereleaseIdentifier().ToUpper() ?? "";
 
         AuthenticationState state = await Provider.GetAuthenticationStateAsync();
-        _isAuthenticated = state.User.Identity?.IsAuthenticated ?? false;
-        _playerName = state.User.Identity?.Name;
+        AuthenticatedUser = state.User.Identity?.IsAuthenticated == true ? state.User : null;
     }
 
 }

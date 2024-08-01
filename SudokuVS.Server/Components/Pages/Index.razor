@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using System.Security.Claims
 @using SudokuVS.Game
 @using SudokuVS.Game.Persistence
 @using SudokuVS.Server.Services
@@ -9,38 +10,47 @@
 
 <PageTitle>@Constants.ProductName</PageTitle>
 
-<div class="h-100 container d-flex flex-column align-items-stretch justify-content-center p-4">
-    <div class="border rounded p-4">
-        <h2>New Game</h2>
-        <EditForm class="w-100 d-flex flex-column align-items-start justify-content-center py-4" Model="_model" OnSubmit="NewGame">
-            <div class="row gap-2 mb-3">
-                <label for="name" class="col-2 col-form-label">Name</label>
-                <div class="col">
-                    <InputText id="name" class="form-control" @bind-Value="_model!.Name" placeholder="(auto)"></InputText>
-                </div>
-            </div>
-            <div class="row gap-2 mb-3">
-                <label for="hints" class="col-2 col-form-label">Hints</label>
-                <div class="col">
-                    <InputNumber id="hints" class="form-control" @bind-Value="_model!.Hints"></InputNumber>
-                </div>
-            </div>
-            <button class="btn btn-primary">Create</button>
-        </EditForm>
-
-        @if (_newGameError != null)
-        {
-            <div class="text-danger small">
-                @_newGameError
-            </div>
-        }
+@if (AuthenticatedUser == null)
+{
+    <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+        <a class="btn btn-primary btn-lg" href="MicrosoftIdentity/Account/SignIn">Login</a>
     </div>
-</div>
+}
+else
+{
+    <div class="h-100 container d-flex flex-column align-items-stretch justify-content-center p-4">
+        <div class="border rounded p-4">
+            <h2>New Game</h2>
+            <EditForm class="w-100 d-flex flex-column align-items-start justify-content-center py-4" Model="_model" OnSubmit="NewGame">
+                <div class="row gap-2 mb-3">
+                    <label for="name" class="col-2 col-form-label">Name</label>
+                    <div class="col">
+                        <InputText id="name" class="form-control" @bind-Value="_model!.Name" placeholder="(auto)"></InputText>
+                    </div>
+                </div>
+                <div class="row gap-2 mb-3">
+                    <label for="hints" class="col-2 col-form-label">Hints</label>
+                    <div class="col">
+                        <InputNumber id="hints" class="form-control" @bind-Value="_model!.Hints"></InputNumber>
+                    </div>
+                </div>
+                <button class="btn btn-primary">Create</button>
+            </EditForm>
+
+            @if (_newGameError != null)
+            {
+                <div class="text-danger small">
+                    @_newGameError
+                </div>
+            }
+        </div>
+    </div>
+}
 
 @code {
 
     [CascadingParameter]
-    public string? PlayerName { get; set; }
+    public ClaimsPrincipal? AuthenticatedUser { get; set; }
 
     Model? _model;
     string? _newGameError;
@@ -51,7 +61,7 @@
     {
         _newGameError = null;
 
-        if (PlayerName == null)
+        if (AuthenticatedUser?.Identity?.Name == null)
         {
             _newGameError = "Could not find player name";
             StateHasChanged();
@@ -74,7 +84,7 @@
 
         Repository.Save(game);
 
-        game.Join(PlayerName, PlayerSide.Player1);
+        game.Join(AuthenticatedUser.Identity.Name, PlayerSide.Player1);
         string token = GameTokenService.Generate(game.Id, PlayerSide.Player1);
         Navigation.NavigateTo($"/game/{token}");
     }
