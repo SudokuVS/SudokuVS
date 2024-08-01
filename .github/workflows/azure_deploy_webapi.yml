@@ -61,4 +61,6 @@ jobs:
           app-name: 'SudokuVSApi'
           slot-name: 'Production'
           package: .
+          clean: true
+          restart: true
           

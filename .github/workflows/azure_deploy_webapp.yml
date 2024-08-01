@@ -61,4 +61,6 @@ jobs:
           app-name: 'SudokuVS'
           slot-name: 'Production'
           package: .
+          clean: true
+          restart: true
           
