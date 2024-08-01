@@ -12,6 +12,7 @@ using SudokuVS.Apps.Common.Logging;
 using SudokuVS.Apps.Common.Persistence;
 using SudokuVS.Game.Persistence;
 using SudokuVS.WebApi;
+using SudokuVS.WebApi.Exceptions;
 
 Log.Logger = Logging.CreateBootstrapLogger();
 
@@ -33,6 +34,7 @@ try
             }
         );
     builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddProblemDetails();
 
     ConfigureOpenApiDocument(builder);
 
@@ -48,6 +50,14 @@ try
 
     WebApplication app = builder.Build();
 
+    if (app.Environment.IsDevelopment())
+    {
+        IdentityModelEventSource.ShowPII = true;
+        IdentityModelEventSource.LogCompleteSecurityArtifact = true;
+    }
+
+    app.UseApiExceptionMiddleware(app.Environment.IsProduction());
+
     app.UseOpenApi(settings => { settings.PostProcess = (document, request) => { document.Host = request.Host.Value; }; });
     app.UseSwaggerUi(
         configure =>
@@ -62,16 +72,6 @@ try
             }
         }
     );
-
-    if (!app.Environment.IsDevelopment())
-    {
-        app.UseExceptionHandler("/Error", true);
-    }
-    else
-    {
-        IdentityModelEventSource.ShowPII = true;
-        IdentityModelEventSource.LogCompleteSecurityArtifact = true;
-    }
 
     app.UseRouting();
     app.UseAuthentication();
@@ -139,6 +139,7 @@ void ConfigureOpenApiDocument(WebApplicationBuilder builder)
             settings.Title = "SudokuVS - API";
             settings.Description = "Rest API for the Sudoku VS game.";
             settings.Version = Metadata.Version?.ToString();
+            settings.DocumentName = "game-server";
 
             const string schemeName = "Microsoft Entra";
             settings.AddSecurity(

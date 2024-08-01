@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-
-namespace SudokuVS.WebApi.Exceptions;
+﻿namespace SudokuVS.WebApi.Exceptions;
 
 public class AccessDeniedException : ApiException
 {
-    public AccessDeniedException() : base(StatusCodes.Status403Forbidden)
+    public AccessDeniedException(Exception? innerException = null) : base(StatusCodes.Status403Forbidden, innerException)
     {
     }
 }

@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-
-namespace SudokuVS.WebApi.Exceptions;
+﻿namespace SudokuVS.WebApi.Exceptions;
 
 public class BadRequest : ApiException
 {
-    public BadRequest() : base(StatusCodes.Status400BadRequest)
+    public BadRequest(Exception? innerException = null) : base(StatusCodes.Status400BadRequest, innerException)
     {
     }
 }
