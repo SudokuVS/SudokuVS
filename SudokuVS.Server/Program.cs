@@ -14,7 +14,9 @@ using SudokuVS.RestApi;
 using SudokuVS.Server.Components;
 using SudokuVS.Server.Services;
 
-Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateBootstrapLogger();
+const LogEventLevel infrastructureLoggingLevel = LogEventLevel.Warning;
+
+Log.Logger = new LoggerConfiguration().WriteTo.Console().Enrich.WithProperty("SourceContext", "Bootstrap").CreateBootstrapLogger();
 
 try
 {
@@ -28,23 +30,20 @@ try
     }
 
     builder.Services.AddSerilog(
-        c => c.WriteTo.Console()
+        c => c.WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} ({SourceContext}){NewLine}{Exception}")
             .MinimumLevel.Is(builder.Environment.IsDevelopment() ? LogEventLevel.Debug : LogEventLevel.Information)
-            .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+            .MinimumLevel.Override("System.Net.Http.HttpClient", infrastructureLoggingLevel)
+            .MinimumLevel.Override("Microsoft.Extensions.Http", infrastructureLoggingLevel)
+            .MinimumLevel.Override("Microsoft.AspNetCore", infrastructureLoggingLevel)
+            .MinimumLevel.Override("Microsoft.Identity", infrastructureLoggingLevel)
+            .MinimumLevel.Override("Microsoft.IdentityModel", infrastructureLoggingLevel)
             .ReadFrom.Configuration(builder.Configuration)
     );
 
     // Add services to the container.
     builder.Services.AddRazorComponents().AddInteractiveServerComponents().AddMicrosoftIdentityConsentHandler();
-    builder.Services.AddControllers().AddApplicationPart(typeof(PingController).Assembly);
-    builder.Services.AddControllersWithViews(
-            options =>
-            {
-                AuthorizationPolicy policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
-                options.Filters.Add(new AuthorizeFilter(policy));
-            }
-        )
-        .AddMicrosoftIdentityUI()
+    builder.Services.AddControllers()
+        .AddApplicationPart(typeof(PingController).Assembly)
         .AddJsonOptions(
             opt =>
             {
@@ -52,17 +51,26 @@ try
                 opt.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
             }
         );
+    builder.Services.AddControllersWithViews(
+            options =>
+            {
+                AuthorizationPolicy policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+                options.Filters.Add(new AuthorizeFilter(policy));
+            }
+        )
+        .AddMicrosoftIdentityUI();
 
     // This is required to be instantiated before the OpenIdConnectOptions starts getting configured.
-// By default, the claims mapping will map claim names in the old format to accommodate older SAML applications.
-// For instance, 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role' instead of 'roles' claim.
-// This flag ensures that the ClaimsIdentity claims collection will be built from the claims in the token
+    // By default, the claims mapping will map claim names in the old format to accommodate older SAML applications.
+    // For instance, 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role' instead of 'roles' claim.
+    // This flag ensures that the ClaimsIdentity claims collection will be built from the claims in the token
     JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
 
     // Sign-in users with the Microsoft identity platform
     builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-        .AddMicrosoftIdentityWebApp(builder.Configuration)
+        .AddMicrosoftIdentityWebApp(builder.Configuration, "AzureAd")
         .EnableTokenAcquisitionToCallDownstreamApi()
+        .AddDownstreamApi("GraphApi", builder.Configuration.GetSection("GraphApi"))
         .AddInMemoryTokenCaches();
 
     builder.Services.AddSingleton<ISudokuGamesRepository, SudokuGamesOnDisk>(
@@ -76,7 +84,7 @@ try
     );
     builder.Services.AddSingleton<GameTokenService>(_ => new GameTokenService(RandomNumberGenerator.GetBytes(64)));
 
-    builder.Services.AddSwagger();
+    builder.AddSwagger();
 
     WebApplication app = builder.Build();
 
@@ -90,6 +98,7 @@ try
 
     app.UseStaticFiles();
     app.UseRouting();
+    app.UseAuthentication();
     app.UseAuthorization();
 
     app.UseAntiforgery();
