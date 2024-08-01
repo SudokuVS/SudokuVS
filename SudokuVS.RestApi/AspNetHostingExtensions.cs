@@ -5,11 +5,11 @@ namespace SudokuVS.RestApi;
 
 public static class AspNetHostingExtensions
 {
-    public static IServiceCollection AddSwagger(this IServiceCollection services)
+    public static WebApplicationBuilder AddSwagger(this WebApplicationBuilder builder)
     {
-        services.AddEndpointsApiExplorer();
+        builder.Services.AddEndpointsApiExplorer();
 
-        services.AddOpenApiDocument(
+        builder.Services.AddOpenApiDocument(
             settings =>
             {
                 settings.Title = "SudokuVS - API";
@@ -18,7 +18,7 @@ public static class AspNetHostingExtensions
             }
         );
 
-        return services;
+        return builder;
     }
 
     public static WebApplication UseSwagger(this WebApplication app)
