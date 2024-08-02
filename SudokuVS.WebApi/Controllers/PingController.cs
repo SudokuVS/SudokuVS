@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace SudokuVS.WebApi.Controllers;
 
+/// <summary>
+///     Ping
+/// </summary>
 [Route("/api/ping")]
 [AllowAnonymous]
 [ApiController]

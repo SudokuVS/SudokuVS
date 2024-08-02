@@ -2,7 +2,7 @@
 
 namespace SudokuVS.WebApi.Exceptions;
 
-public static class ApiExceptionHandler
+static class ApiExceptionHandlerExtensions
 {
     public static void UseApiExceptionMiddleware(this WebApplication app, bool hideDetails) =>
         app.Use(

@@ -56,7 +56,7 @@ public class SudokuPlayerGameDto
     public SudokuGamePlayerSideDto? Winner { get; set; }
 }
 
-public static class SudokuGameMappingExtensions
+static class SudokuGameMappingExtensions
 {
     public static SudokuPlayerGameDto ToPlayerGameDto(this SudokuGame game, PlayerState playerState) =>
         new()

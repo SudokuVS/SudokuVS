@@ -23,7 +23,7 @@ public class SudokuCellDto
     public bool? IsLocked { get; init; }
 }
 
-public static class SudokuCellMappingExtensions
+static class SudokuCellMappingExtensions
 {
     public static SudokuCellDto ToDto(this IReadOnlySudokuCell cell) =>
         new()

@@ -24,7 +24,7 @@ public class SudokuHiddenPlayerCellDto
     public bool? IsHint { get; init; }
 }
 
-public static class SudokuHiddenPlayerCellMappingExtensions
+static class SudokuHiddenPlayerCellMappingExtensions
 {
     public static SudokuHiddenPlayerCellDto ToHiddenPlayerCellDto(this IHiddenSudokuCell cell, IHiddenPlayerState state) =>
         new()

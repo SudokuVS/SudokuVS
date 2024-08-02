@@ -29,7 +29,7 @@ public class SudokuPlayerCellDto
     public bool? IsHint { get; init; }
 }
 
-public static class SudokuPlayerCellMappingExtensions
+static class SudokuPlayerCellMappingExtensions
 {
     public static SudokuPlayerCellDto ToPlayerCellDto(this IReadOnlySudokuCell cell, PlayerState state) =>
         new()

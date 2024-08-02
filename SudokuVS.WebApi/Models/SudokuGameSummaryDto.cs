@@ -1,4 +1,5 @@
-﻿using SudokuVS.Game;
+﻿using System.ComponentModel.DataAnnotations;
+using SudokuVS.Game;
 
 namespace SudokuVS.WebApi.Models;
 
@@ -15,11 +16,13 @@ public class SudokuGameSummaryDto
     /// <summary>
     ///     The name of the game.
     /// </summary>
+    [Required]
     public required string Name { get; init; }
 
     /// <summary>
     ///     The initial grid.
     /// </summary>
+    [Required]
     public required SudokuSimpleGridDto Grid { get; init; }
 
     /// <summary>
@@ -58,7 +61,7 @@ public class SudokuGameSummaryDto
     public SudokuGamePlayerSideDto? Winner { get; set; }
 }
 
-public static class SudokuGameSummaryMappingExtensions
+static class SudokuGameSummaryMappingExtensions
 {
     public static SudokuGameSummaryDto ToSummaryDto(this SudokuGame game) =>
         new()

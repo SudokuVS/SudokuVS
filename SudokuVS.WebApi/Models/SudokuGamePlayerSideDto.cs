@@ -2,13 +2,23 @@
 
 namespace SudokuVS.WebApi.Models;
 
+/// <summary>
+///     Side of a player.
+/// </summary>
 public enum SudokuGamePlayerSideDto
 {
+    /// <summary>
+    ///     Player 1 side.
+    /// </summary>
     Player1,
+
+    /// <summary>
+    ///     Player 2 side.
+    /// </summary>
     Player2
 }
 
-public static class SudokuGamePlayerSideMappingExtensions
+static class SudokuGamePlayerSideMappingExtensions
 {
     public static SudokuGamePlayerSideDto ToDto(this PlayerSide side) =>
         side switch

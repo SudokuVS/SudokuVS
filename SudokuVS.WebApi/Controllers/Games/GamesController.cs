@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
 using SudokuVS.Game;
 using SudokuVS.Game.Persistence;
 using SudokuVS.WebApi.Exceptions;
@@ -8,14 +7,18 @@ using SudokuVS.WebApi.Models;
 
 namespace SudokuVS.WebApi.Controllers.Games;
 
+/// <summary>
+///     Games
+/// </summary>
 [Route("/api/games")]
-[OpenApiTag("Games")]
 [Authorize]
 [ApiController]
 public class GamesController : ControllerBase
 {
     readonly ISudokuGamesRepository _repository;
 
+    /// <summary>
+    /// </summary>
     public GamesController(ISudokuGamesRepository repository)
     {
         _repository = repository;
@@ -25,13 +28,7 @@ public class GamesController : ControllerBase
     ///     Search games
     /// </summary>
     [HttpGet]
-    public async IAsyncEnumerable<SudokuGameSummaryDto> SearchGames()
-    {
-        await foreach (SudokuGame game in _repository.GetAll())
-        {
-            yield return game.ToSummaryDto();
-        }
-    }
+    public IAsyncEnumerable<SudokuGameSummaryDto> SearchGames() => _repository.GetAll().Select(game => game.ToSummaryDto());
 
     /// <summary>
     ///     Get game summary
@@ -47,17 +44,4 @@ public class GamesController : ControllerBase
 
         return game.ToSummaryDto();
     }
-}
-
-public class CreateGameRequest
-{
-    /// <summary>
-    ///     The name of the game.
-    /// </summary>
-    public string? Name { get; init; }
-
-    /// <summary>
-    ///     The number of hints that can be used by each player during the round.
-    /// </summary>
-    public int Hints { get; init; }
 }

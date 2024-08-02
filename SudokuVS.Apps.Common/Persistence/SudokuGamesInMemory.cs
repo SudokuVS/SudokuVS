@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Runtime.CompilerServices;
 using SudokuVS.Game;
 using SudokuVS.Game.Persistence;
 
@@ -9,16 +8,8 @@ public class SudokuGamesInMemory : ISudokuGamesRepository
 {
     readonly ConcurrentDictionary<Guid, SudokuGame> _games = new();
 
-    public async IAsyncEnumerable<SudokuGame> GetAll([EnumeratorCancellation] CancellationToken cancellationToken = default)
-    {
-        foreach (SudokuGame value in _games.Values)
-        {
-            yield return value;
-        }
-    }
-
+    public IAsyncEnumerable<SudokuGame> GetAll(CancellationToken cancellationToken = default) => _games.Values.ToAsyncEnumerable();
     public Task<SudokuGame?> Get(Guid id, CancellationToken _ = default) => Task.FromResult(_games.GetValueOrDefault(id));
-
     public Task<bool> Exists(Guid id, CancellationToken _ = default) => Task.FromResult(_games.ContainsKey(id));
 
     public Task Save(SudokuGame game, CancellationToken _ = default)
