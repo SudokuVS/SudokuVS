@@ -220,7 +220,7 @@ public class SudokuCellTest
 
         SudokuCell clonedCell = SudokuCell.Clone(cell);
 
-        clonedCell.Should().NotBe(cell);
+        clonedCell.Should().NotBeSameAs(cell);
         clonedCell.Should().BeEquivalentTo(cell);
     }
 

@@ -102,4 +102,6 @@ public class SudokuCell : IReadOnlySudokuCell, IHiddenSudokuCell
     }
 
     static int GetRegionIndex(int row, int column) => row / 3 * 3 + column / 3;
+
+    public override string ToString() => $"Cell[{Row}, {Column}]";
 }

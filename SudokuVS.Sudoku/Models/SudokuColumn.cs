@@ -37,7 +37,13 @@ public class SudokuColumn : IReadOnlySudokuColumn, IHiddenSudokuColumn
     IReadOnlySudokuCell IReadOnlySudokuColumn.this[int index] => this[index];
     IHiddenSudokuCell IHiddenSudokuColumn.this[int index] => this[index];
 
-    public void UpdateValidationState()
+    /// <summary>
+    ///     Update the values of <see cref="IsCompleted" /> and <see cref="IsValid" />.
+    /// </summary>
+    /// <remarks>
+    ///     This method is called by the parent grid when cell events are triggered
+    /// </remarks>
+    internal void UpdateValidationState()
     {
         IsCompleted = true;
         IsValid = true;

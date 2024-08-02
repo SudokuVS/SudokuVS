@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using SudokuVS.Game.Users;
 using SudokuVS.Sudoku.Models;
 using SudokuVS.Sudoku.Serialization;
+using SudokuVS.Sudoku.Utils;
 
 namespace SudokuVS.Game.Serialization;
 

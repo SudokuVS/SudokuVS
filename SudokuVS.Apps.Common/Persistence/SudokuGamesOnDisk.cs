@@ -142,8 +142,8 @@ public class SudokuGamesOnDisk : ISudokuGamesRepository
         }
 
         state.HintAdded += (_, _) => SaveToDiskDebounced(game);
-        state.Grid.CellValueChanged += (_, _) => SaveToDiskDebounced(game);
-        state.Grid.CellAnnotationChanged += (_, _) => SaveToDiskDebounced(game);
+        state.Grid.CellElementChanged += (_, _) => SaveToDiskDebounced(game);
+        state.Grid.CellAnnotationsChanged += (_, _) => SaveToDiskDebounced(game);
         state.Grid.CellLockChanged += (_, _) => SaveToDiskDebounced(game);
     }
 

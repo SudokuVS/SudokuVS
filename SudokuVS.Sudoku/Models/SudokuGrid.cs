@@ -16,7 +16,7 @@ public class SudokuGrid : IReadOnlySudokuGrid, IHiddenSudokuGrid
         foreach (SudokuCell cell in grid)
         {
             cell.ElementChanged += (_, _) => OnCellValueChanged(cell);
-            cell.AnnotationsChanged += (_, _) => CellAnnotationChanged?.Invoke(this, (cell.Row, cell.Column));
+            cell.AnnotationsChanged += (_, _) => CellAnnotationsChanged?.Invoke(this, (cell.Row, cell.Column));
             cell.LockChanged += (_, _) => CellLockChanged?.Invoke(this, (cell.Row, cell.Column));
         }
 
@@ -40,8 +40,8 @@ public class SudokuGrid : IReadOnlySudokuGrid, IHiddenSudokuGrid
     public bool IsValid => Regions.All(r => r is { IsValid: true }) && Rows.All(r => r is { IsValid: true }) && Columns.All(c => c is { IsValid: true });
     public bool IsCompleted => Regions.All(r => r is { IsCompleted: true });
 
-    public event EventHandler<(int Row, int Column)>? CellValueChanged;
-    public event EventHandler<(int Row, int Column)>? CellAnnotationChanged;
+    public event EventHandler<(int Row, int Column)>? CellElementChanged;
+    public event EventHandler<(int Row, int Column)>? CellAnnotationsChanged;
     public event EventHandler<(int Row, int Column)>? CellLockChanged;
 
     public SudokuCell this[int rowIndex, int colIndex] {
@@ -92,7 +92,7 @@ public class SudokuGrid : IReadOnlySudokuGrid, IHiddenSudokuGrid
         Columns[cell.Column].UpdateValidationState();
         Regions[cell.Region].UpdateValidationState();
 
-        CellValueChanged?.Invoke(this, (cell.Row, cell.Column));
+        CellElementChanged?.Invoke(this, (cell.Row, cell.Column));
     }
 
     public static SudokuGrid CreateEmpty() => new(new int[9, 9]);
