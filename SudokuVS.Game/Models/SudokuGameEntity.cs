@@ -4,8 +4,11 @@ namespace SudokuVS.Game.Models;
 
 public class SudokuGameEntity
 {
-    public SudokuGameEntity(string name, string initialGrid, string solvedGrid, SudokuGameOptionsEntity? options = null)
+    public SudokuGameEntity() { }
+
+    public SudokuGameEntity(Guid id, string name, string initialGrid, string solvedGrid, SudokuGameOptionsEntity? options = null)
     {
+        Id = id;
         Name = name;
         InitialGrid = initialGrid;
         SolvedGrid = solvedGrid;
@@ -15,55 +18,50 @@ public class SudokuGameEntity
     /// <summary>
     ///     The unique ID of the game
     /// </summary>
-    public Guid Id { get; private set; } = Guid.NewGuid();
+    public Guid Id { get; init; }
 
     /// <summary>
     ///     The name of the game.
     /// </summary>
     [MaxLength(64)]
-    public string Name { get; private set; }
+    public string Name { get; set; }
 
     /// <summary>
     ///     The grid generated for the game.
     /// </summary>
     [MaxLength(81)]
-    public string InitialGrid { get; private set; }
+    public string InitialGrid { get; set; }
 
     /// <summary>
     ///     The solution to the game.
     /// </summary>
     [MaxLength(81)]
-    public string SolvedGrid { get; private set; }
+    public string SolvedGrid { get; set; }
 
     /// <summary>
     ///     The options of the game.
     /// </summary>
-    public SudokuGameOptionsEntity Options { get; private set; }
+    public SudokuGameOptionsEntity Options { get; set; }
 
     /// <summary>
-    ///     The first player of the game.
+    ///     The players of the game.
     /// </summary>
-    public PlayerStateEntity? Player1 { get; set; }
-
-    /// <summary>
-    ///     The second player of the game.
-    /// </summary>
-    public PlayerStateEntity? Player2 { get; set; }
+    public ICollection<PlayerStateEntity> Players { get; set; } = new List<PlayerStateEntity>();
 
     /// <summary>
     ///     The date at which the game started. The game starts once both players have joined the game.
     /// </summary>
-    public DateTime? StartDate { get; private set; }
+    public DateTime? StartDate { get; set; }
 
     /// <summary>
     ///     The date at which the game ended. The game ends once one of them finds the solution to the sudoku puzzle.
     /// </summary>
-    public DateTime? EndDate { get; private set; }
+    public DateTime? EndDate { get; set; }
 
     /// <summary>
     ///     If the game is over, the winner of the game. The winner of the game is the first player that found the solution to the sudoku puzzle.
     /// </summary>
-    public PlayerSide? Winner { get; private set; }
+    public PlayerSide? Winner { get; set; }
 }
 
 public static class SudokuGameEntityExtensions
@@ -74,8 +72,8 @@ public static class SudokuGameEntityExtensions
     public static PlayerStateEntity? GetPlayerState(this SudokuGameEntity game, PlayerSide side) =>
         side switch
         {
-            PlayerSide.Player1 => game.Player1,
-            PlayerSide.Player2 => game.Player2,
+            PlayerSide.Player1 => game.Players.SingleOrDefault(p => p.Side == PlayerSide.Player1),
+            PlayerSide.Player2 => game.Players.SingleOrDefault(p => p.Side == PlayerSide.Player2),
             _ => throw new ArgumentOutOfRangeException(nameof(side), side, null)
         };
 }

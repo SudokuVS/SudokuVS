@@ -73,14 +73,14 @@ public class SudokuGameJsonSerializer
 
     static Dictionary<int, SerializedCell> Serialize(SudokuGrid grid) =>
         grid.Enumerate()
-            .Where(x => x.Cell.Element.HasValue || x.Cell.Annotations.Count > 0 || x.Cell.IsLocked)
+            .Where(cell => cell.Element.HasValue || cell.Annotations.Count > 0 || cell.IsLocked)
             .ToDictionary(
-                x => SudokuGridCoordinates.ComputeFlatIndex(x.Row, x.Column),
-                x => new SerializedCell
+                cell => SudokuGridCoordinates.ComputeFlatIndex(cell.Row, cell.Column),
+                cell => new SerializedCell
                 {
-                    Elements = x.Cell.Element,
-                    Annotations = x.Cell.Annotations.Count == 0 ? null : x.Cell.Annotations.ToArray(),
-                    IsLocked = x.Cell.IsLocked ? true : null
+                    Elements = cell.Element,
+                    Annotations = cell.Annotations.Count == 0 ? null : cell.Annotations.ToArray(),
+                    IsLocked = cell.IsLocked ? true : null
                 }
             );
 

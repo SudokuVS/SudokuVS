@@ -10,13 +10,9 @@ public class AppDbContext : DbContext
     {
     }
 
-    public DbSet<UserIdentityEntity> Users { get; set; }
-    public DbSet<SudokuGameEntity> Games { get; set; }
+    public DbSet<UserIdentityEntity> Users { get; private set; }
+    public DbSet<PlayerStateEntity> PlayerStates { get; private set; }
+    public DbSet<SudokuGameEntity> Games { get; private set; }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<SudokuGameEntity>().OwnsOne(g => g.Options);
-        modelBuilder.Entity<SudokuGameEntity>().OwnsOne(g => g.Player1);
-        modelBuilder.Entity<SudokuGameEntity>().OwnsOne(g => g.Player2);
-    }
+    protected override void OnModelCreating(ModelBuilder modelBuilder) => modelBuilder.Entity<SudokuGameEntity>().HasMany(e => e.Players).WithOne(s => s.Game);
 }

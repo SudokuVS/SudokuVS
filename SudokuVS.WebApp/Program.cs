@@ -7,34 +7,29 @@ using Microsoft.Identity.Web.UI;
 using Microsoft.IdentityModel.Logging;
 using Serilog;
 using SudokuVS.Apps.Common.Logging;
-using SudokuVS.Game.Persistence;
-using SudokuVS.Game.Services;
+using SudokuVS.Game.Utils;
 using SudokuVS.WebApp.Components;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 Log.Logger = Logging.CreateBootstrapLogger();
+ILoggerFactory factory = new LoggerFactory().AddSerilog(Log.Logger);
+ILogger bootstrapLogger = factory.CreateLogger("Bootstrap");
 
 try
 {
-    Log.Logger.Information("Hello!");
+    bootstrapLogger.LogInformation("Hello!");
 
     WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
     builder.ConfigureSerilog();
     ConfigureMicrosoftEntra(builder);
+    builder.ConfigureGameServices(bootstrapLogger);
 
     builder.Services.AddRazorComponents().AddInteractiveServerComponents().AddMicrosoftIdentityConsentHandler();
 
-    builder.Services.AddSingleton<ISudokuGamesRepository, SudokuGamesOnDisk>(
-        services =>
-        {
-            const string relativePath = "%LOCALAPPDATA%/SudokuVS/repository/games";
-            string path = Path.GetFullPath(Environment.ExpandEnvironmentVariables(relativePath));
-            Log.Logger.Information("Game repository path: {path}", path);
-            return new SudokuGamesOnDisk(path, services.GetRequiredService<ILogger<SudokuGamesOnDisk>>());
-        }
-    );
-
     WebApplication app = builder.Build();
+
+    await app.UseGameServicesAsync();
 
     if (!app.Environment.IsDevelopment())
     {
@@ -58,11 +53,11 @@ try
 
     app.Run();
 
-    Log.Information("Bye!");
+    bootstrapLogger.LogInformation("Bye!");
 }
 catch (Exception exn)
 {
-    Log.Fatal(exn, "Uncaught exception.");
+    bootstrapLogger.LogCritical(exn, "Uncaught exception.");
 }
 finally
 {

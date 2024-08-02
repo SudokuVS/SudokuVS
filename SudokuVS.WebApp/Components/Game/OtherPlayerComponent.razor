@@ -65,8 +65,11 @@
             }
         }
 
-        foreach ((int row, int column, IHiddenSudokuCell cell) in Grid.Enumerate())
+        foreach (IHiddenSudokuCell cell in Grid.Enumerate())
         {
+            int row = cell.Row;
+            int column = cell.Column;
+
             _displayGrid[row, column].BackgroundColor = State.Hints.Contains((cell.Row, cell.Column))
                 ? GridComponent.Color.Yellow
                 : cell.IsLocked
