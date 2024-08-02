@@ -6,8 +6,8 @@ namespace Tests.Sudoku;
 public class TEST_TO_REMOVE
 {
     [TestMethod]
-    public void FAILS()
+    public void SUCCEEDS()
     {
-        true.Should().BeFalse();
+        true.Should().BeTrue();
     }
 }
