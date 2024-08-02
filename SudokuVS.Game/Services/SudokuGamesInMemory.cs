@@ -1,8 +1,7 @@
 ﻿using System.Collections.Concurrent;
-using SudokuVS.Game;
 using SudokuVS.Game.Persistence;
 
-namespace SudokuVS.Apps.Common.Services;
+namespace SudokuVS.Game.Services;
 
 public class SudokuGamesInMemory : ISudokuGamesRepository
 {

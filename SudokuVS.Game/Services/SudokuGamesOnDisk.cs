@@ -1,11 +1,11 @@
 ﻿using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
-using SudokuVS.Game;
+using SudokuVS.Game.Models;
 using SudokuVS.Game.Persistence;
 using SudokuVS.Game.Serialization;
 
-namespace SudokuVS.Apps.Common.Services;
+namespace SudokuVS.Game.Services;
 
 public class SudokuGamesOnDisk : ISudokuGamesRepository
 {

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using SudokuVS.Game.Models;
 using SudokuVS.Game.Users;
 using SudokuVS.Sudoku.Generators;
 using SudokuVS.Sudoku.Models;

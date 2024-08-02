@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+using SudokuVS.Game.Models;
 using SudokuVS.Game.Users;
 using SudokuVS.Sudoku.Models;
 using SudokuVS.Sudoku.Serialization;

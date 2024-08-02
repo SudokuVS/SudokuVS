@@ -9,8 +9,8 @@ using NSwag.AspNetCore;
 using NSwag.Generation.Processors.Security;
 using Serilog;
 using SudokuVS.Apps.Common.Logging;
-using SudokuVS.Apps.Common.Services;
 using SudokuVS.Game.Persistence;
+using SudokuVS.Game.Services;
 using SudokuVS.WebApi;
 using SudokuVS.WebApi.Exceptions;
 

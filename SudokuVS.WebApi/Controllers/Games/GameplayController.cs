@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using SudokuVS.Game;
+using SudokuVS.Game.Models;
 using SudokuVS.Game.Persistence;
 using SudokuVS.Game.Users;
 using SudokuVS.WebApi.Controllers.Games.Requests;
