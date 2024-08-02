@@ -6,9 +6,9 @@ public class SudokuGridStringSerializer
 {
     readonly SudokuGridEnumerableSerializer _enumerableSerializer = new();
 
-    public string Serialize(SudokuGrid grid) => string.Join("", _enumerableSerializer.ToEnumerable(grid));
+    public string ToString(SudokuGrid grid) => string.Join("", _enumerableSerializer.ToEnumerable(grid));
 
-    public SudokuGrid Deserialize(string serialized)
+    public SudokuGrid FromString(string serialized)
     {
         if (serialized.Length != 81)
         {

@@ -1,4 +1,5 @@
 ﻿using SudokuVS.Sudoku.Models.Abstractions;
+using SudokuVS.Sudoku.Utils;
 
 namespace SudokuVS.Sudoku.Models;
 
@@ -55,6 +56,19 @@ public class SudokuGrid : IReadOnlySudokuGrid, IHiddenSudokuGrid
             {
                 throw new ArgumentOutOfRangeException(nameof(colIndex), colIndex, "Expected col index to be between 0 and 8.");
             }
+
+            return _grid[rowIndex, colIndex];
+        }
+    }
+
+    public SudokuCell this[int index] {
+        get {
+            if (index is < 0 or > 80)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index), index, "Expected index to be between 0 and 80.");
+            }
+
+            (int rowIndex, int colIndex) = SudokuGridCoordinates.ComputeCoordinates(index);
 
             return _grid[rowIndex, colIndex];
         }

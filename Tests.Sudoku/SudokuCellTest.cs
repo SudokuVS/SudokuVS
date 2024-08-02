@@ -97,6 +97,39 @@ public class SudokuCellTest
     }
 
     [TestMethod]
+    public void ShouldBeEmptyIfElementIsNull()
+    {
+        SudokuCell cell = new(0, 0);
+
+        cell.IsEmpty.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public void ShouldNotBeEmptyIfElementIsNull()
+    {
+        SudokuCell cell = new(0, 0, 1);
+
+        cell.IsEmpty.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void ShouldHaveAnnotationsIfAnnotationsHaveValues()
+    {
+        SudokuCell cell = new(0, 0);
+        cell.Annotations.Add(1);
+
+        cell.HasAnnotations.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public void ShouldNotHaveAnnotationsIfAnnotationsHaveValues()
+    {
+        SudokuCell cell = new(0, 0);
+
+        cell.HasAnnotations.Should().BeFalse();
+    }
+
+    [TestMethod]
     public void ShouldRaiseElementChanged_SetElement()
     {
         SudokuCell cell = new(0, 0, 1);
