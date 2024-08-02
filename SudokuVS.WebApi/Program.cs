@@ -33,6 +33,7 @@ try
                 configure.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
             }
         );
+    builder.Services.AddRazorPages();
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddProblemDetails();
 
@@ -77,6 +78,7 @@ try
     app.UseAuthentication();
     app.UseAuthorization();
 
+    app.MapRazorPages();
     app.MapDefaultControllerRoute();
 
     app.Run();
@@ -140,7 +142,7 @@ void ConfigureOpenApiDocument(WebApplicationBuilder builder)
 
             string basePath = $"{instance}{tenantId}/oauth2/v2.0/";
             Log.Information("Swagger UI authentication configured: {path}.", basePath);
-            
+
             const string schemeName = "Microsoft Entra";
             settings.AddSecurity(
                 schemeName,
