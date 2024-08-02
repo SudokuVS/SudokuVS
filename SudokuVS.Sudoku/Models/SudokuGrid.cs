@@ -15,7 +15,7 @@ public class SudokuGrid : IReadOnlySudokuGrid, IHiddenSudokuGrid
         _grid = grid;
         foreach (SudokuCell cell in grid)
         {
-            cell.ValueChanged += (_, _) => OnCellValueChanged(cell);
+            cell.ElementChanged += (_, _) => OnCellValueChanged(cell);
             cell.AnnotationsChanged += (_, _) => CellAnnotationChanged?.Invoke(this, (cell.Row, cell.Column));
             cell.LockChanged += (_, _) => CellLockChanged?.Invoke(this, (cell.Row, cell.Column));
         }

@@ -2,7 +2,14 @@
 
 namespace SudokuVS.Sudoku.Models;
 
-public class SudokuCellAnnotations : ICollection<int>, IReadOnlyCollection<int>
+/// <summary>
+///     ICollection&lt;int&gt; implementation that is
+///     <list type="number">
+///         <item>observable (see <see cref="CollectionChanged" />)</item>
+///         <item>locked when the parent <see cref="SudokuCell" /> is locked</item>
+///     </list>
+/// </summary>
+class SudokuCellAnnotations : ICollection<int>, IReadOnlyCollection<int>
 {
     readonly HashSet<int> _collectionImplementation = [];
 

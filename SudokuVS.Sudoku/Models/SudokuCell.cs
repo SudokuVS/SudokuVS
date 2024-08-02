@@ -11,24 +11,19 @@ public class SudokuCell : IReadOnlySudokuCell, IHiddenSudokuCell
 
     public SudokuCell(int row, int column, int? element = null)
     {
-        if (Row is < 0 or > 8)
+        if (row is < 0 or > 8)
         {
-            throw new ArgumentOutOfRangeException(nameof(Row), Row, "Expected index of row to be between 0 and 8.");
+            throw new ArgumentOutOfRangeException(nameof(row), row, "Expected index of row to be between 0 and 8.");
         }
 
-        if (Column is < 0 or > 8)
+        if (column is < 0 or > 8)
         {
-            throw new ArgumentOutOfRangeException(nameof(Column), Column, "Expected index of column to be between 0 and 8.");
+            throw new ArgumentOutOfRangeException(nameof(column), column, "Expected index of column to be between 0 and 8.");
         }
 
-        if (Region is < 0 or > 8)
+        if (element is < 1 or > 9)
         {
-            throw new ArgumentOutOfRangeException(nameof(Region), Region, "Expected index of region to be between 0 and 8.");
-        }
-
-        if (Element is < 1 or > 9)
-        {
-            throw new ArgumentOutOfRangeException(nameof(Column), Column, "Expected element be between 1 and 9.");
+            throw new ArgumentOutOfRangeException(nameof(element), element, "Expected element be between 1 and 9.");
         }
 
         Row = row;
@@ -57,8 +52,13 @@ public class SudokuCell : IReadOnlySudokuCell, IHiddenSudokuCell
                 throw new InvalidOperationException("Cell is locked");
             }
 
+            if (_element == value)
+            {
+                return;
+            }
+
             _element = value;
-            ValueChanged?.Invoke(this, EventArgs.Empty);
+            ElementChanged?.Invoke(this, EventArgs.Empty);
         }
     }
     public ICollection<int> Annotations => _annotations;
@@ -68,6 +68,11 @@ public class SudokuCell : IReadOnlySudokuCell, IHiddenSudokuCell
         get => _isLocked;
 
         set {
+            if (_isLocked == value)
+            {
+                return;
+            }
+
             _isLocked = value;
             LockChanged?.Invoke(this, EventArgs.Empty);
         }
@@ -78,15 +83,23 @@ public class SudokuCell : IReadOnlySudokuCell, IHiddenSudokuCell
 
     public bool HasAnnotations => Annotations.Count != 0;
 
-    public event EventHandler? ValueChanged;
+    public event EventHandler? ElementChanged;
     public event EventHandler? AnnotationsChanged;
     public event EventHandler? LockChanged;
 
-    public static SudokuCell Clone(SudokuCell cell) =>
-        new(cell.Row, cell.Column, cell.Element)
+    public static SudokuCell Clone(SudokuCell cell)
+    {
+        SudokuCell result = new(cell.Row, cell.Column, cell.Element);
+
+        foreach (int annotation in cell.Annotations)
         {
-            IsLocked = cell.IsLocked
-        };
+            result.Annotations.Add(annotation);
+        }
+
+        result.IsLocked = cell.IsLocked;
+
+        return result;
+    }
 
     static int GetRegionIndex(int row, int column) => row / 3 * 3 + column / 3;
 }
