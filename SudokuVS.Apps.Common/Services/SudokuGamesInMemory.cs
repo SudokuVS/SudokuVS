@@ -2,7 +2,7 @@
 using SudokuVS.Game;
 using SudokuVS.Game.Persistence;
 
-namespace SudokuVS.Apps.Common.Persistence;
+namespace SudokuVS.Apps.Common.Services;
 
 public class SudokuGamesInMemory : ISudokuGamesRepository
 {

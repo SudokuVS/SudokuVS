@@ -7,7 +7,7 @@ using Microsoft.Identity.Web.UI;
 using Microsoft.IdentityModel.Logging;
 using Serilog;
 using SudokuVS.Apps.Common.Logging;
-using SudokuVS.Apps.Common.Persistence;
+using SudokuVS.Apps.Common.Services;
 using SudokuVS.Game.Persistence;
 using SudokuVS.WebApp.Components;
 
