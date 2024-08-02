@@ -1,4 +1,5 @@
-﻿using SudokuVS.Sudoku.Models.Abstractions;
+﻿using System.ComponentModel.DataAnnotations;
+using SudokuVS.Sudoku.Models.Abstractions;
 using SudokuVS.Sudoku.Serialization;
 
 namespace SudokuVS.WebApi.Models;
@@ -11,10 +12,11 @@ public class SudokuSimpleGridDto
     /// <summary>
     ///     The cells of the grid.
     /// </summary>
+    [Required]
     public required int[] Cells { get; init; }
 }
 
-public static class SudokuSimpleGridMappingExtensions
+static class SudokuSimpleGridMappingExtensions
 {
     public static SudokuSimpleGridDto ToSimpleDto(this IReadOnlySudokuGrid grid) =>
         new()

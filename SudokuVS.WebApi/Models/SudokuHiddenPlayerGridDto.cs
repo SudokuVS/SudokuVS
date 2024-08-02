@@ -1,4 +1,5 @@
-﻿using SudokuVS.Game;
+﻿using System.ComponentModel.DataAnnotations;
+using SudokuVS.Game;
 using SudokuVS.Sudoku.Models.Abstractions;
 
 namespace SudokuVS.WebApi.Models;
@@ -11,10 +12,11 @@ public class SudokuHiddenPlayerGridDto
     /// <summary>
     ///     The cells of the grid.
     /// </summary>
+    [Required]
     public required Dictionary<int, SudokuHiddenPlayerCellDto> Cells { get; init; }
 }
 
-public static class SudokuHiddenPlayerGridMappingExtensions
+static class SudokuHiddenPlayerGridMappingExtensions
 {
     public static SudokuHiddenPlayerGridDto ToHiddenPlayerGridDto(this IHiddenSudokuGrid grid, IHiddenPlayerState state) =>
         new()

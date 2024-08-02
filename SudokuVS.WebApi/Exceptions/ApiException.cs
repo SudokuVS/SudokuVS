@@ -1,6 +1,6 @@
 ﻿namespace SudokuVS.WebApi.Exceptions;
 
-public class ApiException : Exception
+class ApiException : Exception
 {
     public ApiException(int statusCode) : this(statusCode, (string?)null) { }
     public ApiException(int statusCode, Exception? innerException) : this(statusCode, innerException?.ToString()) { }

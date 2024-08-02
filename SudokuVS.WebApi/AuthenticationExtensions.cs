@@ -4,7 +4,7 @@ using SudokuVS.WebApi.Exceptions;
 
 namespace SudokuVS.WebApi;
 
-public static class AuthenticationExtensions
+static class AuthenticationExtensions
 {
     public static Guid? GetAuthenticatedUserId(this ControllerContext context) => context.HttpContext.User.GetId();
 

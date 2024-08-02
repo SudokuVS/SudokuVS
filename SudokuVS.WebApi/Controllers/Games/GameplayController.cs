@@ -4,11 +4,15 @@ using NSwag.Annotations;
 using SudokuVS.Game;
 using SudokuVS.Game.Persistence;
 using SudokuVS.Game.Users;
+using SudokuVS.WebApi.Controllers.Games.Requests;
 using SudokuVS.WebApi.Exceptions;
 using SudokuVS.WebApi.Models;
 
 namespace SudokuVS.WebApi.Controllers.Games;
 
+/// <summary>
+///     Gameplay
+/// </summary>
 [Route("/api/games")]
 [OpenApiTag("Gameplay")]
 [Authorize]
@@ -17,6 +21,8 @@ public class GameplayController : ControllerBase
 {
     readonly ISudokuGamesRepository _repository;
 
+    /// <summary>
+    /// </summary>
     public GameplayController(ISudokuGamesRepository repository)
     {
         _repository = repository;
