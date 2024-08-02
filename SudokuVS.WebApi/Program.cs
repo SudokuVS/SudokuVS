@@ -120,19 +120,6 @@ static void ConfigureMicrosoftEntra(WebApplicationBuilder builder)
 
 void ConfigureOpenApiDocument(WebApplicationBuilder builder)
 {
-    string? instance = builder.Configuration.GetValue<string>("AzureAd:Instance");
-    string? tenantId = builder.Configuration.GetValue<string>("AzureAd:TenantId");
-    string? clientId = builder.Configuration.GetValue<string>("AzureAd:ClientId");
-
-    if (string.IsNullOrWhiteSpace(instance) || string.IsNullOrWhiteSpace(tenantId) || string.IsNullOrWhiteSpace(clientId))
-    {
-        Log.Information("Swagger UI authentication not configured, please set configurations AzureAd:Instance, AzureAd:TenantId and AzureAd:ClientId.");
-        return;
-    }
-
-    string basePath = $"{instance}{tenantId}/oauth2/v2.0/";
-    Log.Information("Swagger UI authentication configured: {path}.", basePath);
-
     builder.Services.AddOpenApiDocument(
         settings =>
         {
@@ -141,6 +128,19 @@ void ConfigureOpenApiDocument(WebApplicationBuilder builder)
             settings.Version = Metadata.Version?.ToString();
             settings.DocumentName = "game-server";
 
+            string? instance = builder.Configuration.GetValue<string>("AzureAd:Instance");
+            string? tenantId = builder.Configuration.GetValue<string>("AzureAd:TenantId");
+            string? clientId = builder.Configuration.GetValue<string>("AzureAd:ClientId");
+
+            if (string.IsNullOrWhiteSpace(instance) || string.IsNullOrWhiteSpace(tenantId) || string.IsNullOrWhiteSpace(clientId))
+            {
+                Log.Information("Swagger UI authentication not configured, please set configurations AzureAd:Instance, AzureAd:TenantId and AzureAd:ClientId.");
+                return;
+            }
+
+            string basePath = $"{instance}{tenantId}/oauth2/v2.0/";
+            Log.Information("Swagger UI authentication configured: {path}.", basePath);
+            
             const string schemeName = "Microsoft Entra";
             settings.AddSecurity(
                 schemeName,
