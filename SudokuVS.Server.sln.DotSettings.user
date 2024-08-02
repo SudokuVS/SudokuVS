@@ -1,0 +1,4 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=a4fd5e59_002D8d46_002D4cb7_002Dacbf_002D8a80d2124c65/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="SudokuCellTest" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Project Location="D:\source\repos\SudokuVS\Tests.Sudoku" Presentation="&amp;lt;Tests&amp;gt;\&amp;lt;Tests.Sudoku&amp;gt;" /&gt;&#xD;
+&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

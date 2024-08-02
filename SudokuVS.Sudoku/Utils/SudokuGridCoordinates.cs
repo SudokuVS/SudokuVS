@@ -1,4 +1,4 @@
-﻿namespace SudokuVS.Game;
+﻿namespace SudokuVS.Sudoku.Utils;
 
 public static class SudokuGridCoordinates
 {

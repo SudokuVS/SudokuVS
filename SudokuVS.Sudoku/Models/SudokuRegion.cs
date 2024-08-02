@@ -41,10 +41,30 @@ public class SudokuRegion : IReadOnlySudokuRegion, IHiddenSudokuRegion
         }
     }
 
+    public SudokuCell this[int index] {
+        get {
+            if (index is < 0 or > 8)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index), index, "Expected index of region to be between 0 and 8.");
+            }
+
+            int regionRowIndex = index / 3;
+            int regionColumnIndex = index % 3;
+
+            return _grid[Row * 3 + regionRowIndex, Column * 3 + regionColumnIndex];
+        }
+    }
+
     IReadOnlySudokuCell IReadOnlySudokuRegion.this[int rowIndex, int colIndex] => this[rowIndex, colIndex];
     IHiddenSudokuCell IHiddenSudokuRegion.this[int rowIndex, int colIndex] => this[rowIndex, colIndex];
 
-    public void UpdateValidationState()
+    /// <summary>
+    ///     Update the values of <see cref="IsCompleted" /> and <see cref="IsValid" />.
+    /// </summary>
+    /// <remarks>
+    ///     This method is called by the parent grid when cell events are triggered
+    /// </remarks>
+    internal void UpdateValidationState()
     {
         IsCompleted = true;
         IsValid = true;

@@ -120,8 +120,8 @@
     protected override void OnInitialized()
     {
         UpdateGrid();
-        Grid.CellValueChanged += OnStateChanged;
-        Grid.CellAnnotationChanged += OnStateChanged;
+        Grid.CellElementChanged += OnStateChanged;
+        Grid.CellAnnotationsChanged += OnStateChanged;
         Grid.CellLockChanged += OnStateChanged;
         State.HintAdded += OnStateChanged;
     }

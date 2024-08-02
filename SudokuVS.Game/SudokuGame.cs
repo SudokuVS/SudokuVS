@@ -50,7 +50,7 @@ public class SudokuGame
         }
 
         SudokuGrid grid = SudokuGrid.Clone(InitialGrid);
-        grid.CellValueChanged += (_, _) => OnCellValueChanged(side);
+        grid.CellElementChanged += (_, _) => OnCellValueChanged(side);
 
         PlayerState newState = new(this, grid, side, user);
         HiddenPlayerState otherPlayerState = new(newState);

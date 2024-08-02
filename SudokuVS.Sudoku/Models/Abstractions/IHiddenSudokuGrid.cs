@@ -7,8 +7,8 @@ public interface IHiddenSudokuGrid
     IReadOnlyList<IHiddenSudokuRow> Rows { get; }
     IReadOnlyList<IHiddenSudokuColumn> Columns { get; }
 
-    event EventHandler<(int Row, int Column)>? CellValueChanged;
-    event EventHandler<(int Row, int Column)>? CellAnnotationChanged;
+    event EventHandler<(int Row, int Column)>? CellElementChanged;
+    event EventHandler<(int Row, int Column)>? CellAnnotationsChanged;
 
     IEnumerable<(int Row, int Column, IHiddenSudokuCell Cell)> Enumerate();
 }
