@@ -14,7 +14,7 @@ class SudokuGamesOnDisk : SudokuGameCachedRepository
     readonly ConcurrentDictionary<Guid, SemaphoreSlim> _semaphores = new();
     readonly ILogger<SudokuGamesOnDisk> _logger;
 
-    public SudokuGamesOnDisk(string directory, ILogger<SudokuGamesOnDisk> logger)
+    public SudokuGamesOnDisk(string directory, ILogger<SudokuGamesOnDisk> logger) : base(logger)
     {
         string directoryFullPath = Path.GetFullPath(directory);
         if (!Path.Exists(directoryFullPath))

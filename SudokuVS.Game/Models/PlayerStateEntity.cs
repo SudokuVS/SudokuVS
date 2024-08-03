@@ -5,7 +5,10 @@ namespace SudokuVS.Game.Models;
 
 public class PlayerStateEntity
 {
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+    // EF ctor
     public PlayerStateEntity() { }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
     public PlayerStateEntity(SudokuGameEntity game, PlayerSide side, UserIdentityEntity user, string grid)
     {

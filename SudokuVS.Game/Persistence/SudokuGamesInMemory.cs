@@ -23,7 +23,7 @@ class SudokuGamesInMemory : ISudokuGamesRepository
 
     public Task DeleteAsync(Guid id, CancellationToken _ = default)
     {
-        if (!_games.TryRemove(id, out SudokuGame _))
+        if (!_games.TryRemove(id, out SudokuGame? _))
         {
             throw new InvalidOperationException($"Game {id} doesn't exist");
         }

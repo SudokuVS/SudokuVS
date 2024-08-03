@@ -1,4 +1,5 @@
-﻿using SudokuVS.Game.Models;
+﻿using Microsoft.Extensions.Logging;
+using SudokuVS.Game.Models;
 
 namespace SudokuVS.Game.Persistence;
 
@@ -6,6 +7,13 @@ abstract class SudokuGameCachedRepository : ISudokuGamesRepository, IDisposable
 {
     readonly SudokuGamesInMemory _localCache = new();
     readonly CancellationTokenSource _instanceCancellationSource = new();
+
+    protected SudokuGameCachedRepository(ILogger<SudokuGameCachedRepository> logger)
+    {
+        Logger = logger;
+    }
+
+    protected ILogger<SudokuGameCachedRepository> Logger { get; }
 
     public void Dispose()
     {
@@ -71,10 +79,11 @@ abstract class SudokuGameCachedRepository : ISudokuGamesRepository, IDisposable
         game.PlayerJoined += (_, side) =>
         {
             SubscribeToPlayerStateChanges(game, side);
-            SaveToDistributedRepositoryAsync(game, _instanceCancellationSource.Token);
+            SaveToDistributedRepository(game);
         };
 
-        game.GameOver += (_, _) => SaveToDistributedRepositoryAsync(game, _instanceCancellationSource.Token);
+        game.GameOver += (_, _) => SaveToDistributedRepository(game);
+        ;
     }
 
     void SubscribeToPlayerStateChanges(SudokuGame game, PlayerSide side)
@@ -85,9 +94,21 @@ abstract class SudokuGameCachedRepository : ISudokuGamesRepository, IDisposable
             return;
         }
 
-        state.HintAdded += (_, _) => SaveToDistributedRepositoryAsync(game, _instanceCancellationSource.Token);
-        state.Grid.CellElementChanged += (_, _) => SaveToDistributedRepositoryAsync(game, _instanceCancellationSource.Token);
-        state.Grid.CellAnnotationsChanged += (_, _) => SaveToDistributedRepositoryAsync(game, _instanceCancellationSource.Token);
-        state.Grid.CellLockChanged += (_, _) => SaveToDistributedRepositoryAsync(game, _instanceCancellationSource.Token);
+        state.HintAdded += (_, _) => SaveToDistributedRepository(game);
+        state.Grid.CellElementChanged += (_, _) => SaveToDistributedRepository(game);
+        state.Grid.CellAnnotationsChanged += (_, _) => SaveToDistributedRepository(game);
+        state.Grid.CellLockChanged += (_, _) => SaveToDistributedRepository(game);
+    }
+
+    void SaveToDistributedRepository(SudokuGame game)
+    {
+        try
+        {
+            SaveToDistributedRepositoryAsync(game, _instanceCancellationSource.Token);
+        }
+        catch (Exception exn)
+        {
+            Logger.LogError(exn, "Could not save game {id} to repository", game.Id);
+        }
     }
 }

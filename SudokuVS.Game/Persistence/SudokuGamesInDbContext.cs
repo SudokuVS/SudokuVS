@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using SudokuVS.Game.Models;
 using SudokuVS.Game.Models.Users;
 using SudokuVS.Game.Users;
@@ -15,7 +16,7 @@ class SudokuGamesInDbContext : SudokuGameCachedRepository
     readonly IServiceScopeFactory _scopeFactory;
     readonly SudokuGridStringSerializer _serializer;
 
-    public SudokuGamesInDbContext(IServiceScopeFactory scopeFactory, SudokuGridStringSerializer serializer)
+    public SudokuGamesInDbContext(IServiceScopeFactory scopeFactory, SudokuGridStringSerializer serializer, ILogger<SudokuGamesInDbContext> logger) : base(logger)
     {
         _scopeFactory = scopeFactory;
         _serializer = serializer;
