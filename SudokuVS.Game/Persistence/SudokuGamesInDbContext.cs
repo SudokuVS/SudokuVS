@@ -42,7 +42,11 @@ class SudokuGamesInDbContext : SudokuGameCachedRepository
         using IServiceScope scope = _scopeFactory.CreateScope();
         AppDbContext context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        SudokuGameEntity entity = await context.Games.RequireAsync(id, cancellationToken);
+        SudokuGameEntity? entity = await context.Games.FindAsync([id], cancellationToken);
+        if (entity == null)
+        {
+            return null;
+        }
 
         SudokuGrid initialGrid = _serializer.FromString(entity.InitialGrid);
         initialGrid.LockNonEmptyCells();
@@ -146,7 +150,7 @@ class SudokuGamesInDbContext : SudokuGameCachedRepository
             if (entityState == null)
             {
                 entityState = new PlayerStateEntity(entity, side, user, grid) { Hints = hints };
-                entity.Players.Add(entityState);
+                context.PlayerStates.Add(entityState);
             }
             else
             {
