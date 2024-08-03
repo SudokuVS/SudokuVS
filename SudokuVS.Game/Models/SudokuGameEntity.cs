@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using SudokuVS.Sudoku.Serialization;
 
 namespace SudokuVS.Game.Models;
 
@@ -35,13 +36,13 @@ public class SudokuGameEntity
     /// <summary>
     ///     The grid generated for the game.
     /// </summary>
-    [MaxLength(81)]
+    [MaxLength(SudokuGridStringSerializer.SerializedStringMaxLength)]
     public string InitialGrid { get; set; }
 
     /// <summary>
     ///     The solution to the game.
     /// </summary>
-    [MaxLength(81)]
+    [MaxLength(SudokuGridStringSerializer.SerializedStringMaxLength)]
     public string SolvedGrid { get; set; }
 
     /// <summary>

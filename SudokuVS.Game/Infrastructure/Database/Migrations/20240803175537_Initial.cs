@@ -17,8 +17,8 @@ namespace SudokuVS.Game.Infrastructure.Database.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
-                    InitialGrid = table.Column<string>(type: "nvarchar(81)", maxLength: 81, nullable: false),
-                    SolvedGrid = table.Column<string>(type: "nvarchar(81)", maxLength: 81, nullable: false),
+                    InitialGrid = table.Column<string>(type: "nvarchar(1053)", maxLength: 1053, nullable: false),
+                    SolvedGrid = table.Column<string>(type: "nvarchar(1053)", maxLength: 1053, nullable: false),
                     Options_MaxHints = table.Column<int>(type: "int", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -50,7 +50,7 @@ namespace SudokuVS.Game.Infrastructure.Database.Migrations
                     GameId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Side = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Grid = table.Column<string>(type: "nvarchar(81)", maxLength: 81, nullable: false),
+                    Grid = table.Column<string>(type: "nvarchar(1053)", maxLength: 1053, nullable: false),
                     Hints = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false)
                 },
                 constraints: table =>

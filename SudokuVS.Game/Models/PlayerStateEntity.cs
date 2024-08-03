@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using SudokuVS.Game.Models.Users;
+using SudokuVS.Sudoku.Serialization;
 
 namespace SudokuVS.Game.Models;
 
@@ -45,7 +46,7 @@ public class PlayerStateEntity
     /// <summary>
     ///     The current grid of the player.
     /// </summary>
-    [MaxLength(81)]
+    [MaxLength(SudokuGridStringSerializer.SerializedStringMaxLength)]
     public string Grid { get; set; }
 
     /// <summary>

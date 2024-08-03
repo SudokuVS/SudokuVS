@@ -33,8 +33,8 @@ namespace SudokuVS.Game.Infrastructure.Database.Migrations
 
                     b.Property<string>("Grid")
                         .IsRequired()
-                        .HasMaxLength(81)
-                        .HasColumnType("nvarchar(81)");
+                        .HasMaxLength(1053)
+                        .HasColumnType("nvarchar(1053)");
 
                     b.Property<string>("Hints")
                         .IsRequired()
@@ -67,8 +67,8 @@ namespace SudokuVS.Game.Infrastructure.Database.Migrations
 
                     b.Property<string>("InitialGrid")
                         .IsRequired()
-                        .HasMaxLength(81)
-                        .HasColumnType("nvarchar(81)");
+                        .HasMaxLength(1053)
+                        .HasColumnType("nvarchar(1053)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -77,8 +77,8 @@ namespace SudokuVS.Game.Infrastructure.Database.Migrations
 
                     b.Property<string>("SolvedGrid")
                         .IsRequired()
-                        .HasMaxLength(81)
-                        .HasColumnType("nvarchar(81)");
+                        .HasMaxLength(1053)
+                        .HasColumnType("nvarchar(1053)");
 
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("datetime2");

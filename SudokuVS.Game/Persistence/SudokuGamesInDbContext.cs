@@ -49,10 +49,7 @@ class SudokuGamesInDbContext : SudokuGameCachedRepository
         }
 
         SudokuGrid initialGrid = _serializer.FromString(entity.InitialGrid);
-        initialGrid.LockNonEmptyCells();
-
         SudokuGrid solvedGrid = _serializer.FromString(entity.SolvedGrid);
-        solvedGrid.CopyLocksFrom(initialGrid);
 
         SudokuGameOptions options = new() { MaxHints = entity.Options.MaxHints };
 
@@ -112,7 +109,6 @@ class SudokuGamesInDbContext : SudokuGameCachedRepository
     PlayerState LoadPlayerState(SudokuGame game, PlayerSide side, PlayerStateEntity state)
     {
         SudokuGrid grid = _serializer.FromString(state.Grid);
-        grid.CopyLocksFrom(game.InitialGrid);
 
         (int Row, int Column)[] hints = state.Hints.Split(",")
             .Select(s => int.TryParse(s, out int i) ? i : -1)

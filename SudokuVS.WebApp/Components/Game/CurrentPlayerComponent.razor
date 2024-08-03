@@ -262,7 +262,7 @@
             int row = cell.Row;
             int column = cell.Column;
             int? element = cell.Element;
-            ICollection<int> annotations = cell.Annotations;
+            IOrderedEnumerable<int> annotations = cell.Annotations.Order();
 
             _displayGrid[row, column].Content = $"{element}";
             _displayGrid[row, column].Annotation = element is null ? string.Join(", ", annotations) : null;
