@@ -88,17 +88,6 @@ public class SudokuGrid : IReadOnlySudokuGrid, IHiddenSudokuGrid
         }
     }
 
-    public void CopyLocksFrom(SudokuGrid grid)
-    {
-        foreach (SudokuCell cell in grid.Enumerate())
-        {
-            if (!cell.IsEmpty)
-            {
-                this[cell.Row, cell.Column].IsLocked = cell.IsLocked;
-            }
-        }
-    }
-
     public IEnumerable<SudokuCell> Enumerate()
     {
         for (int i = 0; i < Rows.Count; i++)
