@@ -110,7 +110,7 @@ else
             await JsRuntime.InvokeVoidAsync("localStorageSetItem", "post-login-redirect", uriDecoded);
         }
 
-        Navigation.NavigateTo("/MicrosoftIdentity/Account/SignIn", true);
+        Navigation.NavigateTo("/login", true);
     }
 
     async Task NewGameAsync()

@@ -1,4 +1,6 @@
-﻿@using System.Net
+﻿@inject NavigationManager Navigation
+@inject AuthenticationStateProvider Provider
+@using System.Net
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Components.Authorization
 @using SudokuVS.Game.Users
@@ -33,12 +35,12 @@
         <div class="flex-grow-1"></div>
 
         <div class="h-100 d-flex align-items-center gap-1 px-4 position-relative">
-            @if (AuthenticatedUser?.Identity?.IsAuthenticated ?? false)
+            @if (_authenticatedUser?.Identity?.IsAuthenticated ?? false)
             {
                 <span class="fs-5 fw-semibold">
-                    @(AuthenticatedUser.GetName())
+                    @(_authenticatedUser.GetName())
                 </span>
-                <a class="small text-white" href="MicrosoftIdentity/Account/SignOut">(logout)</a>
+                <a class="small text-white" href="/logout">(logout)</a>
             }
         </div>
     </header>
@@ -46,22 +48,16 @@
     <hr class="p-0 m-0"/>
 
     <main class="flex-grow-1">
-        <CascadingValue Value="AuthenticatedUser">
-            @Body
-        </CascadingValue>
+        @Body
     </main>
 </div>
-
-@inject NavigationManager Navigation 
-@inject AuthenticationStateProvider Provider 
 
 @code {
 
     string? _version;
     bool _isDebugVersion;
     string? _prereleaseIdentifier;
-
-    public ClaimsPrincipal? AuthenticatedUser { get; set; }
+    ClaimsPrincipal? _authenticatedUser;
 
     protected override async Task OnInitializedAsync()
     {
@@ -73,11 +69,11 @@
 
         if (state.User.Identity?.IsAuthenticated == true)
         {
-            AuthenticatedUser = state.User;
+            _authenticatedUser = state.User;
         }
         else
         {
-            AuthenticatedUser = null;
+            _authenticatedUser = null;
             Uri uri = new(Navigation.Uri);
             if (uri.AbsolutePath != "/")
             {
