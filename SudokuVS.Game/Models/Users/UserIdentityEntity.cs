@@ -1,16 +1,16 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 using SudokuVS.Game.Users;
 
 namespace SudokuVS.Game.Models.Users;
 
+[Index(nameof(ExternalId), IsUnique = true)]
 public class UserIdentityEntity
 {
     /// <summary>
     ///     The unique ID of the user in the database.
     /// </summary>
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    [Key]
     public Guid Id { get; private set; }
 
     /// <summary>

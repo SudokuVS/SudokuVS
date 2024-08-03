@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SudokuVS.Game.Persistence;
+using SudokuVS.Game.Infrastructure.Database;
 
 #nullable disable
 
@@ -49,9 +49,10 @@ namespace SudokuVS.Game.Infrastructure.Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GameId");
-
                     b.HasIndex("UserId");
+
+                    b.HasIndex("GameId", "Side")
+                        .IsUnique();
 
                     b.ToTable("PlayerStates");
                 });
@@ -106,6 +107,9 @@ namespace SudokuVS.Game.Infrastructure.Database.Migrations
                         .HasColumnType("nvarchar(64)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ExternalId")
+                        .IsUnique();
 
                     b.ToTable("Users");
                 });

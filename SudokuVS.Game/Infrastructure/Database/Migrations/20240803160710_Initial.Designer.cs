@@ -5,15 +5,15 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SudokuVS.Game.Persistence;
+using SudokuVS.Game.Infrastructure.Database;
 
 #nullable disable
 
 namespace SudokuVS.Game.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240803152933_1")]
-    partial class _1
+    [Migration("20240803160710_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -52,9 +52,10 @@ namespace SudokuVS.Game.Infrastructure.Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GameId");
-
                     b.HasIndex("UserId");
+
+                    b.HasIndex("GameId", "Side")
+                        .IsUnique();
 
                     b.ToTable("PlayerStates");
                 });
@@ -109,6 +110,9 @@ namespace SudokuVS.Game.Infrastructure.Database.Migrations
                         .HasColumnType("nvarchar(64)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ExternalId")
+                        .IsUnique();
 
                     b.ToTable("Users");
                 });

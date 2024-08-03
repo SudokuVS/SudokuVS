@@ -21,6 +21,7 @@ public class SudokuGameEntity
     /// <summary>
     ///     The unique ID of the game
     /// </summary>
+    [Key]
     public Guid Id { get; init; }
 
     /// <summary>
