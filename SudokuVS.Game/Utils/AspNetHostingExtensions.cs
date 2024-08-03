@@ -11,19 +11,19 @@ namespace SudokuVS.Game.Utils;
 
 public static class AspNetHostingExtensions
 {
-    public static void ConfigureGameServices(this WebApplicationBuilder builder, ILogger logger)
+    public static void ConfigureGameServices(this WebApplicationBuilder builder, ILogger? logger = null)
     {
         string? connectionString = builder.Configuration.GetConnectionString("AppDbContext");
         if (string.IsNullOrWhiteSpace(connectionString))
         {
-            logger.LogInformation("No connection string provided for AppDbContext, falling back to in-memory repository");
+            logger?.LogInformation("No connection string provided for AppDbContext, falling back to in-memory repository");
             builder.Services.AddSingleton<ISudokuGamesRepository, SudokuGamesInMemory>();
         }
         else
         {
             builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
 
-            logger.LogInformation("Using DbContext game repository");
+            logger?.LogInformation("Using DbContext game repository");
             builder.Services.AddSingleton<ISudokuGamesRepository, SudokuGamesInDbContext>();
         }
 
