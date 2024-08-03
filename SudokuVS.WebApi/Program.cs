@@ -61,10 +61,9 @@ try
             configure.PersistAuthorization = true;
 
             string? clientId = builder.Configuration.GetValue<string>("AzureAd:ClientId");
-            string? clientSecret = builder.Configuration.GetValue<string>("AzureAd:ClientSecret");
-            if (!string.IsNullOrWhiteSpace(clientId) || !string.IsNullOrWhiteSpace(clientSecret))
+            if (!string.IsNullOrWhiteSpace(clientId))
             {
-                configure.OAuth2Client = new OAuth2ClientSettings { ClientId = clientId, ClientSecret = clientSecret };
+                configure.OAuth2Client = new OAuth2ClientSettings { AppName = "SudokuVS", ClientId = clientId, ClientSecret = "", UsePkceWithAuthorizationCodeGrant = true };
             }
         }
     );
@@ -149,6 +148,7 @@ void ConfigureOpenApiDocument(WebApplicationBuilder builder)
                     Scheme = JwtBearerDefaults.AuthenticationScheme,
                     BearerFormat = "JWT",
                     Type = OpenApiSecuritySchemeType.OAuth2,
+                    Flow = OpenApiOAuth2Flow.AccessCode,
                     AuthorizationUrl = $"{basePath}authorize",
                     TokenUrl = $"{basePath}token",
                     Scopes = new Dictionary<string, string> { { "api://55a9fda1-7bb2-45c4-b99d-eec6b0caef11/SudokuVS.Play", "Play the game" } }
