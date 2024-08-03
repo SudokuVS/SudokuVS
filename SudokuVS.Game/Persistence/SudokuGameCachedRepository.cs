@@ -83,7 +83,6 @@ abstract class SudokuGameCachedRepository : ISudokuGamesRepository, IDisposable
         };
 
         game.GameOver += (_, _) => SaveToDistributedRepository(game);
-        ;
     }
 
     void SubscribeToPlayerStateChanges(SudokuGame game, PlayerSide side)
@@ -100,11 +99,12 @@ abstract class SudokuGameCachedRepository : ISudokuGamesRepository, IDisposable
         state.Grid.CellLockChanged += (_, _) => SaveToDistributedRepository(game);
     }
 
-    void SaveToDistributedRepository(SudokuGame game)
+    // ReSharper disable once AsyncVoidMethod
+    async void SaveToDistributedRepository(SudokuGame game)
     {
         try
         {
-            SaveToDistributedRepositoryAsync(game, _instanceCancellationSource.Token);
+            await SaveToDistributedRepositoryAsync(game, _instanceCancellationSource.Token);
         }
         catch (Exception exn)
         {

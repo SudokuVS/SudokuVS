@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using SudokuVS.Game.Models.Users;
 
 namespace SudokuVS.Game.Models;
@@ -18,7 +19,8 @@ public class PlayerStateEntity
         Grid = grid;
     }
 
-    public Guid Id { get; private set; } = Guid.NewGuid();
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public Guid Id { get; private set; }
 
     /// <summary>
     ///     The game associated with this state.

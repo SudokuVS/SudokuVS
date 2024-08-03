@@ -116,7 +116,7 @@ class SudokuGamesInDbContext : SudokuGameCachedRepository
             grid[row, column].IsLocked = true;
         }
 
-        UserIdentity user = new() { Id = state.User.Id, Name = state.User.Name };
+        UserIdentity user = new() { ExternalId = state.User.Id, Name = state.User.Name };
 
         PlayerState result = new(game, grid, side, user);
         result.Restore(hints);
@@ -125,7 +125,6 @@ class SudokuGamesInDbContext : SudokuGameCachedRepository
 
     async Task SavePlayerState(AppDbContext context, SudokuGame game, PlayerSide side, SudokuGameEntity entity, CancellationToken cancellationToken)
     {
-
         PlayerState? state = game.GetPlayerState(side);
         if (state == null)
         {
@@ -139,7 +138,7 @@ class SudokuGamesInDbContext : SudokuGameCachedRepository
         {
             PlayerStateEntity? entityState = entity.GetPlayerState(side);
 
-            UserIdentityEntity user = await context.Users.RequireAsync(state.User.Id, cancellationToken);
+            UserIdentityEntity user = await context.Users.GetOrCreateAsync(state.User, cancellationToken);
             string grid = _serializer.ToString(state.Grid);
             string hints = string.Join(",", state.Hints.Select(x => SudokuGridCoordinates.ComputeFlatIndex(x.Row, x.Column)));
 

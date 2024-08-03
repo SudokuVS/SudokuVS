@@ -16,6 +16,6 @@ public static class ClaimsPrincipalExtensions
     public static UserIdentity? GetUserIdentity(this ClaimsPrincipal claimsPrincipal)
     {
         Guid? id = GetId(claimsPrincipal);
-        return id.HasValue ? new UserIdentity { Id = id.Value, Name = GetName(claimsPrincipal) ?? "Player" } : null;
+        return id.HasValue ? new UserIdentity { ExternalId = id.Value, Name = GetName(claimsPrincipal) ?? "Player" } : null;
     }
 }

@@ -98,12 +98,12 @@ public class SudokuGame
 
     public PlayerState? GetPlayerState(Guid playerId)
     {
-        if (Player1 != null && Player1.User.Id == playerId)
+        if (Player1 != null && Player1.User.ExternalId == playerId)
         {
             return Player1;
         }
 
-        if (Player2 != null && Player2.User.Id == playerId)
+        if (Player2 != null && Player2.User.ExternalId == playerId)
         {
             return Player2;
         }
@@ -113,12 +113,12 @@ public class SudokuGame
 
     public IHiddenPlayerState? GetOtherPlayerState(Guid playerId)
     {
-        if (Player1 != null && Player1.User.Id == playerId)
+        if (Player1 != null && Player1.User.ExternalId == playerId)
         {
             return GetHiddenPlayerState(PlayerSide.Player2);
         }
 
-        if (Player2 != null && Player2.User.Id == playerId)
+        if (Player2 != null && Player2.User.ExternalId == playerId)
         {
             return GetHiddenPlayerState(PlayerSide.Player1);
         }
@@ -193,5 +193,5 @@ public class SudokuGame
 public static class SudokuGameExtensions
 {
     public static bool InvolvesPlayer(this SudokuGame game, Guid userId) =>
-        game.Player1 != null && game.Player1.User.Id == userId || game.Player2 != null && game.Player2.User.Id == userId;
+        game.Player1 != null && game.Player1.User.ExternalId == userId || game.Player2 != null && game.Player2.User.ExternalId == userId;
 }

@@ -64,7 +64,7 @@ static class SudokuGameMappingExtensions
             Id = game.Id,
             Name = game.Name,
             Player = playerState.ToPlayerStateDto(),
-            Opponent = game.GetOtherPlayerState(playerState.User.Id)?.ToHiddenPlayerStateDto(),
+            Opponent = game.GetOtherPlayerState(playerState.User.ExternalId)?.ToHiddenPlayerStateDto(),
             IsStarted = game.IsStarted,
             StartDate = game.StartDate,
             IsOver = game.IsOver,
