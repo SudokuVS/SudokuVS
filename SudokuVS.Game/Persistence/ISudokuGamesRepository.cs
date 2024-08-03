@@ -2,8 +2,9 @@
 
 public interface ISudokuGamesRepository
 {
-    IAsyncEnumerable<SudokuGame> GetAll(CancellationToken cancellationToken = default);
-    Task<SudokuGame?> Get(Guid id, CancellationToken cancellationToken = default);
-    Task<bool> Exists(Guid id, CancellationToken cancellationToken = default);
-    Task Save(SudokuGame game, CancellationToken cancellationToken = default);
+    IAsyncEnumerable<SudokuGame> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<SudokuGame?> GetAsync(Guid id, CancellationToken cancellationToken = default);
+    Task SaveAsync(SudokuGame game, CancellationToken cancellationToken = default);
+    Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);
 }

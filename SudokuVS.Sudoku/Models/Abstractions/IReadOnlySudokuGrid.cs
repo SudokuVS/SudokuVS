@@ -10,5 +10,5 @@ public interface IReadOnlySudokuGrid
     event EventHandler<(int Row, int Column)>? CellElementChanged;
     event EventHandler<(int Row, int Column)>? CellAnnotationsChanged;
 
-    IEnumerable<(int Row, int Column, IReadOnlySudokuCell Cell)> Enumerate();
+    IEnumerable<IReadOnlySudokuCell> Enumerate();
 }

@@ -1,4 +1,5 @@
-﻿using SudokuVS.Game.Users;
+﻿using SudokuVS.Game.Models;
+using SudokuVS.Game.Users;
 using SudokuVS.Sudoku.Models;
 using SudokuVS.Sudoku.Models.Abstractions;
 using SudokuVS.Sudoku.Utils;

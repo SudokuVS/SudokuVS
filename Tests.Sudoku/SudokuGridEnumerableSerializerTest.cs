@@ -44,7 +44,7 @@ public class SudokuGridEnumerableSerializerTest
 
         SudokuGrid grid = _serializer.FromEnumerable(values);
 
-        grid.Enumerate().Should().AllSatisfy(x => x.Cell.Element.Should().Be(5));
+        grid.Enumerate().Should().AllSatisfy(cell => cell.Element.Should().Be(5));
     }
 
     [TestMethod]
@@ -54,6 +54,6 @@ public class SudokuGridEnumerableSerializerTest
 
         SudokuGrid grid = _serializer.FromEnumerable(values);
 
-        grid.Enumerate().Should().AllSatisfy(x => x.Cell.IsEmpty.Should().BeTrue());
+        grid.Enumerate().Should().AllSatisfy(cell => cell.IsEmpty.Should().BeTrue());
     }
 }

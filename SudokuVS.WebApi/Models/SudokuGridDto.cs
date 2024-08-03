@@ -22,7 +22,7 @@ static class SudokuGridMappingExtensions
         new()
         {
             Cells = grid.Enumerate()
-                .Where(c => !c.Cell.IsEmpty || c.Cell.HasAnnotations || c.Cell.IsLocked || state.Hints.Contains((c.Row, c.Column)))
-                .ToDictionary(c => c.Cell.GetFlatIndex(), c => c.Cell.ToDto())
+                .Where(c => !c.IsEmpty || c.HasAnnotations || c.IsLocked || state.Hints.Contains((c.Row, c.Column)))
+                .ToDictionary(c => c.GetFlatIndex(), c => c.ToDto())
         };
 }

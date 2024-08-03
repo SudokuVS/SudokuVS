@@ -1,9 +1,11 @@
 ﻿@page "/game/{GameId?}"
 @inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IJSRuntime JsRuntime
 @inject ISudokuGamesRepository Repository
-@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
 @using SudokuVS.Game
+@using SudokuVS.Game.Models
 @using SudokuVS.Game.Persistence
 @using SudokuVS.Game.Users
 @using SudokuVS.WebApp.Components.Game
@@ -83,7 +85,7 @@ else
                                 <div id="invitation-link-container" class="font-monospace text-secondary">
                                     @GetOtherPlayerInvitationLink()
                                 </div>
-                                <a class="btn btn-outline-primary my-2 stretched-link" @onclick="CopyInvitationLink" id="copy-invitation-link-button">Copy invitation link</a>
+                                <a class="btn btn-outline-primary my-2 stretched-link" @onclick="CopyInvitationLinkAsync" id="copy-invitation-link-button">Copy invitation link</a>
                             </div>
                         </div>
                     }
@@ -126,7 +128,7 @@ else
                                 <div id="invitation-link-container" class="font-monospace text-secondary">
                                     @GetOtherPlayerInvitationLink()
                                 </div>
-                                <a class="btn btn-outline-primary my-2 stretched-link" @onclick="CopyInvitationLink" id="copy-invitation-link-button">Copy invitation link</a>
+                                <a class="btn btn-outline-primary my-2 stretched-link" @onclick="CopyInvitationLinkAsync" id="copy-invitation-link-button">Copy invitation link</a>
                             </div>
                         </div>
                     }
@@ -166,9 +168,6 @@ else
     [Parameter]
     public string? GameId { get; set; }
 
-    [CascadingParameter]
-    public ClaimsPrincipal? AuthenticatedUser { get; set; }
-
     UserIdentity? _user;
     SudokuGame? _instance;
     PlayerState? _playerState;
@@ -185,13 +184,14 @@ else
             return;
         }
 
-        _user = AuthenticatedUser?.GetUserIdentity();
+        AuthenticationState authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        _user = authState.User.GetUserIdentity();
         if (_user == null)
         {
             return;
         }
 
-        _instance = await Repository.Get(gameId);
+        _instance = await Repository.GetAsync(gameId);
         if (_instance == null)
         {
             return;
@@ -224,10 +224,7 @@ else
             return;
         }
 
-        _playerState = _instance.GetPlayerState(_user.Id);
-        if (_playerState == null)
-        {
-        }
+        _playerState = _instance.GetPlayerState(_user.ExternalId);
     }
 
     void JoinAsPlayer1()
@@ -312,7 +309,7 @@ else
 
     string GetOtherPlayerInvitationLink() => _instance == null ? "" : $"{Navigation.BaseUri}game/{_instance.Id}";
 
-    async Task CopyInvitationLink()
+    async Task CopyInvitationLinkAsync()
     {
         if (_gameModule == null)
         {

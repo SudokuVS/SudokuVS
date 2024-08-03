@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+using SudokuVS.Game.Models;
 using SudokuVS.Game.Users;
 using SudokuVS.Sudoku.Models;
 using SudokuVS.Sudoku.Serialization;
@@ -64,7 +65,7 @@ public class SudokuGameJsonSerializer
     static SerializedPlayerState Serialize(PlayerState player) =>
         new()
         {
-            PlayerId = player.User.Id,
+            PlayerId = player.User.ExternalId,
             PlayerName = player.User.Name,
             Grid = Serialize(player.Grid),
             Hints = player.Hints.Select(x => SudokuGridCoordinates.ComputeFlatIndex(x.Row, x.Column)).ToArray()
@@ -72,21 +73,21 @@ public class SudokuGameJsonSerializer
 
     static Dictionary<int, SerializedCell> Serialize(SudokuGrid grid) =>
         grid.Enumerate()
-            .Where(x => x.Cell.Element.HasValue || x.Cell.Annotations.Count > 0 || x.Cell.IsLocked)
+            .Where(cell => cell.Element.HasValue || cell.Annotations.Count > 0 || cell.IsLocked)
             .ToDictionary(
-                x => SudokuGridCoordinates.ComputeFlatIndex(x.Row, x.Column),
-                x => new SerializedCell
+                cell => SudokuGridCoordinates.ComputeFlatIndex(cell.Row, cell.Column),
+                cell => new SerializedCell
                 {
-                    Elements = x.Cell.Element,
-                    Annotations = x.Cell.Annotations.Count == 0 ? null : x.Cell.Annotations.ToArray(),
-                    IsLocked = x.Cell.IsLocked ? true : null
+                    Elements = cell.Element,
+                    Annotations = cell.Annotations.Count == 0 ? null : cell.Annotations.ToArray(),
+                    IsLocked = cell.IsLocked ? true : null
                 }
             );
 
     static PlayerState Deserialize(SudokuGame game, PlayerSide side, SerializedPlayerState player)
     {
         SudokuGrid grid = Deserialize(player.Grid);
-        PlayerState state = new(game, grid, side, new UserIdentity { Id = player.PlayerId, Name = player.PlayerName });
+        PlayerState state = new(game, grid, side, new UserIdentity { ExternalId = player.PlayerId, Name = player.PlayerName });
 
         IEnumerable<(int Row, int Column)> hints = player.Hints.Select(SudokuGridCoordinates.ComputeCoordinates);
         state.Restore(hints);
@@ -140,7 +141,7 @@ public class SudokuGameJsonSerializer
 
     class SerializedPlayerState
     {
-        public required Guid PlayerId { get; init; }
+        public required string PlayerId { get; init; }
         public required string PlayerName { get; init; }
         public required Dictionary<int, SerializedCell> Grid { get; init; }
         public required int[] Hints { get; init; }

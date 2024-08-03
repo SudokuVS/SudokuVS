@@ -88,17 +88,17 @@ public class SudokuGrid : IReadOnlySudokuGrid, IHiddenSudokuGrid
         }
     }
 
-    public IEnumerable<(int Row, int Column, SudokuCell Cell)> Enumerate()
+    public IEnumerable<SudokuCell> Enumerate()
     {
         for (int i = 0; i < Rows.Count; i++)
         for (int j = 0; j < Columns.Count; j++)
         {
-            yield return (i, j, this[i, j]);
+            yield return this[i, j];
         }
     }
 
-    IEnumerable<(int Row, int Column, IReadOnlySudokuCell Cell)> IReadOnlySudokuGrid.Enumerate() => Enumerate().Select(x => (x.Row, x.Column, (IReadOnlySudokuCell)x.Cell));
-    IEnumerable<(int Row, int Column, IHiddenSudokuCell Cell)> IHiddenSudokuGrid.Enumerate() => Enumerate().Select(x => (x.Row, x.Column, (IHiddenSudokuCell)x.Cell));
+    IEnumerable<IReadOnlySudokuCell> IReadOnlySudokuGrid.Enumerate() => Enumerate();
+    IEnumerable<IHiddenSudokuCell> IHiddenSudokuGrid.Enumerate() => Enumerate();
 
     void OnCellValueChanged(SudokuCell cell)
     {

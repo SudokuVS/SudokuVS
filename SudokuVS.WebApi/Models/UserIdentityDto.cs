@@ -11,7 +11,7 @@ public class UserIdentityDto
     /// <summary>
     ///     The unique identifier of the user.
     /// </summary>
-    public required Guid Id { get; init; }
+    public required string Id { get; init; }
 
     /// <summary>
     ///     The name of the user.
@@ -22,5 +22,5 @@ public class UserIdentityDto
 
 static class UserIdentityMappingExtensions
 {
-    public static UserIdentityDto ToDto(this UserIdentity user) => new() { Id = user.Id, Name = user.Name };
+    public static UserIdentityDto ToDto(this UserIdentity user) => new() { Id = user.ExternalId, Name = user.Name };
 }

@@ -9,12 +9,14 @@ using NSwag.AspNetCore;
 using NSwag.Generation.Processors.Security;
 using Serilog;
 using SudokuVS.Apps.Common.Logging;
-using SudokuVS.Apps.Common.Persistence;
-using SudokuVS.Game.Persistence;
+using SudokuVS.Game.Utils;
 using SudokuVS.WebApi;
 using SudokuVS.WebApi.Exceptions;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 Log.Logger = Logging.CreateBootstrapLogger();
+ILoggerFactory factory = new LoggerFactory().AddSerilog(Log.Logger);
+ILogger bootstrapLogger = factory.CreateLogger("Bootstrap");
 
 try
 {
@@ -36,20 +38,13 @@ try
     builder.Services.AddRazorPages();
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddProblemDetails();
+    builder.ConfigureGameServices(bootstrapLogger);
 
     ConfigureOpenApiDocument(builder);
 
-    builder.Services.AddSingleton<ISudokuGamesRepository, SudokuGamesOnDisk>(
-        services =>
-        {
-            const string relativePath = "%LOCALAPPDATA%/SudokuVS/repository/games";
-            string path = Path.GetFullPath(Environment.ExpandEnvironmentVariables(relativePath));
-            Log.Logger.Information("Game repository path: {path}", path);
-            return new SudokuGamesOnDisk(path, services.GetRequiredService<ILogger<SudokuGamesOnDisk>>());
-        }
-    );
-
     WebApplication app = builder.Build();
+
+    await app.UseGameServicesAsync();
 
     if (app.Environment.IsDevelopment())
     {
