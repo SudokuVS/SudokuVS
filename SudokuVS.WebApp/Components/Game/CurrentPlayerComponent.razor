@@ -263,10 +263,11 @@
             int column = cell.Column;
             int? element = cell.Element;
             IOrderedEnumerable<int> annotations = cell.Annotations.Order();
+            SudokuCell? selectedCell = _selectedCell.HasValue ? Grid[_selectedCell.Value.Row, _selectedCell.Value.Column] : null;
 
             _displayGrid[row, column].Content = $"{element}";
-            _displayGrid[row, column].Annotation = element is null ? string.Join(", ", annotations) : null;
-            _displayGrid[row, column].FontStyle = _selectedCell.HasValue && Grid[_selectedCell.Value.Row, _selectedCell.Value.Column].Element == element ? GridComponent.FontStyle.Bold : GridComponent.FontStyle.None;
+            _displayGrid[row, column].Annotation = element is null ? string.Join(", ", annotations.Select(a => selectedCell != null && a == selectedCell.Element ? $"<span class=\"fw-bold text-decoration-underline\">{a}</span>" : $"{a}")) : null;
+            _displayGrid[row, column].FontModifiers = selectedCell != null && selectedCell.Element == element ? GridComponent.FontModifiers.Bold | GridComponent.FontModifiers.Underline : GridComponent.FontModifiers.None;
             _displayGrid[row, column].BackgroundColor = IsHint(cell.Row, cell.Column)
                 ? GridComponent.Color.Yellow
                 : cell.IsLocked

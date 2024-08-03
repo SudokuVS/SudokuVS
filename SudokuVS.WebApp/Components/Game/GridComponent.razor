@@ -8,20 +8,29 @@
 
             <div class="@ComputeCellStyle(row, column)">
 
-                @Grid[row, column].Content
+                <span class="@ComputeCellContentStyle(row, column)">@Grid[row, column].Content</span>
 
-                @if (Grid[row, column].Annotation != null || Grid[row, column].AnnotationIcon != null)
-                {
-                    <div class="@ComputeAnnotationStyle(row, column)">
-                        @if (Grid[row, column].AnnotationIcon != null)
+
+                @{
+                    string? annotation = Grid[row, column].Annotation;
+                    string? annotationIcon = Grid[row, column].AnnotationIcon;
+
+                    if (annotation != null || annotationIcon != null)
+                    {
+                        if (annotationIcon != null)
                         {
-                            <i class="bi bi-@Grid[row, column].AnnotationIcon"></i>
+                            <div class="@ComputeAnnotationStyle(row, column)">
+                                <i class="bi bi-@annotationIcon"></i>
+                            </div>
                         }
-                        @if (Grid[row, column].Annotation != null)
+
+                        if (annotation != null)
                         {
-                            @Grid[row, column].Annotation
+                            <div class="@ComputeAnnotationStyle(row, column)">
+                                @((MarkupString)annotation!)
+                            </div>
                         }
-                    </div>
+                    }
                 }
 
                 @if (!Disabled)
@@ -104,7 +113,13 @@
     string ComputeCellStyle(int row, int column)
     {
         Cell cell = Grid[row, column];
-        return $"cell {GetSizeStyle(GridSize)} {GetFontStyle(cell.FontStyle)} {GetBgColorStyle(cell.BackgroundColor)} {GetBorderColorStyle(cell.Border) ?? "border border-secondary-subtle"} position-relative";
+        return $"cell {GetSizeStyle(GridSize)} {GetBgColorStyle(cell.BackgroundColor)} {GetBorderColorStyle(cell.Border) ?? "border border-secondary-subtle"} position-relative";
+    }
+
+    string ComputeCellContentStyle(int row, int column)
+    {
+        Cell cell = Grid[row, column];
+        return GetFontStyle(cell.FontModifiers);
     }
 
     string ComputeAnnotationStyle(int row, int column)
@@ -122,13 +137,18 @@
             _ => ""
         };
 
-    static string GetFontStyle(FontStyle style)
+    static string GetFontStyle(FontModifiers modifiers)
     {
         List<string> result = [];
 
-        if (style.HasFlag(FontStyle.Bold))
+        if (modifiers.HasFlag(FontModifiers.Bold))
         {
             result.Add("fw-bold");
+        }
+
+        if (modifiers.HasFlag(FontModifiers.Underline))
+        {
+            result.Add("text-decoration-underline");
         }
 
         return string.Join(" ", result);
@@ -192,7 +212,7 @@
         public string? Content { get; set; }
         public string? Annotation { get; set; }
         public string? AnnotationIcon { get; set; }
-        public FontStyle FontStyle { get; set; }
+        public FontModifiers FontModifiers { get; set; }
         public Color Border { get; set; }
         public Color BackgroundColor { get; set; }
         public Color AnnotationBackgroundColor { get; set; }
@@ -220,10 +240,11 @@
     }
 
     [Flags]
-    public enum FontStyle
+    public enum FontModifiers
     {
         None = 0,
-        Bold = 1<<1
+        Bold = 1<<1,
+        Underline = 1<<2
     }
 
 }
