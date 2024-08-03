@@ -34,10 +34,10 @@ class SudokuGamesOnDisk : SudokuGameCachedRepository
         _serializer = new SudokuGameJsonSerializer(indented);
     }
 
-    protected override IAsyncEnumerable<Guid> ListIds(CancellationToken cancellationToken) =>
+    protected override IAsyncEnumerable<Guid> ListIdsAsync(CancellationToken cancellationToken) =>
         Directory.EnumerateFiles(_directory).Select(f => IsSaveFilePath(f, out Guid id) ? id : default).Where(id => id != default).ToAsyncEnumerable();
 
-    protected override async Task<SudokuGame?> LoadFromDistributedRepository(Guid id, CancellationToken cancellationToken)
+    protected override async Task<SudokuGame?> LoadFromDistributedRepositoryAsync(Guid id, CancellationToken cancellationToken)
     {
         string path = GetSaveFilePath(id);
         if (!File.Exists(path))
@@ -60,13 +60,13 @@ class SudokuGamesOnDisk : SudokuGameCachedRepository
         return _serializer.Deserialize(save);
     }
 
-    protected override Task<bool> ExistsInDistributedRepository(Guid id, CancellationToken _)
+    protected override Task<bool> ExistsInDistributedRepositoryAsync(Guid id, CancellationToken _)
     {
         string saveFileName = GetSaveFilePath(id);
         return Task.FromResult(File.Exists(saveFileName));
     }
 
-    protected override async Task SaveToDistributedRepository(SudokuGame game, CancellationToken cancellationToken)
+    protected override async Task SaveToDistributedRepositoryAsync(SudokuGame game, CancellationToken cancellationToken)
     {
         string path = GetSaveFilePath(game.Id);
         string serialized = _serializer.Serialize(game);
@@ -80,7 +80,7 @@ class SudokuGamesOnDisk : SudokuGameCachedRepository
         semaphore.Release();
     }
 
-    protected override async Task DeleteFromDistributedRepository(Guid id, CancellationToken cancellationToken)
+    protected override async Task DeleteFromDistributedRepositoryAsync(Guid id, CancellationToken cancellationToken)
     {
         string path = GetSaveFilePath(id);
 

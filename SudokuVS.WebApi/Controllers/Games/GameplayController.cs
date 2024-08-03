@@ -50,7 +50,7 @@ public class GameplayController : ControllerBase
             throw new InternalErrorException("Failed to create game.");
         }
 
-        await _repository.Save(game);
+        await _repository.SaveAsync(game);
         PlayerState playerState = game.Join(user, PlayerSide.Player1);
 
         return game.ToPlayerGameDto(playerState);
@@ -154,7 +154,7 @@ public class GameplayController : ControllerBase
     async Task<(SudokuGame game, PlayerState playerState)> GetGameAndPlayerState(Guid gameId, CancellationToken cancellationToken)
     {
         Guid user = ControllerContext.RequireAuthenticatedUserId();
-        SudokuGame game = await _repository.Get(gameId, cancellationToken) ?? throw new NotFoundException();
+        SudokuGame game = await _repository.GetAsync(gameId, cancellationToken) ?? throw new NotFoundException();
         PlayerState playerState = game.GetPlayerState(user) ?? throw new NotFoundException();
         return (game, playerState);
     }

@@ -13,61 +13,55 @@ abstract class SudokuGameCachedRepository : ISudokuGamesRepository, IDisposable
         GC.SuppressFinalize(this);
     }
 
-    public IAsyncEnumerable<SudokuGame> GetAll(CancellationToken cancellationToken = default) =>
-        ListIds(cancellationToken).SelectAwait(async id => await Get(id, cancellationToken)).OfType<SudokuGame>();
+    public IAsyncEnumerable<SudokuGame> GetAllAsync(CancellationToken cancellationToken = default) =>
+        ListIdsAsync(cancellationToken).SelectAwait(async id => await GetAsync(id, cancellationToken)).OfType<SudokuGame>();
 
-    public async Task<bool> Exists(Guid id, CancellationToken cancellationToken = default) =>
-        await _localCache.Exists(id, cancellationToken) || await ExistsInDistributedRepository(id, cancellationToken);
+    public async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default) =>
+        await _localCache.ExistsAsync(id, cancellationToken) || await ExistsInDistributedRepositoryAsync(id, cancellationToken);
 
-    public async Task<SudokuGame?> Get(Guid id, CancellationToken cancellationToken = default)
+    public async Task<SudokuGame?> GetAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        SudokuGame? game = await _localCache.Get(id, cancellationToken);
+        SudokuGame? game = await _localCache.GetAsync(id, cancellationToken);
         if (game != null)
         {
             return game;
         }
 
-        game = await LoadFromDistributedRepository(id, cancellationToken);
+        game = await LoadFromDistributedRepositoryAsync(id, cancellationToken);
         if (game == null)
         {
             return null;
         }
 
-        await _localCache.Save(game, cancellationToken);
+        await _localCache.SaveAsync(game, cancellationToken);
         SubscribeToChanges(game);
 
         return game;
     }
 
-    public async Task Save(SudokuGame game, CancellationToken cancellationToken = default)
+    public async Task SaveAsync(SudokuGame game, CancellationToken cancellationToken = default)
     {
-        await SaveToDistributedRepository(game, cancellationToken);
-        await _localCache.Save(game, cancellationToken);
+        await SaveToDistributedRepositoryAsync(game, cancellationToken);
+        await _localCache.SaveAsync(game, cancellationToken);
         SubscribeToChanges(game);
     }
 
-    public async Task Delete(Guid id, CancellationToken cancellationToken = default)
+    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        if (!await Exists(id, cancellationToken))
+        if (!await ExistsAsync(id, cancellationToken))
         {
             throw new InvalidOperationException($"Game {id} doesn't exist");
         }
 
-        await DeleteFromDistributedRepository(id, cancellationToken);
-        await _localCache.Delete(id, cancellationToken);
+        await DeleteFromDistributedRepositoryAsync(id, cancellationToken);
+        await _localCache.DeleteAsync(id, cancellationToken);
     }
 
-    public async Task<SudokuGame?> Refresh(Guid id, CancellationToken cancellationToken = default)
-    {
-        await _localCache.Delete(id, cancellationToken);
-        return await Get(id, cancellationToken);
-    }
-
-    protected abstract IAsyncEnumerable<Guid> ListIds(CancellationToken cancellationToken);
-    protected abstract Task<bool> ExistsInDistributedRepository(Guid id, CancellationToken cancellationToken);
-    protected abstract Task<SudokuGame?> LoadFromDistributedRepository(Guid id, CancellationToken cancellationToken);
-    protected abstract Task SaveToDistributedRepository(SudokuGame game, CancellationToken cancellationToken);
-    protected abstract Task DeleteFromDistributedRepository(Guid id, CancellationToken cancellationToken);
+    protected abstract IAsyncEnumerable<Guid> ListIdsAsync(CancellationToken cancellationToken);
+    protected abstract Task<bool> ExistsInDistributedRepositoryAsync(Guid id, CancellationToken cancellationToken);
+    protected abstract Task<SudokuGame?> LoadFromDistributedRepositoryAsync(Guid id, CancellationToken cancellationToken);
+    protected abstract Task SaveToDistributedRepositoryAsync(SudokuGame game, CancellationToken cancellationToken);
+    protected abstract Task DeleteFromDistributedRepositoryAsync(Guid id, CancellationToken cancellationToken);
 
     void SubscribeToChanges(SudokuGame game)
     {
@@ -77,10 +71,10 @@ abstract class SudokuGameCachedRepository : ISudokuGamesRepository, IDisposable
         game.PlayerJoined += (_, side) =>
         {
             SubscribeToPlayerStateChanges(game, side);
-            SaveToDistributedRepository(game, _instanceCancellationSource.Token);
+            SaveToDistributedRepositoryAsync(game, _instanceCancellationSource.Token);
         };
 
-        game.GameOver += (_, _) => SaveToDistributedRepository(game, _instanceCancellationSource.Token);
+        game.GameOver += (_, _) => SaveToDistributedRepositoryAsync(game, _instanceCancellationSource.Token);
     }
 
     void SubscribeToPlayerStateChanges(SudokuGame game, PlayerSide side)
@@ -91,9 +85,9 @@ abstract class SudokuGameCachedRepository : ISudokuGamesRepository, IDisposable
             return;
         }
 
-        state.HintAdded += (_, _) => SaveToDistributedRepository(game, _instanceCancellationSource.Token);
-        state.Grid.CellElementChanged += (_, _) => SaveToDistributedRepository(game, _instanceCancellationSource.Token);
-        state.Grid.CellAnnotationsChanged += (_, _) => SaveToDistributedRepository(game, _instanceCancellationSource.Token);
-        state.Grid.CellLockChanged += (_, _) => SaveToDistributedRepository(game, _instanceCancellationSource.Token);
+        state.HintAdded += (_, _) => SaveToDistributedRepositoryAsync(game, _instanceCancellationSource.Token);
+        state.Grid.CellElementChanged += (_, _) => SaveToDistributedRepositoryAsync(game, _instanceCancellationSource.Token);
+        state.Grid.CellAnnotationsChanged += (_, _) => SaveToDistributedRepositoryAsync(game, _instanceCancellationSource.Token);
+        state.Grid.CellLockChanged += (_, _) => SaveToDistributedRepositoryAsync(game, _instanceCancellationSource.Token);
     }
 }

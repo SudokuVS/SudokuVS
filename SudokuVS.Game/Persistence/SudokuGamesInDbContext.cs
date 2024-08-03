@@ -21,21 +21,21 @@ class SudokuGamesInDbContext : SudokuGameCachedRepository
         _serializer = serializer;
     }
 
-    protected override IAsyncEnumerable<Guid> ListIds(CancellationToken cancellationToken)
+    protected override IAsyncEnumerable<Guid> ListIdsAsync(CancellationToken cancellationToken)
     {
         using IServiceScope scope = _scopeFactory.CreateScope();
         AppDbContext context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         return context.Games.Select(g => g.Id).AsAsyncEnumerable();
     }
 
-    protected override async Task<bool> ExistsInDistributedRepository(Guid id, CancellationToken cancellationToken)
+    protected override async Task<bool> ExistsInDistributedRepositoryAsync(Guid id, CancellationToken cancellationToken)
     {
         using IServiceScope scope = _scopeFactory.CreateScope();
         AppDbContext context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         return await context.Games.AnyAsync(g => g.Id == id, cancellationToken);
     }
 
-    protected override async Task<SudokuGame?> LoadFromDistributedRepository(Guid id, CancellationToken cancellationToken)
+    protected override async Task<SudokuGame?> LoadFromDistributedRepositoryAsync(Guid id, CancellationToken cancellationToken)
     {
         using IServiceScope scope = _scopeFactory.CreateScope();
         AppDbContext context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -62,7 +62,7 @@ class SudokuGamesInDbContext : SudokuGameCachedRepository
         return game;
     }
 
-    protected override async Task SaveToDistributedRepository(SudokuGame game, CancellationToken cancellationToken)
+    protected override async Task SaveToDistributedRepositoryAsync(SudokuGame game, CancellationToken cancellationToken)
     {
         using IServiceScope scope = _scopeFactory.CreateScope();
         AppDbContext context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -90,7 +90,7 @@ class SudokuGamesInDbContext : SudokuGameCachedRepository
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    protected override async Task DeleteFromDistributedRepository(Guid id, CancellationToken cancellationToken)
+    protected override async Task DeleteFromDistributedRepositoryAsync(Guid id, CancellationToken cancellationToken)
     {
         using IServiceScope scope = _scopeFactory.CreateScope();
         AppDbContext context = scope.ServiceProvider.GetRequiredService<AppDbContext>();

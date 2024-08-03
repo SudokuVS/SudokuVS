@@ -28,7 +28,7 @@ public class GamesController : ControllerBase
     ///     Search games
     /// </summary>
     [HttpGet]
-    public IAsyncEnumerable<SudokuGameSummaryDto> SearchGames() => _repository.GetAll().Select(game => game.ToSummaryDto());
+    public IAsyncEnumerable<SudokuGameSummaryDto> SearchGames() => _repository.GetAllAsync().Select(game => game.ToSummaryDto());
 
     /// <summary>
     ///     Get game summary
@@ -36,7 +36,7 @@ public class GamesController : ControllerBase
     [HttpGet("{id:guid}/summary")]
     public async Task<SudokuGameSummaryDto> GetGameSummary(Guid id)
     {
-        SudokuGame? game = await _repository.Get(id);
+        SudokuGame? game = await _repository.GetAsync(id);
         if (game == null)
         {
             throw new NotFoundException();

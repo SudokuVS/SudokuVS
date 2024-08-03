@@ -192,7 +192,7 @@ else
             return;
         }
 
-        _instance = await Repository.Get(gameId);
+        _instance = await Repository.GetAsync(gameId);
         if (_instance == null)
         {
             return;

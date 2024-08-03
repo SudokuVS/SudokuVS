@@ -135,7 +135,7 @@ else
             return;
         }
 
-        await Repository.Save(game);
+        await Repository.SaveAsync(game);
 
         game.Join(userIdentity, PlayerSide.Player1);
         Navigation.NavigateTo($"/game/{game.Id}");

@@ -6,11 +6,11 @@ class SudokuGamesInMemory : ISudokuGamesRepository
 {
     readonly ConcurrentDictionary<Guid, SudokuGame> _games = new();
 
-    public IAsyncEnumerable<SudokuGame> GetAll(CancellationToken cancellationToken = default) => _games.Values.ToAsyncEnumerable();
-    public Task<bool> Exists(Guid id, CancellationToken _ = default) => Task.FromResult(_games.ContainsKey(id));
-    public Task<SudokuGame?> Get(Guid id, CancellationToken _ = default) => Task.FromResult(_games.GetValueOrDefault(id));
+    public IAsyncEnumerable<SudokuGame> GetAllAsync(CancellationToken cancellationToken = default) => _games.Values.ToAsyncEnumerable();
+    public Task<bool> ExistsAsync(Guid id, CancellationToken _ = default) => Task.FromResult(_games.ContainsKey(id));
+    public Task<SudokuGame?> GetAsync(Guid id, CancellationToken _ = default) => Task.FromResult(_games.GetValueOrDefault(id));
 
-    public Task Save(SudokuGame game, CancellationToken _ = default)
+    public Task SaveAsync(SudokuGame game, CancellationToken _ = default)
     {
         SudokuGame existingGame = _games.GetOrAdd(game.Id, game);
         if (existingGame != game)
@@ -21,7 +21,7 @@ class SudokuGamesInMemory : ISudokuGamesRepository
         return Task.CompletedTask;
     }
 
-    public Task Delete(Guid id, CancellationToken _ = default)
+    public Task DeleteAsync(Guid id, CancellationToken _ = default)
     {
         if (!_games.TryRemove(id, out SudokuGame _))
         {
