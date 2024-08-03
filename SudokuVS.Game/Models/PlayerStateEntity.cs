@@ -30,7 +30,7 @@ public class PlayerStateEntity
     /// <summary>
     ///     The game associated with this state.
     /// </summary>
-    public virtual SudokuGameEntity Game { get; private set; }
+    public SudokuGameEntity Game { get; private set; }
 
     /// <summary>
     ///     The side of the player.
@@ -40,7 +40,7 @@ public class PlayerStateEntity
     /// <summary>
     ///     The user associated with the state.
     /// </summary>
-    public virtual UserIdentityEntity User { get; set; }
+    public UserIdentityEntity User { get; set; }
 
     /// <summary>
     ///     The current grid of the player.

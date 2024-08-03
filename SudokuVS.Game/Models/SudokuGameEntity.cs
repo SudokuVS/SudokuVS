@@ -52,7 +52,7 @@ public class SudokuGameEntity
     /// <summary>
     ///     The players of the game.
     /// </summary>
-    public virtual ICollection<PlayerStateEntity> Players { get; private set; } = new HashSet<PlayerStateEntity>();
+    public ICollection<PlayerStateEntity> Players { get; private set; } = new HashSet<PlayerStateEntity>();
 
     /// <summary>
     ///     The date at which the game started. The game starts once both players have joined the game.
