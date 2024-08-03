@@ -84,7 +84,7 @@ else
                                 <div id="invitation-link-container" class="font-monospace text-secondary">
                                     @GetOtherPlayerInvitationLink()
                                 </div>
-                                <a class="btn btn-outline-primary my-2 stretched-link" @onclick="CopyInvitationLink" id="copy-invitation-link-button">Copy invitation link</a>
+                                <a class="btn btn-outline-primary my-2 stretched-link" @onclick="CopyInvitationLinkAsync" id="copy-invitation-link-button">Copy invitation link</a>
                             </div>
                         </div>
                     }
@@ -127,7 +127,7 @@ else
                                 <div id="invitation-link-container" class="font-monospace text-secondary">
                                     @GetOtherPlayerInvitationLink()
                                 </div>
-                                <a class="btn btn-outline-primary my-2 stretched-link" @onclick="CopyInvitationLink" id="copy-invitation-link-button">Copy invitation link</a>
+                                <a class="btn btn-outline-primary my-2 stretched-link" @onclick="CopyInvitationLinkAsync" id="copy-invitation-link-button">Copy invitation link</a>
                             </div>
                         </div>
                     }
@@ -313,7 +313,7 @@ else
 
     string GetOtherPlayerInvitationLink() => _instance == null ? "" : $"{Navigation.BaseUri}game/{_instance.Id}";
 
-    async Task CopyInvitationLink()
+    async Task CopyInvitationLinkAsync()
     {
         if (_gameModule == null)
         {

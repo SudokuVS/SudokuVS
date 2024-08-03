@@ -27,8 +27,8 @@
                 @if (!Disabled)
                 {
                     <a class="stretched-link" type="button"
-                       @onclick="async () => await CellClicked(row, column)" @onclick:preventDefault="true" @onclick:stopPropagation="true"
-                       @oncontextmenu="async () => await CellRightClicked(row, column)" @oncontextmenu:preventDefault="true" @oncontextmenu:stopPropagation="true">
+                       @onclick="async () => await CellClickedAsync(row, column)" @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                       @oncontextmenu="async () => await CellRightClickedAsync(row, column)" @oncontextmenu:preventDefault="true" @oncontextmenu:stopPropagation="true">
                     </a>
                 }
             </div>
@@ -167,7 +167,7 @@
             _ => ""
         };
 
-    async Task CellClicked(int row, int column)
+    async Task CellClickedAsync(int row, int column)
     {
         if (Disabled)
         {
@@ -177,7 +177,7 @@
         await OnCellClicked.InvokeAsync((row, column));
     }
 
-    async Task CellRightClicked(int row, int column)
+    async Task CellRightClickedAsync(int row, int column)
     {
         if (Disabled)
         {
