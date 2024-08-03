@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using SudokuVS.Game.Infrastructure.Database;
 using SudokuVS.Game.Models;
 using SudokuVS.Game.Models.Users;
 using SudokuVS.Game.Users;

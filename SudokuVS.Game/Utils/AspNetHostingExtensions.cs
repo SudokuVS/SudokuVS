@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using SudokuVS.Game.Infrastructure.Database;
 using SudokuVS.Game.Persistence;
 using SudokuVS.Sudoku.Serialization;
 

@@ -2,7 +2,7 @@
 using SudokuVS.Game.Models;
 using SudokuVS.Game.Models.Users;
 
-namespace SudokuVS.Game.Persistence;
+namespace SudokuVS.Game.Infrastructure.Database;
 
 public class AppDbContext : DbContext
 {
