@@ -141,7 +141,7 @@ public class SudokuGameJsonSerializer
 
     class SerializedPlayerState
     {
-        public required Guid PlayerId { get; init; }
+        public required string PlayerId { get; init; }
         public required string PlayerName { get; init; }
         public required Dictionary<int, SerializedCell> Grid { get; init; }
         public required int[] Hints { get; init; }

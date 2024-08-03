@@ -12,7 +12,7 @@ using SudokuVS.Game.Infrastructure.Database;
 namespace SudokuVS.Game.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240803160710_Initial")]
+    [Migration("20240803171755_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -52,10 +52,9 @@ namespace SudokuVS.Game.Infrastructure.Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("GameId");
 
-                    b.HasIndex("GameId", "Side")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("PlayerStates");
                 });
@@ -101,8 +100,10 @@ namespace SudokuVS.Game.Infrastructure.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ExternalId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("ExternalId")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("Name")
                         .IsRequired()

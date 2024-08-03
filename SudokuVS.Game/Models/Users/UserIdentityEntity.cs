@@ -16,7 +16,8 @@ public class UserIdentityEntity
     /// <summary>
     ///     The unique ID of the user in the identity provider.
     /// </summary>
-    public required Guid ExternalId { get; init; }
+    [MaxLength(256)]
+    public required string ExternalId { get; init; }
 
     /// <summary>
     ///     The name of the user.

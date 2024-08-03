@@ -34,7 +34,7 @@ namespace SudokuVS.Game.Infrastructure.Database.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ExternalId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ExternalId = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     Name = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false)
                 },
                 constraints: table =>
@@ -71,10 +71,9 @@ namespace SudokuVS.Game.Infrastructure.Database.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_PlayerStates_GameId_Side",
+                name: "IX_PlayerStates_GameId",
                 table: "PlayerStates",
-                columns: new[] { "GameId", "Side" },
-                unique: true);
+                column: "GameId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PlayerStates_UserId",

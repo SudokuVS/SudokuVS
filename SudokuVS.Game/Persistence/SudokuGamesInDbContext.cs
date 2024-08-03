@@ -42,7 +42,7 @@ class SudokuGamesInDbContext : SudokuGameCachedRepository
         using IServiceScope scope = _scopeFactory.CreateScope();
         AppDbContext context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        SudokuGameEntity? entity = await context.Games.FindAsync([id], cancellationToken);
+        SudokuGameEntity? entity = await FindGame(context, id, cancellationToken);
         if (entity == null)
         {
             return null;
@@ -73,7 +73,7 @@ class SudokuGamesInDbContext : SudokuGameCachedRepository
         using IServiceScope scope = _scopeFactory.CreateScope();
         AppDbContext context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        SudokuGameEntity? entity = await context.Games.FindAsync([game.Id], cancellationToken);
+        SudokuGameEntity? entity = await FindGame(context, game.Id, cancellationToken);
         if (entity == null)
         {
             entity = new SudokuGameEntity(game.Id, game.Name, _serializer.ToString(game.InitialGrid), _serializer.ToString(game.SolvedGrid));
@@ -106,6 +106,9 @@ class SudokuGamesInDbContext : SudokuGameCachedRepository
         await context.SaveChangesAsync(cancellationToken);
     }
 
+    static async Task<SudokuGameEntity?> FindGame(AppDbContext context, Guid id, CancellationToken cancellationToken) =>
+        await context.Games.Include(g => g.Players).ThenInclude(p => p.User).SingleOrDefaultAsync(g => g.Id == id, cancellationToken);
+
     PlayerState LoadPlayerState(SudokuGame game, PlayerSide side, PlayerStateEntity state)
     {
         SudokuGrid grid = _serializer.FromString(state.Grid);
@@ -121,7 +124,7 @@ class SudokuGamesInDbContext : SudokuGameCachedRepository
             grid[row, column].IsLocked = true;
         }
 
-        UserIdentity user = new() { ExternalId = state.User.Id, Name = state.User.Name };
+        UserIdentity user = new() { ExternalId = state.User.ExternalId, Name = state.User.Name };
 
         PlayerState result = new(game, grid, side, user);
         result.Restore(hints);

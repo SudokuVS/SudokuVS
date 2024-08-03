@@ -1,13 +1,14 @@
 ﻿@page "/"
 @using System.Collections.Specialized
 @using System.Net
-@using System.Security.Claims
 @using System.Web
+@using Microsoft.AspNetCore.Components.Authorization
 @using SudokuVS.Game
 @using SudokuVS.Game.Models
 @using SudokuVS.Game.Persistence
 @using SudokuVS.Game.Users
 @inject NavigationManager Navigation;
+@inject AuthenticationStateProvider AuthenticationStateProvider;
 @inject IJSRuntime JsRuntime; 
 @inject ISudokuGamesRepository Repository;
 @inject ILogger<Index> Logger;
@@ -15,7 +16,7 @@
 
 <PageTitle>@Constants.ProductName</PageTitle>
 
-@if (AuthenticatedUser == null)
+@if (_authenticatedUser == null)
 {
     <div class="w-100 h-100 d-flex align-items-center justify-content-center">
         <button class="btn btn-primary btn-lg" @onclick="LoginAsync">Login</button>
@@ -54,28 +55,31 @@ else
 
 @code {
 
-    [CascadingParameter]
-    public ClaimsPrincipal? AuthenticatedUser { get; set; }
-
     Model? _model;
     string? _newGameError;
+    UserIdentity? _authenticatedUser;
 
-    protected override void OnInitialized() => _model ??= new Model();
+    protected override async Task OnInitializedAsync()
+    {
+        AuthenticationState authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        _authenticatedUser = authState.User.GetUserIdentity();
+
+        _model ??= new Model();
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         // Login with redirection flow:
         // - The unauthenticated user navigates to /some/path
         // - The MainLayout redirects the user to /?post-login-redirect=/some/path
-        // - The Index saves the post-login-redirect to the local storage of the user
-        // - The Index navigates to / (no query params) because it is the redirect URI of the OAuth2 provider
         // - The Index waits for the user to press Login
+        // - The Index saves the post-login-redirect to the local storage of the user
         // - The Index navigates to the /MicrosoftIdentity/Account/SignIn page (Microsoft Identity Web UI)
         // - The SignIn page redirects to Microsoft Identity
         // - Microsoft Identity performs authentication and returns to the Index
         // - The Index finds an authenticated user and a post-login-redirect item in the local storage and redirects to that URI 
 
-        if (AuthenticatedUser != null)
+        if (_authenticatedUser != null)
         {
             string postLoginRedirect = await JsRuntime.InvokeAsync<string>("localStorageGetItem", "post-login-redirect");
             if (!string.IsNullOrWhiteSpace(postLoginRedirect))
@@ -113,8 +117,7 @@ else
     {
         _newGameError = null;
 
-        UserIdentity? userIdentity = AuthenticatedUser?.GetUserIdentity();
-        if (userIdentity == null)
+        if (_authenticatedUser == null)
         {
             _newGameError = "Could not find player name";
             StateHasChanged();
@@ -137,7 +140,7 @@ else
 
         await Repository.SaveAsync(game);
 
-        game.Join(userIdentity, PlayerSide.Player1);
+        game.Join(_authenticatedUser, PlayerSide.Player1);
         Navigation.NavigateTo($"/game/{game.Id}");
     }
 

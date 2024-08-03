@@ -1,10 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore;
 using SudokuVS.Game.Models.Users;
 
 namespace SudokuVS.Game.Models;
 
-[Index(nameof(GameId), nameof(Side), IsUnique = true)]
 public class PlayerStateEntity
 {
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
@@ -14,6 +12,7 @@ public class PlayerStateEntity
 
     public PlayerStateEntity(SudokuGameEntity game, PlayerSide side, UserIdentityEntity user, string grid)
     {
+        GameId = game.Id;
         Game = game;
         Side = side;
         User = user;
@@ -24,11 +23,14 @@ public class PlayerStateEntity
     public Guid Id { get; private set; }
 
     /// <summary>
+    ///     The unique ID of the game associated with this state.
+    /// </summary>
+    public Guid GameId { get; private set; }
+
+    /// <summary>
     ///     The game associated with this state.
     /// </summary>
-    public SudokuGameEntity Game { get; private set; }
-    
-    public Guid GameId { get; private set; }
+    public virtual SudokuGameEntity Game { get; private set; }
 
     /// <summary>
     ///     The side of the player.
@@ -38,7 +40,7 @@ public class PlayerStateEntity
     /// <summary>
     ///     The user associated with the state.
     /// </summary>
-    public UserIdentityEntity User { get; set; }
+    public virtual UserIdentityEntity User { get; set; }
 
     /// <summary>
     ///     The current grid of the player.

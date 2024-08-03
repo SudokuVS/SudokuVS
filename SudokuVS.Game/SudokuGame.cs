@@ -96,7 +96,7 @@ public class SudokuGame
             _ => null
         };
 
-    public PlayerState? GetPlayerState(Guid playerId)
+    public PlayerState? GetPlayerState(string playerId)
     {
         if (Player1 != null && Player1.User.ExternalId == playerId)
         {
@@ -111,7 +111,7 @@ public class SudokuGame
         return null;
     }
 
-    public IHiddenPlayerState? GetOtherPlayerState(Guid playerId)
+    public IHiddenPlayerState? GetOtherPlayerState(string playerId)
     {
         if (Player1 != null && Player1.User.ExternalId == playerId)
         {
@@ -192,6 +192,6 @@ public class SudokuGame
 
 public static class SudokuGameExtensions
 {
-    public static bool InvolvesPlayer(this SudokuGame game, Guid userId) =>
+    public static bool InvolvesPlayer(this SudokuGame game, string userId) =>
         game.Player1 != null && game.Player1.User.ExternalId == userId || game.Player2 != null && game.Player2.User.ExternalId == userId;
 }

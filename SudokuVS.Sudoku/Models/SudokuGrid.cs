@@ -94,7 +94,7 @@ public class SudokuGrid : IReadOnlySudokuGrid, IHiddenSudokuGrid
         {
             if (!cell.IsEmpty)
             {
-                cell.IsLocked = true;
+                this[cell.Row, cell.Column].IsLocked = cell.IsLocked;
             }
         }
     }

@@ -1,8 +1,9 @@
 ﻿@page "/game/{GameId?}"
 @inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IJSRuntime JsRuntime
 @inject ISudokuGamesRepository Repository
-@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
 @using SudokuVS.Game
 @using SudokuVS.Game.Models
 @using SudokuVS.Game.Persistence
@@ -167,9 +168,6 @@ else
     [Parameter]
     public string? GameId { get; set; }
 
-    [CascadingParameter]
-    public ClaimsPrincipal? AuthenticatedUser { get; set; }
-
     UserIdentity? _user;
     SudokuGame? _instance;
     PlayerState? _playerState;
@@ -186,7 +184,8 @@ else
             return;
         }
 
-        _user = AuthenticatedUser?.GetUserIdentity();
+        AuthenticationState authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        _user = authState.User.GetUserIdentity();
         if (_user == null)
         {
             return;
@@ -226,9 +225,6 @@ else
         }
 
         _playerState = _instance.GetPlayerState(_user.ExternalId);
-        if (_playerState == null)
-        {
-        }
     }
 
     void JoinAsPlayer1()

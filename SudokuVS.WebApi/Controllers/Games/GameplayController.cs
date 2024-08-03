@@ -153,7 +153,7 @@ public class GameplayController : ControllerBase
 
     async Task<(SudokuGame game, PlayerState playerState)> GetGameAndPlayerStateAsync(Guid gameId, CancellationToken cancellationToken)
     {
-        Guid user = ControllerContext.RequireAuthenticatedUserId();
+        string user = ControllerContext.RequireAuthenticatedUserId();
         SudokuGame game = await _repository.GetAsync(gameId, cancellationToken) ?? throw new NotFoundException();
         PlayerState playerState = game.GetPlayerState(user) ?? throw new NotFoundException();
         return (game, playerState);

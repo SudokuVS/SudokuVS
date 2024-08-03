@@ -11,7 +11,7 @@ public class UserIdentityDto
     /// <summary>
     ///     The unique identifier of the user.
     /// </summary>
-    public required Guid Id { get; init; }
+    public required string Id { get; init; }
 
     /// <summary>
     ///     The name of the user.
