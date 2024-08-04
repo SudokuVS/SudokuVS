@@ -12,25 +12,11 @@
 </div>
 
 @section Head {
-    <base href="/app/"/>
-    <component type="typeof(HeadOutlet)"
-               render-mode="ServerPrerendered"/>
+    <link href="/SudokuVS.WebApi.styles.css" rel="stylesheet">
+    <base href="/"/>
+    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered"/>
 }
 
 @section Scripts {
-    <script>
-    window.copyInvitationLink = async link =>
-        await navigator.clipboard.writeText(link).then(() => {
-            const button = document.getElementById("copy-invitation-link-button");
-            if (!button) {
-                return;
-            }
-
-            button.textContent = "Copied!";
-            button.classList.remove("btn-outline-primary");
-            button.classList.add("btn-outline-secondary");
-        })
-    </script>
-
-    <script src="_framework/blazor.web.js"></script>
+    <script src="/_framework/blazor.web.js"></script>
 }

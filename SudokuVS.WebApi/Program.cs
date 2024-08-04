@@ -13,6 +13,7 @@ using SudokuVS.Apps.Common.Logging;
 using SudokuVS.Game.Infrastructure.Database;
 using SudokuVS.Game.Utils;
 using SudokuVS.WebApi;
+using SudokuVS.WebApi.Areas.App.Components;
 using SudokuVS.WebApi.Exceptions;
 using SudokuVS.WebApi.Infrastructure.Database;
 using SudokuVS.WebApi.Infrastructure.Emails;
@@ -40,7 +41,7 @@ try
     }
 
     builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(appConnectionString));
-    bootstrapLogger.LogInformation("Connection to App database configured.");
+    bootstrapLogger.LogInformation("Connection to AppComponent database configured.");
 
     string? gameConnectionString = builder.Configuration.GetConnectionString("GameDbContext");
     if (string.IsNullOrWhiteSpace(gameConnectionString))
@@ -78,7 +79,7 @@ try
                 configure.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
             }
         );
-    builder.Services.AddRazorPages(options => { options.Conventions.AuthorizeAreaFolder("App", "/"); });
+    builder.Services.AddRazorPages(options => { options.Conventions.AuthorizeAreaFolder("AppComponent", "/"); });
     builder.Services.AddRazorComponents().AddInteractiveServerComponents().AddMicrosoftIdentityConsentHandler();
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddProblemDetails();
@@ -121,6 +122,7 @@ try
     app.UseAntiforgery();
 
     app.MapRazorPages();
+    app.MapRazorComponents<AppComponent>().AddInteractiveServerRenderMode();
     app.MapControllerRoute("areas", "{area:exists}/{controller=Home}/{action=Index}/{id?}");
     app.MapDefaultControllerRoute();
 

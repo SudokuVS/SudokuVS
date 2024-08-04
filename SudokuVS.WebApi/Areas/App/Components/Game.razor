@@ -3,7 +3,6 @@
 @inject IJSRuntime JsRuntime
 @inject ISudokuGamesRepository Repository
 @using Microsoft.AspNetCore.Components.Authorization
-@using Microsoft.JSInterop
 @using SudokuVS.Game
 @using SudokuVS.Game.Models
 @using SudokuVS.Game.Persistence
@@ -12,66 +11,13 @@
 
 @if (_instance != null)
 {
-    <div class="container-lg">
-        <div class="d-flex">
-            <div>
-                <GridIconComponent Grid="_instance.InitialGrid"></GridIconComponent>
-            </div>
-            <div class="ps-4">
-                <div class="fs-2">@_instance.Name</div>
-                <div>
-                    <span class="fs-4 fw-semibold">@(_instance.Player1?.User.Name ?? "???")</span>
-                    vs.
-                    <span class="fs-4 fw-semibold">@(_instance.Player2?.User.Name ?? "???")</span>
-                </div>
-            </div>
-        </div>
+    <div class="container-lg py-3">
+        <GameSummaryComponent Game="_instance"></GameSummaryComponent>
+        <hr/>
     </div>
 
 
     <div class="w-100 h-100 d-flex flex-column">
-        <div class="d-flex align-items-center justify-content-center">
-            <div class="game-result d-flex flex-column align-items-center justify-content-center border-bottom border-secondary-subtle text-center px-4 py-2">
-                <div class="fs-2">@_instance.Name</div>
-
-                <div class="fs-4">
-                    @if (_instance.IsOver)
-                    {
-                        @if (_playerState == null)
-                        {
-                            <span class="fw-bold">
-                                @(_instance.Winner == PlayerSide.Player1 ? _instance.Player1!.User.Name : _instance.Player2!.User.Name)
-                                WIN!
-                            </span>
-                        }
-                        else
-                        {
-                            @if (_instance.Winner == _playerState.Side)
-                            {
-                                <span class="fw-bold text-success">You WIN!</span>
-                            }
-                            else
-                            {
-                                <span class="fw-bold text-danger">You LOSE!</span>
-                            }
-                        }
-                    }
-                    else if (_instance.IsStarted)
-                    {
-                        <span>Round 1</span>
-                    }
-                    else
-                    {
-                        <span>In preparation</span>
-                    }
-                </div>
-
-                @if (_instance.IsStarted)
-                {
-                    <div class="fs-4 fw-semibold">@GetElapsedTime()</div>
-                }
-            </div>
-        </div>
         <div class="w-100 flex-grow-1 d-flex align-items-stretch">
             <div class="w-50 border-end border-secondary-subtle pt-4">
                 @if (_player1HiddenState == null)
@@ -261,36 +207,7 @@ else
             return;
         }
 
-        _gameModule ??= await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/Pages/Game.razor.js");
-    }
-
-    string GetElapsedTime()
-    {
-        if (_instance == null)
-        {
-            return "";
-        }
-
-        TimeSpan time;
-        if (_instance.IsOver)
-        {
-            time = _instance.EndDate.Value - _instance.StartDate.Value;
-        }
-        else if (_instance.IsStarted)
-        {
-            time = DateTime.Now - _instance.StartDate.Value;
-        }
-        else
-        {
-            time = TimeSpan.Zero;
-        }
-
-        if (time.TotalHours >= 1)
-        {
-            return $"{time.TotalHours:0.}:{time.Minutes:00}:{time.Seconds:00}";
-        }
-
-        return $"{time.TotalMinutes:00}:{time.Seconds:00}";
+        _gameModule ??= await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./Areas/App/Components/Game.razor.js");
     }
 
     public void Dispose()

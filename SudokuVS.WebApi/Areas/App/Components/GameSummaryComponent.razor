@@ -1,0 +1,92 @@
+﻿@using SudokuVS.Game
+@using SudokuVS.Game.Models
+<div class="d-flex px-5">
+    @if (Game != null)
+    {
+        <div>
+            <GridIconComponent Grid="Game.InitialGrid" Hidden="!Game.IsStarted"></GridIconComponent>
+        </div>
+        <div class="flex-grow-1 ps-4">
+            @switch (Game.Winner)
+            {
+                case PlayerSide.Player1:
+                    <div>
+                        <span class="fs-4 fw-semibold text-success">@(Game.Player1?.User.Name ?? "???")</span>
+                        vs.
+                        <span class="fs-4 fw-semibold text-danger">@(Game.Player2?.User.Name ?? "???")</span>
+                    </div>
+                    break;
+                case PlayerSide.Player2:
+                    <div>
+                        <span class="fs-4 fw-semibold text-danger">@(Game.Player1?.User.Name ?? "???")</span>
+                        vs.
+                        <span class="fs-4 fw-semibold text-success">@(Game.Player2?.User.Name ?? "???")</span>
+                    </div>
+                    break;
+                default:
+                    <div>
+                        <span class="fs-4 fw-semibold">@(Game.Player1?.User.Name ?? "???")</span>
+                        vs.
+                        <span class="fs-4 fw-semibold">@(Game.Player2?.User.Name ?? "???")</span>
+                    </div>
+                    break;
+            }
+            <div class="lead">@Game.Name</div>
+            <div>
+                @if (Game.IsStarted)
+                {
+                    @:Round 1
+                }
+                else if (!Game.IsOver)
+                {
+                    @:<i class="bi bi-hourglass-split ps-2"></i> In preparation
+                }
+            </div>
+        </div>
+
+        @if (Game.IsStarted)
+        {
+            <div class="d-flex align-items-center justify-content-center">
+                <span class="fs-4 fw-semibold">
+                    @GetElapsedTime()
+                </span>
+            </div>
+        }
+    }
+</div>
+
+@code {
+
+    [Parameter]
+    public SudokuGame? Game { get; set; }
+
+    string GetElapsedTime()
+    {
+        if (Game == null)
+        {
+            return "";
+        }
+
+        TimeSpan time;
+        if (Game.IsOver)
+        {
+            time = Game.EndDate.Value - Game.StartDate.Value;
+        }
+        else if (Game.IsStarted)
+        {
+            time = DateTime.Now - Game.StartDate.Value;
+        }
+        else
+        {
+            time = TimeSpan.Zero;
+        }
+
+        if (time.TotalHours >= 1)
+        {
+            return $"{time.TotalHours:0.}:{time.Minutes:00}:{time.Seconds:00}";
+        }
+
+        return $"{time.TotalMinutes:00}:{time.Seconds:00}";
+    }
+
+}

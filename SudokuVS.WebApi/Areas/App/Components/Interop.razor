@@ -1,8 +1,6 @@
 ﻿@inject IJSRuntime JsRuntime;
-@using Microsoft.AspNetCore.Components.Web
-@using Microsoft.JSInterop
 @using Serilog
-@implements IAsyncDisposable
+@implements IAsyncDisposable 
 
 @code {
 
@@ -24,7 +22,7 @@
         }
 
         _instances.Add(_interopKey, this);
-        _interopModule ??= await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/Interop.razor.js");
+        _interopModule ??= await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./Areas/App/Components/Interop.razor.js");
         _interopInstance = await _interopModule.InvokeAsync<IJSObjectReference>("createInteropInstance", _interopKey);
 
         IEnumerable<string> callbacks = Events.Select(GetAddListenerName).OfType<string>();
