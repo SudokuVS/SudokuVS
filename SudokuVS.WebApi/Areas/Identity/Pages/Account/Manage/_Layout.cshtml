@@ -6,7 +6,7 @@
     }
     else
     {
-        Layout = "/Areas/Identity/Pages/Layout.cshtml";
+        throw new InvalidOperationException("No layout was found");
     }
 }
 
@@ -26,5 +26,5 @@
 </div>
 
 @section Scripts {
-    @RenderSection("Scripts", false)
+    @await RenderSectionAsync("Scripts", false)
 }

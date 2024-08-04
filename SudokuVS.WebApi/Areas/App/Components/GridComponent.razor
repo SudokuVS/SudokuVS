@@ -91,6 +91,9 @@
     public Color[,] RegionBorderColor { get; set; } = new Color[0, 0];
 
     [Parameter]
+    public bool HideCellBorders { get; set; }
+
+    [Parameter]
     public Size GridSize { get; set; } = Size.Medium;
 
     [Parameter]
@@ -113,7 +116,7 @@
     string ComputeCellStyle(int row, int column)
     {
         Cell cell = Grid[row, column];
-        return $"cell {GetSizeStyle(GridSize)} {GetBgColorStyle(cell.BackgroundColor)} {GetBorderColorStyle(cell.Border) ?? "border border-secondary-subtle"} position-relative";
+        return $"cell {GetSizeStyle(GridSize)} {GetBgColorStyle(cell.BackgroundColor)} {GetBorderColorStyle(cell.Border) ?? (HideCellBorders ? null : "border border-secondary-subtle")} position-relative";
     }
 
     string ComputeCellContentStyle(int row, int column)
@@ -131,6 +134,7 @@
     static string GetSizeStyle(Size size) =>
         size switch
         {
+            Size.XSmall => "xsmall",
             Size.Small => "small",
             Size.Medium => "medium",
             Size.Big => "big",
@@ -184,6 +188,15 @@
             Color.Yellow => "bg-yellow",
             Color.Red => "bg-red",
             Color.Green => "bg-green",
+            Color.Dark1 => "bg-dark1",
+            Color.Dark2 => "bg-dark2",
+            Color.Dark3 => "bg-dark3",
+            Color.Dark4 => "bg-dark4",
+            Color.Dark5 => "bg-dark5",
+            Color.Dark6 => "bg-dark6",
+            Color.Dark7 => "bg-dark7",
+            Color.Dark8 => "bg-dark8",
+            Color.Dark9 => "bg-dark9",
             _ => ""
         };
 
@@ -229,11 +242,21 @@
         Blue,
         Yellow,
         Red,
-        Green
+        Green,
+        Dark1,
+        Dark2,
+        Dark3,
+        Dark4,
+        Dark5,
+        Dark6,
+        Dark7,
+        Dark8,
+        Dark9
     }
 
     public enum Size
     {
+        XSmall,
         Small,
         Medium,
         Big

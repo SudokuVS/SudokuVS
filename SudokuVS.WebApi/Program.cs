@@ -121,7 +121,7 @@ try
     app.UseAntiforgery();
 
     app.MapRazorPages();
-    app.MapControllerRoute("AppArea", "App/{controller=App}/{action=Index}/{id?}");
+    app.MapControllerRoute("areas", "{area:exists}/{controller=Home}/{action=Index}/{id?}");
     app.MapDefaultControllerRoute();
 
     app.Run();

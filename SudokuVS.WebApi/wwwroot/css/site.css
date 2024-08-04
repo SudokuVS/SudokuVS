@@ -63,6 +63,11 @@ button.accept-policy {
     line-height: inherit;
 }
 
+.wrap-anywhere {
+    overflow-wrap: anywhere;
+    word-break: break-all
+}
+
 html, body {
     position: relative;
     width: 100%;
@@ -75,13 +80,14 @@ html, body {
     width: 100%;
     overflow: hidden;
     white-space: nowrap;
-    line-height: 64px;
+    height: 64px;
+    z-index: 99999;
 }
 
 .main {
     width: 100%;
     height: 100%;
-    overflow: auto;
+    overflow: hidden;
     padding-top: 64px;
     padding-bottom: 32px;
 }
@@ -92,9 +98,12 @@ html, body {
     width: 100%;
     overflow: hidden;
     white-space: nowrap;
-    line-height: 32px;
+    height: 32px;
+    background-color: white;
+    z-index: 99999;
 }
 
+/* Sign in */
 
 .signin-form, .register-form {
     width: 330px;
@@ -116,3 +125,218 @@ html, body {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 }
+
+/* endregion */
+
+/* region Grid Component */
+
+.sudoku-grid {
+    display: grid;
+    grid-template-rows: repeat(9, 1fr);
+    grid-template-columns: repeat(9, 1fr);
+}
+
+.sudoku-grid.big {
+    width: 768px;
+    height: 768px;
+}
+
+.sudoku-grid.medium {
+    width: 384px;
+    height: 384px;
+}
+
+.sudoku-grid.small {
+    width: 192px;
+    height: 192px;
+}
+
+.sudoku-grid.xsmall {
+    width: 96px;
+    height: 96px;
+}
+
+.sudoku-grid .rows {
+    position: absolute;
+    inset: 0;
+
+    display: grid;
+    grid-template-rows: repeat(9, 1fr);
+    grid-template-columns: 1fr;
+}
+
+.sudoku-grid .columns {
+    position: absolute;
+    inset: 0;
+
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: repeat(9, 1fr);
+}
+
+.sudoku-grid .regions {
+    position: absolute;
+    inset: 0;
+
+    display: grid;
+    grid-template-rows: repeat(3, 1fr);
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.sudoku-grid .cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sudoku-grid .annotation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 20%;
+
+    padding: 4px;
+}
+
+.sudoku-grid.big .cell {
+    font-size: 48px;
+}
+
+.sudoku-grid.medium .cell {
+    font-size: 24px;
+}
+
+.sudoku-grid.small .cell {
+    font-size: 12px;
+}
+
+.sudoku-grid.xsmall .cell {
+    font-size: 6px;
+}
+
+.sudoku-grid.big .annotation {
+    font-size: 12px;
+}
+
+.sudoku-grid.medium .annotation {
+    font-size: 6px;
+}
+
+.sudoku-grid.small .annotation {
+    font-size: 3px;
+}
+
+.sudoku-grid.xsmall .annotation {
+    font-size: 1px;
+}
+
+.sudoku-grid .border-light-grey {
+    box-shadow: inset 0 0 0 2px lightgray;
+}
+
+.sudoku-grid .border-grey {
+    box-shadow: inset 0 0 0 2px gray;
+}
+
+.sudoku-grid .border-light-pink {
+    box-shadow: inset 0 0 0 2px pink;
+}
+
+.sudoku-grid .border-pink {
+    box-shadow: inset 0 0 0 2px hotpink;
+}
+
+.sudoku-grid .border-light-blue {
+    box-shadow: inset 0 0 0 2px lightcyan;
+}
+
+.sudoku-grid .border-blue {
+    box-shadow: inset 0 0 0 2px lightblue;
+}
+
+.sudoku-grid .border-yellow {
+    box-shadow: inset 0 0 0 2px gold;
+}
+
+.sudoku-grid .border-red {
+    box-shadow: inset 0 0 0 2px red;
+}
+
+.sudoku-grid .border-green {
+    box-shadow: inset 0 0 0 2px green;
+}
+
+.sudoku-grid .bg-light-grey {
+    background-color: lightgray;
+}
+
+.sudoku-grid .bg-grey {
+    background-color: gray;
+}
+
+.sudoku-grid .bg-light-pink {
+    background-color: lightpink;
+}
+
+.sudoku-grid .bg-pink {
+    background-color: pink;
+}
+
+.sudoku-grid .bg-light-blue {
+    background-color: lightcyan;
+}
+
+.sudoku-grid .bg-blue {
+    background-color: lightblue;
+}
+
+.sudoku-grid .bg-yellow {
+    background-color: gold;
+}
+
+.sudoku-grid .bg-red {
+    background-color: red;
+}
+
+.sudoku-grid .bg-green {
+    background-color: green;
+}
+
+.sudoku-grid .bg-dark1 {
+    background-color: #F0F0F0;
+}
+
+.sudoku-grid .bg-dark2 {
+    background-color: #E0E0E0;
+}
+
+.sudoku-grid .bg-dark3 {
+    background-color: #D0D0D0;
+}
+
+.sudoku-grid .bg-dark4 {
+    background-color: #C0C0C0;
+}
+
+.sudoku-grid .bg-dark5 {
+    background-color: #B0B0B0;
+}
+
+.sudoku-grid .bg-dark6 {
+    background-color: #A0A0A0;
+}
+
+.sudoku-grid .bg-dark7 {
+    background-color: #909090;
+}
+
+.sudoku-grid .bg-dark8 {
+    background-color: #808080;
+}
+
+.sudoku-grid .bg-dark9 {
+    background-color: #707070;
+}
+
+/* endregion */

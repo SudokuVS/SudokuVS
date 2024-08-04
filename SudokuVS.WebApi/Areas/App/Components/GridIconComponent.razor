@@ -1,0 +1,43 @@
+﻿@using SudokuVS.Sudoku.Models.Abstractions
+<GridComponent Grid="_cells" GridSize="GridComponent.Size.XSmall" HideCellBorders></GridComponent>
+
+@code {
+    GridComponent.Cell[,] _cells;
+
+    [Parameter]
+    public IReadOnlySudokuGrid Grid { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _cells = new GridComponent.Cell[9, 9];
+
+        for (int i = 0; i < 9; i++)
+        for (int j = 0; j < 9; j++)
+        {
+            GridComponent.Color backgroundColor = GetBackgroundColor(Grid[i, j].Element);
+
+            _cells[i, j] = new GridComponent.Cell
+            {
+                BackgroundColor = backgroundColor,
+                Border = GridComponent.Color.None
+            };
+        }
+    }
+
+    static GridComponent.Color GetBackgroundColor(int? element) =>
+        element switch
+        {
+            1 => GridComponent.Color.Dark1,
+            2 => GridComponent.Color.Dark2,
+            3 => GridComponent.Color.Dark3,
+            4 => GridComponent.Color.Dark4,
+            5 => GridComponent.Color.Dark5,
+            6 => GridComponent.Color.Dark6,
+            7 => GridComponent.Color.Dark7,
+            8 => GridComponent.Color.Dark8,
+            9 => GridComponent.Color.Dark9,
+            null => GridComponent.Color.None,
+            _ => GridComponent.Color.None
+        };
+
+}

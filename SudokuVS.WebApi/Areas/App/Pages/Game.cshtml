@@ -4,10 +4,12 @@
 @model SudokuVS.WebApi.Areas.App.Pages.GamePage
 
 @{
-    Layout = "_Layout";
+    Layout = "_SimpleLayout";
 }
 
-<component type="typeof(Game)" render-mode="ServerPrerendered" param-GameId="@Model.GameId"/>
+<div class="h-100 overflow-auto">
+    <component type="typeof(Game)" render-mode="ServerPrerendered" param-GameId="@Model.GameId"/>
+</div>
 
 @section Head {
     <base href="/app/"/>
@@ -16,5 +18,19 @@
 }
 
 @section Scripts {
+    <script>
+    window.copyInvitationLink = async link =>
+        await navigator.clipboard.writeText(link).then(() => {
+            const button = document.getElementById("copy-invitation-link-button");
+            if (!button) {
+                return;
+            }
+
+            button.textContent = "Copied!";
+            button.classList.remove("btn-outline-primary");
+            button.classList.add("btn-outline-secondary");
+        })
+    </script>
+
     <script src="_framework/blazor.web.js"></script>
 }

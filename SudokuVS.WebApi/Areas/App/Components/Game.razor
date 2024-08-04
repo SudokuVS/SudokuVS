@@ -12,6 +12,23 @@
 
 @if (_instance != null)
 {
+    <div class="container-lg">
+        <div class="d-flex">
+            <div>
+                <GridIconComponent Grid="_instance.InitialGrid"></GridIconComponent>
+            </div>
+            <div class="ps-4">
+                <div class="fs-2">@_instance.Name</div>
+                <div>
+                    <span class="fs-4 fw-semibold">@(_instance.Player1?.User.Name ?? "???")</span>
+                    vs.
+                    <span class="fs-4 fw-semibold">@(_instance.Player2?.User.Name ?? "???")</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <div class="w-100 h-100 d-flex flex-column">
         <div class="d-flex align-items-center justify-content-center">
             <div class="game-result d-flex flex-column align-items-center justify-content-center border-bottom border-secondary-subtle text-center px-4 py-2">
