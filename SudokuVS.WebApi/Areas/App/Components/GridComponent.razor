@@ -116,19 +116,19 @@
     string ComputeCellStyle(int row, int column)
     {
         Cell cell = Grid[row, column];
-        return $"cell {GetSizeStyle(GridSize)} {GetBgColorStyle(cell.BackgroundColor)} {GetBorderColorStyle(cell.Border) ?? (HideCellBorders ? null : "border border-secondary-subtle")} position-relative";
+        return $"cell {GetSizeStyle(GridSize)} {GetBgColorStyle(cell.BackgroundColor)} {GetBorderColorStyle(cell.BorderColor) ?? (HideCellBorders ? null : "border border-secondary-subtle")} position-relative";
     }
 
     string ComputeCellContentStyle(int row, int column)
     {
         Cell cell = Grid[row, column];
-        return GetFontStyle(cell.FontModifiers);
+        return $"{GetFontStyle(cell.FontModifiers)} {GetTextColorStyle(cell.TextColor)}";
     }
 
     string ComputeAnnotationStyle(int row, int column)
     {
         Cell cell = Grid[row, column];
-        return $"annotation {GetBgColorStyle(cell.AnnotationBackgroundColor)}";
+        return $"annotation {GetBgColorStyle(cell.AnnotationBackgroundColor)} {GetTextColorStyle(cell.TextColor)}";
     }
 
     static string GetSizeStyle(Size size) =>
@@ -162,7 +162,7 @@
     string? GetBorderColorStyle(Color color) =>
         color switch
         {
-            Color.None => null,
+            Color.Default => null,
             Color.LightGrey => "border-light-grey",
             Color.Grey => "border-grey",
             Color.LightPink => "border-light-pink",
@@ -172,13 +172,23 @@
             Color.Yellow => "border-yellow",
             Color.Red => "border-red",
             Color.Green => "border-green",
+            Color.Orange => "border-orange",
+            Color.Dark1 => "border-dark1",
+            Color.Dark2 => "border-dark2",
+            Color.Dark3 => "border-dark3",
+            Color.Dark4 => "border-dark4",
+            Color.Dark5 => "border-dark5",
+            Color.Dark6 => "border-dark6",
+            Color.Dark7 => "border-dark7",
+            Color.Dark8 => "border-dark8",
+            Color.Dark9 => "border-dark9",
             _ => null
         };
 
     static string GetBgColorStyle(Color color) =>
         color switch
         {
-            Color.None => "",
+            Color.Default => "",
             Color.LightGrey => "bg-light-grey",
             Color.Grey => "bg-grey",
             Color.LightPink => "bg-light-pink",
@@ -188,6 +198,7 @@
             Color.Yellow => "bg-yellow",
             Color.Red => "bg-red",
             Color.Green => "bg-green",
+            Color.Orange => "bg-orange",
             Color.Dark1 => "bg-dark1",
             Color.Dark2 => "bg-dark2",
             Color.Dark3 => "bg-dark3",
@@ -197,6 +208,32 @@
             Color.Dark7 => "bg-dark7",
             Color.Dark8 => "bg-dark8",
             Color.Dark9 => "bg-dark9",
+            _ => ""
+        };
+
+    static string GetTextColorStyle(Color color) =>
+        color switch
+        {
+            Color.Default => "",
+            Color.LightGrey => "txt-light-grey",
+            Color.Grey => "txt-grey",
+            Color.LightPink => "txt-light-pink",
+            Color.Pink => "txt-pink",
+            Color.LightBlue => "txt-light-blue",
+            Color.Blue => "txt-blue",
+            Color.Yellow => "txt-yellow",
+            Color.Red => "txt-red",
+            Color.Green => "txt-green",
+            Color.Orange => "txt-orange",
+            Color.Dark1 => "txt-dark1",
+            Color.Dark2 => "txt-dark2",
+            Color.Dark3 => "txt-dark3",
+            Color.Dark4 => "txt-dark4",
+            Color.Dark5 => "txt-dark5",
+            Color.Dark6 => "txt-dark6",
+            Color.Dark7 => "txt-dark7",
+            Color.Dark8 => "txt-dark8",
+            Color.Dark9 => "txt-dark9",
             _ => ""
         };
 
@@ -226,14 +263,15 @@
         public string? Annotation { get; set; }
         public string? AnnotationIcon { get; set; }
         public FontModifiers FontModifiers { get; set; }
-        public Color Border { get; set; }
+        public Color TextColor { get; set; }
+        public Color BorderColor { get; set; }
         public Color BackgroundColor { get; set; }
         public Color AnnotationBackgroundColor { get; set; }
     }
 
     public enum Color
     {
-        None,
+        Default,
         LightGrey,
         Grey,
         LightPink,
@@ -243,6 +281,7 @@
         Yellow,
         Red,
         Green,
+        Orange,
         Dark1,
         Dark2,
         Dark3,

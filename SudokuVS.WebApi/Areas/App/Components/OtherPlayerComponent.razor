@@ -76,7 +76,7 @@
                     ? GridComponent.Color.LightGrey
                     : !cell.IsEmpty
                         ? GridComponent.Color.LightBlue
-                        : GridComponent.Color.None;
+                        : GridComponent.Color.Default;
 
             _displayGrid[row, column].AnnotationIcon = cell.HasAnnotations ? "three-dots" : null;
         }

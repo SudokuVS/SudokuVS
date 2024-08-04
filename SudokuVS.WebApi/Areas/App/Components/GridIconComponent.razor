@@ -54,8 +54,8 @@
         for (int i = 0; i < 9; i++)
         for (int j = 0; j < 9; j++)
         {
-            _cells[i, j].BackgroundColor = HideState ? GridComponent.Color.None : GetBackgroundColor(Grid[i, j].Element);
-            _cells[i, j].Border = GridComponent.Color.None;
+            _cells[i, j].BackgroundColor = HideState ? GridComponent.Color.Default : GetBackgroundColor(Grid[i, j].Element);
+            _cells[i, j].BorderColor = GridComponent.Color.Default;
         }
     }
 
@@ -72,8 +72,8 @@
             7 => GridComponent.Color.Dark7,
             8 => GridComponent.Color.Dark8,
             9 => GridComponent.Color.Dark9,
-            null => GridComponent.Color.None,
-            _ => GridComponent.Color.None
+            null => GridComponent.Color.Default,
+            _ => GridComponent.Color.Default
         };
 
 }

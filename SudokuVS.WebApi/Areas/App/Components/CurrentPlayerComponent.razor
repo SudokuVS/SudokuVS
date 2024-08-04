@@ -84,8 +84,8 @@
 
             @if (Game.Options.MaxHints > 0 && !IsHint(_selectedCell.Value.Row, _selectedCell.Value.Column))
             {
-                <button class="btn btn-lg btn-outline-secondary" @onclick="UseHintAtSelectedCell" disabled="@(State.RemainingHints <= 0)">
-                    Hint @State.RemainingHints / @Game.Options.MaxHints
+                <button class="btn btn-lg btn-outline-secondary" @onclick="UseHintAtSelectedCell" disabled="@(PlayerState.RemainingHints <= 0)">
+                    Hint @PlayerState.RemainingHints / @Game.Options.MaxHints
                 </button>
             }
         }
@@ -104,13 +104,16 @@
     bool _annotationMode;
 
     [Parameter]
-    public required PlayerState State { get; set; }
+    public required PlayerState? PlayerState { get; set; }
+
+    [Parameter]
+    public required IHiddenPlayerState? OtherPlayerState { get; set; }
 
     [Parameter]
     public bool RightToLeft { get; set; }
 
-    SudokuGame Game => State.Game;
-    SudokuGrid Grid => State.Grid;
+    SudokuGame Game => PlayerState.Game;
+    SudokuGrid Grid => PlayerState.Grid;
 
     protected override void OnInitialized()
     {
@@ -118,7 +121,7 @@
         Grid.CellElementChanged += OnStateChanged;
         Grid.CellAnnotationsChanged += OnStateChanged;
         Grid.CellLockChanged += OnStateChanged;
-        State.HintAdded += OnStateChanged;
+        PlayerState.HintAdded += OnStateChanged;
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -202,11 +205,11 @@
 
         if (element.HasValue)
         {
-            State.SetElement(_selectedCell.Value.Row, _selectedCell.Value.Column, element.Value);
+            PlayerState!.SetElement(_selectedCell.Value.Row, _selectedCell.Value.Column, element.Value);
         }
         else
         {
-            State.ClearElement(_selectedCell.Value.Row, _selectedCell.Value.Column);
+            PlayerState!.ClearElement(_selectedCell.Value.Row, _selectedCell.Value.Column);
         }
     }
 
@@ -217,7 +220,7 @@
             return;
         }
 
-        State.ToggleAnnotation(_selectedCell.Value.Row, _selectedCell.Value.Column, element);
+        PlayerState!.ToggleAnnotation(_selectedCell.Value.Row, _selectedCell.Value.Column, element);
     }
 
     void ClearSelectedCellAnnotations()
@@ -227,7 +230,7 @@
             return;
         }
 
-        State.ClearAnnotations(_selectedCell.Value.Row, _selectedCell.Value.Column);
+        PlayerState!.ClearAnnotations(_selectedCell.Value.Row, _selectedCell.Value.Column);
     }
 
     void UseHintAtSelectedCell()
@@ -237,7 +240,7 @@
             return;
         }
 
-        State.TryUseHint(_selectedCell.Value.Row, _selectedCell.Value.Column);
+        PlayerState!.TryUseHint(_selectedCell.Value.Row, _selectedCell.Value.Column);
     }
 
     void UpdateGrid()
@@ -259,59 +262,61 @@
             int? element = cell.Element;
             IOrderedEnumerable<int> annotations = cell.Annotations.Order();
             SudokuCell? selectedCell = _selectedCell.HasValue ? Grid[_selectedCell.Value.Row, _selectedCell.Value.Column] : null;
+            bool isHint = IsHint(row, column);
 
             _displayGrid[row, column].Content = $"{element}";
             _displayGrid[row, column].Annotation = element is null ? string.Join(", ", annotations.Select(a => selectedCell != null && a == selectedCell.Element ? $"<span class=\"fw-bold text-decoration-underline\">{a}</span>" : $"{a}")) : null;
             _displayGrid[row, column].FontModifiers = selectedCell != null && selectedCell.Element == element ? GridComponent.FontModifiers.Bold | GridComponent.FontModifiers.Underline : GridComponent.FontModifiers.None;
-            _displayGrid[row, column].BackgroundColor = IsHint(cell.Row, cell.Column)
-                ? GridComponent.Color.Yellow
-                : cell.IsLocked
-                    ? GridComponent.Color.LightGrey
-                    : GridComponent.Color.None;
-            _displayGrid[row, column].Border = _selectedCell == (row, column) ? _annotationMode ? GridComponent.Color.Grey : GridComponent.Color.Yellow : GridComponent.Color.None;
+            _displayGrid[row, column].TextColor = isHint ? GridComponent.Color.Orange : GridComponent.Color.Default;
+            _displayGrid[row, column].BackgroundColor = cell.IsLocked && !isHint
+                ? GridComponent.Color.LightGrey
+                : OtherPlayerState != null && !OtherPlayerState.Grid[row, column].IsEmpty
+                    ? GridComponent.Color.LightBlue
+                    : GridComponent.Color.Default;
+            _displayGrid[row, column].BorderColor = _selectedCell == (row, column) ? _annotationMode ? GridComponent.Color.Grey : GridComponent.Color.Yellow : GridComponent.Color.Default;
 
         }
 
         if (_rowBorderColors == null)
         {
-            _rowBorderColors = Enumerable.Range(0, 9).Select(_ => GridComponent.Color.None).ToArray();
+            _rowBorderColors = Enumerable.Range(0, 9).Select(_ => GridComponent.Color.Default).ToArray();
         }
 
         for (int i = 0; i < Grid.Rows.Count; i++)
         {
             SudokuRow row = Grid.Rows[i];
-            _rowBorderColors[i] = row is { IsCompleted: true, IsValid: false } ? GridComponent.Color.Red : GridComponent.Color.None;
+            _rowBorderColors[i] = row is { IsCompleted: true, IsValid: false } ? GridComponent.Color.Red : GridComponent.Color.Default;
         }
 
         if (_columnBorderColors == null)
         {
-            _columnBorderColors = Enumerable.Range(0, 9).Select(_ => GridComponent.Color.None).ToArray();
+            _columnBorderColors = Enumerable.Range(0, 9).Select(_ => GridComponent.Color.Default).ToArray();
         }
 
         for (int i = 0; i < Grid.Columns.Count; i++)
         {
             SudokuColumn column = Grid.Columns[i];
-            _columnBorderColors[i] = column is { IsCompleted: true, IsValid: false } ? GridComponent.Color.Red : GridComponent.Color.None;
+            _columnBorderColors[i] = column is { IsCompleted: true, IsValid: false } ? GridComponent.Color.Red : GridComponent.Color.Default;
         }
 
         if (_regionBorderColors == null)
         {
             _regionBorderColors = new[,]
             {
-                { GridComponent.Color.None, GridComponent.Color.None, GridComponent.Color.None },
-                { GridComponent.Color.None, GridComponent.Color.None, GridComponent.Color.None },
-                { GridComponent.Color.None, GridComponent.Color.None, GridComponent.Color.None }
+                { GridComponent.Color.Default, GridComponent.Color.Default, GridComponent.Color.Default },
+                { GridComponent.Color.Default, GridComponent.Color.Default, GridComponent.Color.Default },
+                { GridComponent.Color.Default, GridComponent.Color.Default, GridComponent.Color.Default }
             };
         }
 
         for (int i = 0; i < Grid.Regions.Count; i++)
         {
             SudokuRegion region = Grid.Regions[i];
-            _regionBorderColors[region.Row, region.Column] = region is { IsCompleted: true, IsValid: false } ? GridComponent.Color.Red : GridComponent.Color.None;
+            _regionBorderColors[region.Row, region.Column] = region is { IsCompleted: true, IsValid: false } ? GridComponent.Color.Red : GridComponent.Color.Default;
         }
     }
 
-    bool IsHint(int row, int column) => State.Hints.Contains((row, column));
+    bool IsHint(int row, int column) => PlayerState!.Hints.Contains((row, column));
 
     void OnCellClicked((int Row, int Column) cell)
     {

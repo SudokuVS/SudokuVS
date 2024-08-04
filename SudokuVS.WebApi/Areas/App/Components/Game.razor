@@ -42,7 +42,7 @@
         }
         else
         {
-            <CurrentPlayerComponent State="_playerState" RightToLeft></CurrentPlayerComponent>
+            <CurrentPlayerComponent PlayerState="_playerState" OtherPlayerState="_otherPlayerState" RightToLeft></CurrentPlayerComponent>
         }
     </div>
 }
@@ -62,6 +62,7 @@ else
     UserIdentity? _user;
     SudokuGame? _instance;
     PlayerState? _playerState;
+    IHiddenPlayerState? _otherPlayerState;
     Timer? _timer;
 
     IJSObjectReference? _gameModule;
@@ -109,6 +110,7 @@ else
         }
 
         _playerState = _instance.GetPlayerState(_user.ExternalId);
+        _otherPlayerState = _instance.GetOtherPlayerState(_user.ExternalId);
     }
 
     async Task JoinGame()
@@ -119,26 +121,6 @@ else
         }
 
         await GameplayService.JoinGameAsync(_instance.Id, _user);
-    }
-
-    void JoinAsPlayer1()
-    {
-        if (_instance == null || _user == null)
-        {
-            return;
-        }
-
-        _instance.Join(_user, PlayerSide.Player1);
-    }
-
-    void JoinAsPlayer2()
-    {
-        if (_instance == null || _user == null)
-        {
-            return;
-        }
-
-        _instance.Join(_user, PlayerSide.Player2);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -185,4 +167,3 @@ else
     }
 
 }
-
