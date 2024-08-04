@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace SudokuVS.WebApi.Areas.Identity.Data;
+namespace SudokuVS.WebApi.Infrastructure;
 
 class AppDbContext : IdentityDbContext<IdentityUser>
 {

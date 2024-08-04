@@ -11,8 +11,8 @@ using SudokuVS.Apps.Common.Logging;
 using SudokuVS.Game.Infrastructure.Database;
 using SudokuVS.Game.Utils;
 using SudokuVS.WebApi;
-using SudokuVS.WebApi.Areas.Identity.Data;
 using SudokuVS.WebApi.Exceptions;
+using SudokuVS.WebApi.Infrastructure;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 Log.Logger = Logging.CreateBootstrapLogger();
