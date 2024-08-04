@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Logging;
 using NSwag;
 using NSwag.AspNetCore;
@@ -76,6 +77,7 @@ try
             }
         );
     builder.Services.AddRazorPages(options => { options.Conventions.AuthorizeAreaFolder("App", "/"); });
+    builder.Services.AddRazorComponents().AddInteractiveServerComponents().AddMicrosoftIdentityConsentHandler();
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddProblemDetails();
 
@@ -114,9 +116,10 @@ try
     app.UseRouting();
     app.UseAuthentication();
     app.UseAuthorization();
+    app.UseAntiforgery();
 
     app.MapRazorPages();
-    app.MapControllerRoute("areas", "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+    app.MapControllerRoute("AppArea", "App/{controller=App}/{action=Index}/{id?}");
     app.MapDefaultControllerRoute();
 
     app.Run();

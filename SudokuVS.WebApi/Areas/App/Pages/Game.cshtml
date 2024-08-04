@@ -1,0 +1,16 @@
+﻿@page "{gameId}"
+@using Microsoft.AspNetCore.Components.Web
+@using SudokuVS.WebApi.Areas.App.Components
+@model SudokuVS.WebApi.Areas.App.Pages.GamePage
+
+<component type="typeof(Game)" render-mode="ServerPrerendered" params-GameId="@Model.GameId"/>
+
+@section Head {
+    <base href="/app/"/>
+    <component type="typeof(HeadOutlet)"
+               render-mode="ServerPrerendered"/>
+}
+
+@section Scripts {
+    <script src="_framework/blazor.web.js"></script>
+}

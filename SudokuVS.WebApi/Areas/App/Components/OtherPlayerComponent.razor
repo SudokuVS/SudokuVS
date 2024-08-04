@@ -1,0 +1,94 @@
+﻿@using SudokuVS.Game
+@using SudokuVS.Sudoku.Models.Abstractions
+<div class="d-flex flex-column align-items-center justify-content-center gap-4">
+    <div class="fs-4 fw-semibold">
+        @State.User.Name
+    </div>
+    <div class="w-100 d-flex align-items-start gap-4 px-4">
+        <div class="flex-grow-1">
+            @if (!RightToLeft)
+            {
+                <div class="fs-4 mb-3 invisible">
+                    Progress
+                </div>
+                <div class="mb-1">
+                    <GridTotalProgressComponent Grid="Grid" ProgressBarColor="GridTotalProgressComponent.Color.Grey"/>
+                </div>
+            }
+        </div>
+        <GridComponent Grid="_displayGrid" GridSize="GridComponent.Size.Big" Disabled="true"/>
+        <div class="flex-grow-1">
+            @if (RightToLeft)
+            {
+                <div class="fs-4 mb-3 invisible">
+                    Progress
+                </div>
+                <div class="mb-1">
+                    <GridTotalProgressComponent Grid="Grid" ProgressBarColor="GridTotalProgressComponent.Color.Grey"/>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="controls">
+        <!-- WIP -->
+    </div>
+</div>
+
+@code {
+
+    GridComponent.Cell[,]? _displayGrid;
+
+    [Parameter]
+    public required IHiddenPlayerState State { get; set; }
+
+    [Parameter]
+    public bool RightToLeft { get; set; }
+
+    IHiddenSudokuGrid Grid => State.Grid;
+
+    protected override void OnInitialized()
+    {
+        UpdateGrid();
+        Grid.CellElementChanged += OnCellValueChanged;
+        Grid.CellAnnotationsChanged += OnCellValueChanged;
+    }
+
+    void UpdateGrid()
+    {
+        if (_displayGrid == null)
+        {
+            _displayGrid = new GridComponent.Cell[Grid.Rows.Count, Grid.Columns.Count];
+            for (int i = 0; i < Grid.Rows.Count; i++)
+            for (int j = 0; j < Grid.Rows.Count; j++)
+            {
+                _displayGrid[i, j] = new GridComponent.Cell();
+            }
+        }
+
+        foreach (IHiddenSudokuCell cell in Grid.Enumerate())
+        {
+            int row = cell.Row;
+            int column = cell.Column;
+
+            _displayGrid[row, column].BackgroundColor = State.Hints.Contains((cell.Row, cell.Column))
+                ? GridComponent.Color.Yellow
+                : cell.IsLocked
+                    ? GridComponent.Color.LightGrey
+                    : !cell.IsEmpty
+                        ? GridComponent.Color.LightBlue
+                        : GridComponent.Color.None;
+
+            _displayGrid[row, column].AnnotationIcon = cell.HasAnnotations ? "three-dots" : null;
+        }
+    }
+
+    void OnCellValueChanged(object? sender, (int, int) __) =>
+        _ = InvokeAsync(
+            () =>
+            {
+                UpdateGrid();
+                StateHasChanged();
+            }
+        );
+
+}
