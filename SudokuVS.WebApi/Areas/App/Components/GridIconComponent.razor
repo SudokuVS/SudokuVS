@@ -2,7 +2,7 @@
 <div class="position-relative">
     <GridComponent Grid="_cells" GridSize="GridComponent.Size.XSmall" HideCellBorders Disabled></GridComponent>
 
-    @if (Hidden)
+    @if (HideState)
     {
         <div class="position-absolute top-0 bottom-0 start-0 end-0 d-flex align-items-center justify-content-center bg-light bg-opacity-75">
         </div>
@@ -16,7 +16,13 @@
     public IReadOnlySudokuGrid Grid { get; set; }
 
     [Parameter]
-    public bool Hidden { get; set; }
+    public bool HidePlayerState { get; set; }
+
+    [Parameter]
+    public bool HideOtherState { get; set; }
+
+    [Parameter]
+    public bool HideState { get; set; }
 
     protected override void OnInitialized()
     {
@@ -25,7 +31,7 @@
         for (int i = 0; i < 9; i++)
         for (int j = 0; j < 9; j++)
         {
-            GridComponent.Color backgroundColor = Hidden ? GridComponent.Color.None : GetBackgroundColor(Grid[i, j].Element);
+            GridComponent.Color backgroundColor = HideState ? GridComponent.Color.None : GetBackgroundColor(Grid[i, j].Element);
 
             _cells[i, j] = new GridComponent.Cell
             {
