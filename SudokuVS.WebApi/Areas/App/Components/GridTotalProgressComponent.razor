@@ -42,8 +42,9 @@
 
         result += ProgressBarColor switch
         {
-            Color.Blue => " bg-info",
-            Color.Grey => " bg-grey",
+            Color.Blue => " text-bg-info",
+            Color.Grey => " text-bg-grey",
+            Color.Yellow => " text-bg-yellow",
             _ => ""
         };
 
@@ -53,7 +54,8 @@
     public enum Color
     {
         Blue,
-        Grey
+        Grey,
+        Yellow
     }
 
 }

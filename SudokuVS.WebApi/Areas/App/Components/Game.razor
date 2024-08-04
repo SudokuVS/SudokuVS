@@ -42,7 +42,50 @@
         }
         else
         {
-            <CurrentPlayerComponent PlayerState="_playerState" OtherPlayerState="_otherPlayerState" RightToLeft></CurrentPlayerComponent>
+            <div class="w-100 d-flex gap-5">
+                <div class="flex-grow-1">
+                    <div class="mb-1">
+                        <GridTotalProgressComponent Grid="_playerState.Grid" ProgressBarColor="GridTotalProgressComponent.Color.Yellow"/>
+                    </div>
+                    @for (int i = 1; i <= 9; i++)
+                    {
+                        <div class="mb-1">
+                            <GridElementProgressComponent Grid="_playerState.Grid" Element="i" ProgressBarColor="GridElementProgressComponent.Color.Yellow"/>
+                        </div>
+                    }
+
+                    @if (_instance.Options.MaxHints > 0)
+                    {
+                        <div class="row">
+                            <div class="col-3 text-end">
+                                Hints
+                            </div>
+                            <div class="col">
+                                <div class="w-100 h-100 progress" role="progressbar" aria-valuemin="0" aria-valuenow="@_playerState.RemainingHints" aria-valuemax="@_instance.Options.MaxHints">
+                                    <div class="progress-bar text-bg-orange" style="width: @((_playerState.RemainingHints * 100.0 / _instance.Options.MaxHints).ToString("00."))%">
+                                        @_playerState.RemainingHints / @_instance.Options.MaxHints
+                                    </div>
+
+                                    @if (_playerState.RemainingHints == 0)
+                                    {
+                                        <div class="w-100 d-flex align-items-center justify-content-center">
+                                            @_playerState.RemainingHints / @_instance.Options.MaxHints
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div>
+                    <CurrentPlayerComponent PlayerState="_playerState" OtherPlayerState="_otherPlayerState" RightToLeft></CurrentPlayerComponent>
+                </div>
+                <div class="flex-grow-1">
+                    <div class="mb-1">
+                        <GridTotalProgressComponent Grid="_playerState.Grid" ProgressBarColor="GridTotalProgressComponent.Color.Blue"/>
+                    </div>
+                </div>
+            </div>
         }
     </div>
 }
