@@ -4,7 +4,7 @@
     @if (Game != null)
     {
         <div>
-            <GridIconComponent Grid="Game.InitialGrid" hidden="!Game.IsStarted"></GridIconComponent>
+            <GridIconComponent Grid="Game.InitialGrid" HideState="!Game.IsStarted"></GridIconComponent>
         </div>
         <div class="flex-grow-1 ps-4">
             @switch (Game.Winner)

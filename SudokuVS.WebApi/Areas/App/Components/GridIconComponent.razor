@@ -10,36 +10,55 @@
 </div>
 
 @code {
-    GridComponent.Cell[,] _cells;
+    GridComponent.Cell[,]? _cells;
+    IReadOnlySudokuGrid? _grid;
+    bool _hideState;
 
     [Parameter]
-    public IReadOnlySudokuGrid Grid { get; set; }
+    public IReadOnlySudokuGrid? Grid {
+        get => _grid;
+
+        set {
+            _grid = value;
+            UpdateGrid();
+        }
+    }
 
     [Parameter]
-    public bool HidePlayerState { get; set; }
+    public bool HideState {
+        get => _hideState;
 
-    [Parameter]
-    public bool HideOtherState { get; set; }
-
-    [Parameter]
-    public bool HideState { get; set; }
+        set {
+            _hideState = value;
+            UpdateGrid();
+        }
+    }
 
     protected override void OnInitialized()
     {
         _cells = new GridComponent.Cell[9, 9];
+        for (int i = 0; i < 9; i++)
+        for (int j = 0; j < 9; j++)
+        {
+            _cells[i, j] = new GridComponent.Cell();
+        }
+    }
+
+    void UpdateGrid()
+    {
+        if (_cells == null || Grid == null)
+        {
+            return;
+        }
 
         for (int i = 0; i < 9; i++)
         for (int j = 0; j < 9; j++)
         {
-            GridComponent.Color backgroundColor = HideState ? GridComponent.Color.None : GetBackgroundColor(Grid[i, j].Element);
-
-            _cells[i, j] = new GridComponent.Cell
-            {
-                BackgroundColor = backgroundColor,
-                Border = GridComponent.Color.None
-            };
+            _cells[i, j].BackgroundColor = HideState ? GridComponent.Color.None : GetBackgroundColor(Grid[i, j].Element);
+            _cells[i, j].Border = GridComponent.Color.None;
         }
     }
+
 
     static GridComponent.Color GetBackgroundColor(int? element) =>
         element switch

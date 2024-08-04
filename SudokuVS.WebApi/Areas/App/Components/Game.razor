@@ -2,110 +2,48 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IJSRuntime JsRuntime
 @inject ISudokuGamesRepository Repository
+@inject GameplayService GameplayService
 @using Microsoft.AspNetCore.Components.Authorization
 @using SudokuVS.Game
 @using SudokuVS.Game.Models
 @using SudokuVS.Game.Persistence
 @using SudokuVS.Game.Users
+@using SudokuVS.WebApi.Services
 @implements IDisposable
 
 @if (_instance != null)
 {
     <div class="container-lg py-3">
         <GameSummaryComponent Game="_instance"></GameSummaryComponent>
-        <hr/>
-    </div>
 
+        <hr class="mb-4"/>
 
-    <div class="w-100 h-100 d-flex flex-column">
-        <div class="w-100 flex-grow-1 d-flex align-items-stretch">
-            <div class="w-50 border-end border-secondary-subtle pt-4">
-                @if (_player1HiddenState == null)
-                {
-                    @if (_playerState == null)
-                    {
-                        // Player is not the game, they can join as player 1
-                        <div class="w-100 h-100 d-flex align-items-center justify-content-center">
-                            <button class="btn btn-outline-primary" @onclick="JoinAsPlayer1">Join</button>
-                        </div>
-                    }
-                    else
-                    {
-                        // Player is in the game, this side is empty and waiting for an opponent
-                        <div class="w-100 h-100 d-flex flex-column gap-2 align-items-center justify-content-center">
-                            <h3>No opponent has joined yet!</h3>
-                            <div class="w-50 position-relative d-flex flex-column gap-2 border border-secondary-subtle rounded p-2 px-4 wrap-anywhere">
-                                <div id="invitation-link-container" class="font-monospace text-secondary">
-                                    @GetOtherPlayerInvitationLink()
-                                </div>
-                                <a class="btn btn-outline-primary my-2 stretched-link" @onclick="CopyInvitationLinkAsync" id="copy-invitation-link-button">Copy invitation link</a>
-                            </div>
-                        </div>
-                    }
-                }
-                else
-                {
-                    @if (_playerState is { Side: PlayerSide.Player1 })
-                    {
-                        @if (_instance.IsStarted)
-                        {
-                            <CurrentPlayerComponent State="_playerState" RightToLeft></CurrentPlayerComponent>
-                        }
-                        else
-                        {
-                            <OtherPlayerComponent State="_player1HiddenState" RightToLeft></OtherPlayerComponent>
-                        }
-                    }
-                    else
-                    {
-                        <OtherPlayerComponent State="_player1HiddenState" RightToLeft></OtherPlayerComponent>
-                    }
-                }
+        @if (_playerState == null)
+        {
+            // Player is not the game, they can join as player 1
+            <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+                <button class="btn btn-outline-primary" @onclick="JoinGame">Join</button>
             </div>
-            <div class="w-50 pt-4">
-                @if (_player2HiddenState == null)
-                {
-                    @if (_playerState == null)
-                    {
-                        // Player is not the game, they can join as player 2
-                        <div class="w-100 h-100 d-flex align-items-center justify-content-center">
-                            <button class="btn btn-outline-primary" @onclick="JoinAsPlayer2">Join</button>
-                        </div>
-                    }
-                    else
-                    {
-                        // Player is in the game, this side is empty and waiting for an opponent
-                        <div class="w-100 h-100 d-flex flex-column gap-2 align-items-center justify-content-center">
-                            <h3>No opponent has joined yet!</h3>
-                            <div class="w-50 position-relative d-flex flex-column gap-2 border border-secondary-subtle rounded p-2 px-4 wrap-anywhere">
-                                <div id="invitation-link-container" class="font-monospace text-secondary">
-                                    @GetOtherPlayerInvitationLink()
-                                </div>
-                                <a class="btn btn-outline-primary my-2 stretched-link" @onclick="CopyInvitationLinkAsync" id="copy-invitation-link-button">Copy invitation link</a>
-                            </div>
-                        </div>
-                    }
-                }
-                else
-                {
-                    @if (_playerState is { Side: PlayerSide.Player2 })
-                    {
-                        @if (_instance.IsStarted)
-                        {
-                            <CurrentPlayerComponent State="_playerState"></CurrentPlayerComponent>
-                        }
-                        else
-                        {
-                            <OtherPlayerComponent State="_player2HiddenState"></OtherPlayerComponent>
-                        }
-                    }
-                    else
-                    {
-                        <OtherPlayerComponent State="_player2HiddenState"></OtherPlayerComponent>
-                    }
-                }
+        }
+        else if (!_instance.IsStarted)
+        {
+            // Player is in the game, this side is empty and waiting for an opponent
+            <div class="w-100 h-100 d-flex flex-column gap-2 align-items-center justify-content-center">
+                <h3>No opponent has joined yet!</h3>
+                <div class="position-relative d-flex align-items-center gap-4 border border-secondary-subtle rounded px-2 text-nowrap">
+                    <div id="invitation-link-container" class="font-monospace text-secondary">
+                        @GetOtherPlayerInvitationLink()
+                    </div>
+                    <a class="btn btn-outline-primary my-2 stretched-link" @onclick="CopyInvitationLinkAsync" id="copy-invitation-link-button">
+                        <i class="bi bi-clipboard"></i>
+                    </a>
+                </div>
             </div>
-        </div>
+        }
+        else
+        {
+            <CurrentPlayerComponent State="_playerState" RightToLeft></CurrentPlayerComponent>
+        }
     </div>
 }
 else
@@ -124,8 +62,6 @@ else
     UserIdentity? _user;
     SudokuGame? _instance;
     PlayerState? _playerState;
-    IHiddenPlayerState? _player1HiddenState;
-    IHiddenPlayerState? _player2HiddenState;
     Timer? _timer;
 
     IJSObjectReference? _gameModule;
@@ -162,14 +98,9 @@ else
     {
         if (_instance == null)
         {
-            _player1HiddenState = null;
-            _player2HiddenState = null;
             _playerState = null;
             return;
         }
-
-        _player1HiddenState = _instance.GetHiddenPlayerState(PlayerSide.Player1);
-        _player2HiddenState = _instance.GetHiddenPlayerState(PlayerSide.Player2);
 
         if (_user == null)
         {
@@ -178,6 +109,16 @@ else
         }
 
         _playerState = _instance.GetPlayerState(_user.ExternalId);
+    }
+
+    async Task JoinGame()
+    {
+        if (_instance == null || _user == null)
+        {
+            return;
+        }
+
+        await GameplayService.JoinGameAsync(_instance.Id, _user);
     }
 
     void JoinAsPlayer1()
@@ -231,7 +172,7 @@ else
 
     void OnGameOver(object? __, PlayerSide ___) => _ = InvokeAsync(StateHasChanged);
 
-    string GetOtherPlayerInvitationLink() => _instance == null ? "" : $"{Navigation.BaseUri}game/{_instance.Id}";
+    string GetOtherPlayerInvitationLink() => _instance == null ? "" : $"{Navigation.BaseUri}app/game/{_instance.Id}";
 
     async Task CopyInvitationLinkAsync()
     {
