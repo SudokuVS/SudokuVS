@@ -63,12 +63,12 @@ button.accept-policy {
     line-height: inherit;
 }
 
-html {
+html, body {
     position: relative;
-    min-height: 100%;
+    height: 100%;
 }
 
-body {
+body:has(.footer) {
     margin-bottom: 32px;
 }
 

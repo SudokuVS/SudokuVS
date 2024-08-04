@@ -39,6 +39,10 @@
       </Content>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="wwwroot\img\" />
+    </ItemGroup>
+
     <PropertyGroup>
         <MinVerTagPrefix>v</MinVerTagPrefix>
         <MinVerBuildMetadata Condition="'$(Configuration)' == 'Debug'">DEBUG</MinVerBuildMetadata>
