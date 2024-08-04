@@ -123,7 +123,7 @@ try
 
     app.MapRazorPages();
     app.MapRazorComponents<AppComponent>().AddInteractiveServerRenderMode();
-    app.MapControllerRoute("areas", "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+    app.MapControllerRoute("AppArea", "App/{controller=Home}/{action=Index}/{id?}").RequireAuthorization();
     app.MapDefaultControllerRoute();
 
     app.Run();
