@@ -98,17 +98,15 @@
         @RenderBody()
     </main>
 </div>
-<footer class="footer border-top pl-3 text-muted">
-    <div class="container">
-        &copy; 2024 - SudokuVS
-        @{
-            string? foundPrivacy = Url.Page("/Privacy", new { area = "" });
-        }
-        @if (foundPrivacy != null)
-        {
-            <a asp-area="" asp-page="/Privacy">Privacy</a>
-        }
-    </div>
+<footer class="footer border-top ps-3 text-muted">
+    &copy; 2024 - SudokuVS
+    @{
+        string? foundPrivacy = Url.Page("/Privacy", new { area = "" });
+    }
+    @if (foundPrivacy != null)
+    {
+        <a asp-area="" asp-page="/Privacy">Privacy</a>
+    }
 </footer>
 
 <environment include="Development">
