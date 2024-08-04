@@ -52,11 +52,14 @@ try
         bootstrapLogger.LogInformation("Connection to Game database configured.");
     }
 
-    builder.Services.AddDefaultIdentity<IdentityUser>(options =>
-    {
-        // FIXME: enable when email sender configured properly
-        options.SignIn.RequireConfirmedAccount = false;
-    }).AddEntityFrameworkStores<AppDbContext>();
+    builder.Services.AddDefaultIdentity<IdentityUser>(
+            options =>
+            {
+                // FIXME: enable when email sender configured properly
+                options.SignIn.RequireConfirmedAccount = false;
+            }
+        )
+        .AddEntityFrameworkStores<AppDbContext>();
     builder.Services.AddAuthorization();
 
     builder.Services.AddTransient<IEmailSender, GmailEmailSender>();
@@ -72,7 +75,7 @@ try
                 configure.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
             }
         );
-    builder.Services.AddRazorPages();
+    builder.Services.AddRazorPages(options => { options.Conventions.AuthorizeAreaFolder("App", "/"); });
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddProblemDetails();
 
@@ -113,6 +116,7 @@ try
     app.UseAuthorization();
 
     app.MapRazorPages();
+    app.MapControllerRoute("areas", "{area:exists}/{controller=Home}/{action=Index}/{id?}");
     app.MapDefaultControllerRoute();
 
     app.Run();
