@@ -1,7 +1,19 @@
+@using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @using Microsoft.AspNetCore.Mvc.ViewEngines
+@using SudokuVS.WebApi
 @inject IWebHostEnvironment Environment
 @inject ICompositeViewEngine Engine
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+@{
+    bool isAuthenticated = SignInManager.IsSignedIn(User);
+    string? version = Metadata.Version != null ? $"v{Metadata.Version.Major}.{Metadata.Version.Minor}.{Metadata.Version.Patch}" : null;
+    string? prereleaseIdentifier = Metadata.Version?.PrereleaseIdentifier();
+    bool isDebugVersion = Metadata.Version?.IsDebug() ?? false;
+}
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -22,27 +34,60 @@
     </environment>
 </head>
 <body>
+
 <header>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-        <div class="container">
-            <a class="navbar-brand" href="~/">SudokuVS</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
-                @{
-                    ViewEngineResult result = Engine.FindView(ViewContext, "_LoginPartial", false);
-                }
-                @if (result.Success)
+    <nav class="text-bg-dark d-flex align-items-center justify-content-between gap-2 px-2 box-shadow mb-3" style="height:64px;">
+        <div class="h-100 d-flex align-items-center justify-content-center px-4 position-relative">
+            <div class="d-flex gap-2 align-items-baseline justify-content-center">
+                <div class="d-flex flex-column">
+                    <span class="fs-4 fw-semibold">Sudoku VS</span>
+                </div>
+
+                @if (version != null)
                 {
-                    await Html.RenderPartialAsync("_LoginPartial");
+                    <span class="small">@version</span>
                 }
-                else
+
+                @if (!string.IsNullOrWhiteSpace(prereleaseIdentifier))
                 {
-                    throw new InvalidOperationException("The default Identity UI layout requires a partial view '_LoginPartial' " + "usually located at '/Pages/_LoginPartial' or at '/Views/Shared/_LoginPartial' to work. Based on your configuration " + $"we have looked at it in the following locations: {System.Environment.NewLine}{string.Join(System.Environment.NewLine, result.SearchedLocations)}.");
+                    <span class="badge text-bg-light">@prereleaseIdentifier</span>
+                }
+
+                @if (isDebugVersion)
+                {
+                    <span class="badge text-bg-warning">DEBUG</span>
                 }
             </div>
+            <a class="stretched-link" href="/"></a>
+        </div>
+
+        <div class="h-100 d-flex align-items-center gap-4 px-4 position-relative">
+            @if (isAuthenticated)
+            {
+                <div class="h-100 d-flex align-items-center position-relative fw-semibold">
+                    @UserManager.GetUserName(User)
+                    <a id="manage" class="stretched-link" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage"></a>
+                </div>
+                <div>
+                    <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                        <div class="h-100 d-flex align-items-center position-relative">
+                            Logout
+                            <a id="logout" type="submit" class="stretched-link"></a>
+                        </div>
+                    </form>
+                </div>
+            }
+            else
+            {
+                <div class="h-100 d-flex align-items-center position-relative">
+                    Register
+                    <a id="register" class="stretched-link" asp-area="Identity" asp-page="/Account/Register"></a>
+                </div>
+                <div class="h-100 d-flex align-items-center position-relative">
+                    Login
+                    <a id="login" class="stretched-link" asp-area="Identity" asp-page="/Account/Login"></a>
+                </div>
+            }
         </div>
     </nav>
 </header>
