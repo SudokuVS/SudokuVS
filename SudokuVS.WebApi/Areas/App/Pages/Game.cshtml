@@ -3,7 +3,11 @@
 @using SudokuVS.WebApi.Areas.App.Components
 @model SudokuVS.WebApi.Areas.App.Pages.GamePage
 
-<component type="typeof(Game)" render-mode="ServerPrerendered" params-GameId="@Model.GameId"/>
+@{
+    Layout = "_Layout";
+}
+
+<component type="typeof(Game)" render-mode="ServerPrerendered" param-GameId="@Model.GameId"/>
 
 @section Head {
     <base href="/app/"/>

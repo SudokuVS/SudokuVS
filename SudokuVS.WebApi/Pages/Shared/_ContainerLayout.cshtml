@@ -1,0 +1,17 @@
+@{
+    Layout = "_Layout";
+}
+
+<div class="container">
+    <main role="main" class="pb-1">
+        @RenderBody()
+    </main>
+</div>
+
+@section Head {
+    @await RenderSectionAsync("Head", false)
+}
+
+@section Scripts {
+    @await RenderSectionAsync("Scripts", false)
+}

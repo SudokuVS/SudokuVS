@@ -16,6 +16,7 @@ using SudokuVS.WebApi;
 using SudokuVS.WebApi.Exceptions;
 using SudokuVS.WebApi.Infrastructure.Database;
 using SudokuVS.WebApi.Infrastructure.Emails;
+using SudokuVS.WebApi.Services;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 Log.Logger = Logging.CreateBootstrapLogger();
@@ -67,6 +68,7 @@ try
     builder.Services.Configure<GmailAccountConfiguration>(builder.Configuration.GetSection("Gmail"));
 
     builder.ConfigureGameServices(gameOptions);
+    builder.Services.AddTransient<GameplayService>();
 
     builder.Services.AddControllers()
         .AddJsonOptions(

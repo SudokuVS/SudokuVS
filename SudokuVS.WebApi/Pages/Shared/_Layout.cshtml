@@ -1,4 +1,4 @@
-@using Microsoft.AspNetCore.Identity
+﻿@using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @using SudokuVS.WebApi
 @inject SignInManager<IdentityUser> SignInManager
@@ -9,8 +9,8 @@
     bool isAuthenticated = SignInManager.IsSignedIn(User);
 }
 
-<header>
-    <nav class="text-bg-dark d-flex align-items-center gap-4 px-2 box-shadow mb-3" style="height:64px;">
+<header class="header">
+    <nav class="text-bg-dark d-flex align-items-center gap-4 px-2 box-shadow mb-3">
         <div class="h-100 d-flex align-items-center justify-content-center px-4 position-relative">
             <div class="d-flex gap-2 align-items-baseline justify-content-center">
                 <div class="d-flex flex-column">
@@ -70,12 +70,10 @@
     </nav>
 </header>
 
-<div class="container">
-    <partial name="_CookieConsentPartial" optional/>
-    <main role="main" class="pb-1">
-        @RenderBody()
-    </main>
-</div>
+<main class="main">
+    @RenderBody()
+</main>
+
 <footer class="footer border-top ps-3 text-muted small">
     &copy; 2024 - SudokuVS
     @{

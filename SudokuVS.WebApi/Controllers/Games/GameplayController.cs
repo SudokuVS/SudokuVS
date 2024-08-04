@@ -2,12 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using SudokuVS.Game;
-using SudokuVS.Game.Models;
 using SudokuVS.Game.Persistence;
 using SudokuVS.Game.Users;
 using SudokuVS.WebApi.Controllers.Games.Requests;
 using SudokuVS.WebApi.Exceptions;
 using SudokuVS.WebApi.Models;
+using SudokuVS.WebApi.Services;
 
 namespace SudokuVS.WebApi.Controllers.Games;
 
@@ -21,12 +21,14 @@ namespace SudokuVS.WebApi.Controllers.Games;
 public class GameplayController : ControllerBase
 {
     readonly ISudokuGamesRepository _repository;
+    readonly GameplayService _gameplayService;
 
     /// <summary>
     /// </summary>
-    public GameplayController(ISudokuGamesRepository repository)
+    public GameplayController(ISudokuGamesRepository repository, GameplayService gameplayService)
     {
         _repository = repository;
+        _gameplayService = gameplayService;
     }
 
     /// <summary>
@@ -37,21 +39,12 @@ public class GameplayController : ControllerBase
     {
         UserIdentity user = ControllerContext.HttpContext.User.GetUserIdentity() ?? throw new AccessDeniedException();
 
-        SudokuGame? game = SudokuGame.Create(
-            request.Name,
-            new SudokuGameOptions
-            {
-                MaxHints = request.Hints
-            }
-        );
-
-        if (game == null)
+        SudokuGame game = await _gameplayService.CreateGameAsync(request.Name, new SudokuGameOptions { MaxHints = request.Hints }, user);
+        PlayerState? playerState = game.GetPlayerState(user.ExternalId);
+        if (playerState == null)
         {
-            throw new InternalErrorException("Failed to create game.");
+            throw new InternalErrorException("Player has not joined game");
         }
-
-        await _repository.SaveAsync(game);
-        PlayerState playerState = game.Join(user, PlayerSide.Player1);
 
         return game.ToPlayerGameDto(playerState);
     }
