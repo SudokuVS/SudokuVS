@@ -71,20 +71,16 @@
                 <div>
                     <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
                         <div class="h-100 d-flex align-items-center position-relative">
-                            Logout
-                            <a id="logout" type="submit" class="stretched-link"></a>
+                            Sign out
+                            <button id="logout" type="submit" class="btn btn-link stretched-link"></button>
                         </div>
                     </form>
                 </div>
             }
             else
             {
-                <div class="h-100 d-flex align-items-center position-relative">
-                    Register
-                    <a id="register" class="stretched-link" asp-area="Identity" asp-page="/Account/Register"></a>
-                </div>
-                <div class="h-100 d-flex align-items-center position-relative">
-                    Login
+                <div class="h-100 d-flex align-items-center position-relative fw-semibold">
+                    Sign in
                     <a id="login" class="stretched-link" asp-area="Identity" asp-page="/Account/Login"></a>
                 </div>
             }
