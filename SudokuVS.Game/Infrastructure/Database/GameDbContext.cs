@@ -4,9 +4,9 @@ using SudokuVS.Game.Models.Users;
 
 namespace SudokuVS.Game.Infrastructure.Database;
 
-public class AppDbContext : DbContext
+public class GameDbContext : DbContext
 {
-    public AppDbContext(DbContextOptions options) : base(options)
+    public GameDbContext(DbContextOptions options) : base(options)
     {
     }
 

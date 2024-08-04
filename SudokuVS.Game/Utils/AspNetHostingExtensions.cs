@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SudokuVS.Game.Infrastructure.Database;
@@ -11,20 +10,18 @@ namespace SudokuVS.Game.Utils;
 
 public static class AspNetHostingExtensions
 {
-    public static void ConfigureGameServices(this WebApplicationBuilder builder, ILogger? logger = null)
+    public static void ConfigureGameServices(this WebApplicationBuilder builder, GameOptions options)
     {
-        string? connectionString = builder.Configuration.GetConnectionString("AppDbContext");
-        if (string.IsNullOrWhiteSpace(connectionString))
+        switch (options.PersistenceMode)
         {
-            logger?.LogInformation("No connection string provided for AppDbContext, falling back to in-memory repository");
-            builder.Services.AddSingleton<ISudokuGamesRepository, SudokuGamesInMemory>();
-        }
-        else
-        {
-            builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
-
-            logger?.LogInformation("Using DbContext game repository");
-            builder.Services.AddSingleton<ISudokuGamesRepository, SudokuGamesInDbContext>();
+            case PersistenceMode.InMemory:
+                options.Logger?.LogInformation("Using InMemory game repository");
+                builder.Services.AddSingleton<ISudokuGamesRepository, SudokuGamesInMemory>();
+                break;
+            case PersistenceMode.Database:
+                options.Logger?.LogInformation("Using DbContext game repository");
+                builder.Services.AddSingleton<ISudokuGamesRepository, SudokuGamesInDbContext>();
+                break;
         }
 
 
@@ -36,7 +33,19 @@ public static class AspNetHostingExtensions
     {
         IServiceScopeFactory scopeProvider = app.Services.GetRequiredService<IServiceScopeFactory>();
         using IServiceScope scope = scopeProvider.CreateScope();
-        AppDbContext context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        GameDbContext context = scope.ServiceProvider.GetRequiredService<GameDbContext>();
         await context.Database.MigrateAsync();
     }
+}
+
+public class GameOptions
+{
+    public ILogger? Logger { get; set; }
+    public PersistenceMode PersistenceMode { get; set; } = PersistenceMode.Database;
+}
+
+public enum PersistenceMode
+{
+    InMemory,
+    Database
 }

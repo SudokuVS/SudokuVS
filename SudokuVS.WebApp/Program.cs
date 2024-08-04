@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Logging;
 using Serilog;
-using SudokuVS.Apps.Common.Authentication;
 using SudokuVS.Apps.Common.Logging;
+using SudokuVS.Game.Infrastructure.Database;
 using SudokuVS.Game.Utils;
 using SudokuVS.WebApp.Components;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
@@ -19,14 +20,28 @@ try
 
     WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-    builder.ConfigureSerilog();
-    builder.ConfigureGameServices(bootstrapLogger);
+    GameOptions gameOptions = new() { Logger = bootstrapLogger };
 
-    builder.AddPasswordIdAuthentication();
+    builder.ConfigureSerilog();
+
+    string? gameConnectionString = builder.Configuration.GetConnectionString("GameDbContext");
+    if (string.IsNullOrWhiteSpace(gameConnectionString))
+    {
+        bootstrapLogger.LogInformation("No connection string provided for GameDbContext, falling back to in-memory repository.");
+        gameOptions.PersistenceMode = PersistenceMode.InMemory;
+    }
+    else
+    {
+        builder.Services.AddDbContext<GameDbContext>(options => options.UseSqlServer(gameConnectionString));
+        bootstrapLogger.LogInformation("Connection to SQL Server configured.");
+    }
+
     builder.Services.AddAuthorization();
 
+    builder.ConfigureGameServices(gameOptions);
+
     builder.Services.AddRazorComponents().AddInteractiveServerComponents().AddMicrosoftIdentityConsentHandler();
-    builder.Services.AddControllers();
+    builder.Services.AddControllersWithViews();
 
     WebApplication app = builder.Build();
 

@@ -13,6 +13,10 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.7">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="Microsoft.Identity.Web.UI" Version="3.0.1"/>
         <PackageReference Include="MinVer" Version="5.0.0">
           <PrivateAssets>all</PrivateAssets>
@@ -27,6 +31,12 @@
         <ProjectReference Include="..\SudokuVS.Apps.Common\SudokuVS.Apps.Common.csproj"/>
         <ProjectReference Include="..\SudokuVS.Game\SudokuVS.Game.csproj"/>
         <ProjectReference Include="..\SudokuVS.Sudoku\SudokuVS.Sudoku.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Update="wwwroot\**\*">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
     <PropertyGroup>

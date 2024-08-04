@@ -11,8 +11,8 @@ using SudokuVS.Game.Infrastructure.Database;
 
 namespace SudokuVS.Game.Infrastructure.Database.Migrations
 {
-    [DbContext(typeof(AppDbContext))]
-    [Migration("20240803175537_Initial")]
+    [DbContext(typeof(GameDbContext))]
+    [Migration("20240804081604_Initial")]
     partial class Initial
     {
         /// <inheritdoc />

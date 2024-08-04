@@ -1,14 +1,17 @@
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Logging;
 using NSwag;
 using NSwag.AspNetCore;
 using NSwag.Generation.Processors.Security;
 using Serilog;
-using SudokuVS.Apps.Common.Authentication;
 using SudokuVS.Apps.Common.Logging;
+using SudokuVS.Game.Infrastructure.Database;
 using SudokuVS.Game.Utils;
 using SudokuVS.WebApi;
+using SudokuVS.WebApi.Areas.Identity.Data;
 using SudokuVS.WebApi.Exceptions;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
@@ -22,11 +25,36 @@ try
 
     WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-    builder.ConfigureSerilog();
-    builder.ConfigureGameServices(bootstrapLogger);
+    GameOptions gameOptions = new() { Logger = bootstrapLogger };
 
-    builder.AddPasswordIdAuthentication();
+    builder.ConfigureSerilog();
+
+    string? appConnectionString = builder.Configuration.GetConnectionString("AppDbContext");
+    if (string.IsNullOrWhiteSpace(appConnectionString))
+    {
+        throw new InvalidOperationException("No connection string provided for AppDbContext.");
+    }
+
+    builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(appConnectionString));
+    bootstrapLogger.LogInformation("Connection to App database configured.");
+
+    string? gameConnectionString = builder.Configuration.GetConnectionString("GameDbContext");
+    if (string.IsNullOrWhiteSpace(gameConnectionString))
+    {
+        bootstrapLogger.LogInformation("No connection string provided for GameDbContext, falling back to in-memory repository.");
+        gameOptions.PersistenceMode = PersistenceMode.InMemory;
+    }
+    else
+    {
+        builder.Services.AddDbContext<GameDbContext>(options => options.UseSqlServer(gameConnectionString));
+        bootstrapLogger.LogInformation("Connection to Game database configured.");
+    }
+
+    builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<AppDbContext>();
+
     builder.Services.AddAuthorization();
+
+    builder.ConfigureGameServices(gameOptions);
 
     builder.Services.AddControllers()
         .AddJsonOptions(
@@ -43,6 +71,9 @@ try
     ConfigureOpenApiDocument(builder);
 
     WebApplication app = builder.Build();
+
+    await ApplyMigrations<AppDbContext>(app);
+    await ApplyMigrations<GameDbContext>(app);
 
     await app.UseGameServicesAsync();
 
@@ -68,6 +99,7 @@ try
         }
     );
 
+    app.UseStaticFiles();
     app.UseRouting();
     app.UseAuthentication();
     app.UseAuthorization();
@@ -128,4 +160,14 @@ void ConfigureOpenApiDocument(WebApplicationBuilder builder)
             settings.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor(schemeName));
         }
     );
+}
+
+async Task ApplyMigrations<TContext>(WebApplication app) where TContext: DbContext
+{
+    bootstrapLogger.LogInformation("Applying migrations to {ctx}", typeof(TContext).Name);
+
+    IServiceScopeFactory scopeProvider = app.Services.GetRequiredService<IServiceScopeFactory>();
+    using IServiceScope scope = scopeProvider.CreateScope();
+    TContext context = scope.ServiceProvider.GetRequiredService<TContext>();
+    await context.Database.MigrateAsync();
 }
