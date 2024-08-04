@@ -86,7 +86,7 @@ body {
 }
 
 
-.signin-form {
+.signin-form, .register-form {
     width: 330px;
     padding: 1rem;
 }

@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Logging;
 using NSwag;
@@ -12,7 +13,8 @@ using SudokuVS.Game.Infrastructure.Database;
 using SudokuVS.Game.Utils;
 using SudokuVS.WebApi;
 using SudokuVS.WebApi.Exceptions;
-using SudokuVS.WebApi.Infrastructure;
+using SudokuVS.WebApi.Infrastructure.Database;
+using SudokuVS.WebApi.Infrastructure.Emails;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 Log.Logger = Logging.CreateBootstrapLogger();
@@ -50,9 +52,15 @@ try
         bootstrapLogger.LogInformation("Connection to Game database configured.");
     }
 
-    builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<AppDbContext>();
-
+    builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+    {
+        // FIXME: enable when email sender configured properly
+        options.SignIn.RequireConfirmedAccount = false;
+    }).AddEntityFrameworkStores<AppDbContext>();
     builder.Services.AddAuthorization();
+
+    builder.Services.AddTransient<IEmailSender, GmailEmailSender>();
+    builder.Services.Configure<GmailAccountConfiguration>(builder.Configuration.GetSection("Gmail"));
 
     builder.ConfigureGameServices(gameOptions);
 
