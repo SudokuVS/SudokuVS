@@ -1,0 +1,91 @@
+﻿@{
+    int percent = GetValuePercent();
+}
+
+<div class="row">
+    @if (LabelCols > 0 && Label != null)
+    {
+        <div class="@GetLabelStyle()">
+            @Label
+        </div>
+    }
+    <div class="col">
+        <div class="w-100 h-100 progress position-relative" role="progressbar" aria-valuemin="0" aria-valuenow="@Value" aria-valuemax="@MaxValue">
+            <div class="@GetProgressBarStyle()" style="width: @(percent)%">
+            </div>
+
+            <div class="w-100 h-100 d-flex align-items-center justify-content-center position-absolute">
+                <span class="@(percent > 40 ? GetProgressTextStyle() : "")">
+                    @Value / @MaxValue
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public int Value { get; set; }
+
+    [Parameter]
+    public int MaxValue { get; set; }
+
+    [Parameter]
+    public string? Label { get; set; }
+
+    [Parameter]
+    public int LabelCols { get; set; }
+
+    [Parameter]
+    public Color ProgressBarColor { get; set; }
+
+    int GetValuePercent()
+    {
+        if (MaxValue == 0)
+        {
+            return 0;
+        }
+
+        int count = Value;
+        int percent = count * 100 / MaxValue;
+        return percent;
+    }
+
+    string GetProgressBarStyle()
+    {
+        string result = "progress-bar";
+
+        result += ProgressBarColor switch
+        {
+            Color.Blue => " bg-info",
+            Color.Grey => " bg-grey",
+            Color.Yellow => " bg-yellow",
+            Color.Orange => " bg-orange",
+            _ => ""
+        };
+
+        return result;
+    }
+
+    string GetProgressTextStyle() =>
+        ProgressBarColor switch
+        {
+            Color.Blue => "text-on-blue",
+            Color.Grey => "text-on-grey",
+            Color.Yellow => "text-on-yellow",
+            Color.Orange => "text-on-orange",
+            _ => ""
+        };
+
+    string GetLabelStyle() => $"col-{LabelCols} text-end";
+
+    public enum Color
+    {
+        Blue,
+        Grey,
+        Yellow,
+        Orange
+    }
+
+}

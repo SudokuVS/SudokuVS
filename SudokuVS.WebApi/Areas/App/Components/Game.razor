@@ -45,35 +45,19 @@
             <div class="w-100 d-flex gap-5">
                 <div class="flex-grow-1">
                     <div class="mb-1">
-                        <GridTotalProgressComponent Grid="_playerState.Grid" ProgressBarColor="GridTotalProgressComponent.Color.Yellow"/>
+                        <ProgressBar Label="Total" LabelCols="3" Value="@GetFilledCellsCount()" MaxValue="@GetToFillCellsCount()" ProgressBarColor="ProgressBar.Color.Yellow"/>
                     </div>
                     @for (int i = 1; i <= 9; i++)
                     {
                         <div class="mb-1">
-                            <GridElementProgressComponent Grid="_playerState.Grid" Element="i" ProgressBarColor="GridElementProgressComponent.Color.Yellow"/>
+                            <ProgressBar Label="@i.ToString()" LabelCols="3" Value="@GetFilledCellsCount(i)" MaxValue="@GetToFillCellsCount(i)" ProgressBarColor="ProgressBar.Color.Yellow"/>
                         </div>
                     }
 
                     @if (_instance.Options.MaxHints > 0)
                     {
-                        <div class="row">
-                            <div class="col-3 text-end">
-                                Hints
-                            </div>
-                            <div class="col">
-                                <div class="w-100 h-100 progress" role="progressbar" aria-valuemin="0" aria-valuenow="@_playerState.RemainingHints" aria-valuemax="@_instance.Options.MaxHints">
-                                    <div class="progress-bar text-bg-orange" style="width: @((_playerState.RemainingHints * 100.0 / _instance.Options.MaxHints).ToString("00."))%">
-                                        @_playerState.RemainingHints / @_instance.Options.MaxHints
-                                    </div>
-
-                                    @if (_playerState.RemainingHints == 0)
-                                    {
-                                        <div class="w-100 d-flex align-items-center justify-content-center">
-                                            @_playerState.RemainingHints / @_instance.Options.MaxHints
-                                        </div>
-                                    }
-                                </div>
-                            </div>
+                        <div class="mb-1">
+                            <ProgressBar Label="Hints" LabelCols="3" Value="@_playerState.RemainingHints" MaxValue="@_instance.Options.MaxHints" ProgressBarColor="ProgressBar.Color.Orange"/>
                         </div>
                     }
                 </div>
@@ -82,7 +66,7 @@
                 </div>
                 <div class="flex-grow-1">
                     <div class="mb-1">
-                        <GridTotalProgressComponent Grid="_playerState.Grid" ProgressBarColor="GridTotalProgressComponent.Color.Blue"/>
+                        <ProgressBar Label="Total" LabelCols="3" Value="@GetOtherPlayerFilledCellsCount()" MaxValue="@GetToFillCellsCount()" ProgressBarColor="ProgressBar.Color.Blue"/>
                     </div>
                 </div>
             </div>
@@ -209,4 +193,10 @@ else
         await _gameModule.InvokeVoidAsync("copyInvitationLink", GetOtherPlayerInvitationLink());
     }
 
+    int GetFilledCellsCount() => _instance == null || _playerState == null ? 0 : _playerState.Grid.Enumerate().Count(cell => _instance.InitialGrid[cell.Row, cell.Column].IsEmpty && !cell.IsEmpty);
+    int GetOtherPlayerFilledCellsCount() => _instance == null || _otherPlayerState == null ? 0 : _otherPlayerState.Grid.Enumerate().Count(cell => _instance.InitialGrid[cell.Row, cell.Column].IsEmpty && !cell.IsEmpty);
+    int GetToFillCellsCount() => _instance?.InitialGrid.Enumerate().Count(cell => cell is { IsEmpty: true }) ?? 1;
+
+    int GetFilledCellsCount(int element) => _instance == null || _playerState == null ? 0 : _playerState.Grid.Enumerate().Count(cell => _instance.InitialGrid[cell.Row, cell.Column].IsEmpty && cell.Element == element);
+    int GetToFillCellsCount(int element) => _instance == null ? 9 : 9 - _instance.InitialGrid.Enumerate().Count(cell => cell.Element == element);
 }
