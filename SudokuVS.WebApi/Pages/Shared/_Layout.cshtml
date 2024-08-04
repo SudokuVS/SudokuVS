@@ -1,69 +1,70 @@
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.Mvc.TagHelpers
-@using Microsoft.AspNetCore.Mvc.ViewEngines
 @using SudokuVS.WebApi
-@inject IWebHostEnvironment Environment
-@inject ICompositeViewEngine Engine
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
 
 @{
     Layout = "_EmptyLayout";
-
     bool isAuthenticated = SignInManager.IsSignedIn(User);
-    string? version = Metadata.Version != null ? $"v{Metadata.Version.Major}.{Metadata.Version.Minor}.{Metadata.Version.Patch}" : null;
-    string? prereleaseIdentifier = Metadata.Version?.PrereleaseIdentifier();
-    bool isDebugVersion = Metadata.Version?.IsDebug() ?? false;
 }
 
 <header>
-    <nav class="text-bg-dark d-flex align-items-center justify-content-between gap-2 px-2 box-shadow mb-3" style="height:64px;">
+    <nav class="text-bg-dark d-flex align-items-center gap-4 px-2 box-shadow mb-3" style="height:64px;">
         <div class="h-100 d-flex align-items-center justify-content-center px-4 position-relative">
             <div class="d-flex gap-2 align-items-baseline justify-content-center">
                 <div class="d-flex flex-column">
-                    <span class="fs-4 fw-semibold">Sudoku VS</span>
+                    <span class="fs-4 fw-semibold">@Constants.ProductName</span>
                 </div>
 
-                @if (version != null)
+                @if (ViewBag.DisplayVersionInformation ?? false)
                 {
-                    <span class="small">@version</span>
-                }
+                    string? version = Metadata.Version != null ? $"v{Metadata.Version.Major}.{Metadata.Version.Minor}.{Metadata.Version.Patch}" : null;
+                    string? prereleaseIdentifier = Metadata.Version?.PrereleaseIdentifier();
+                    bool isDebugVersion = Metadata.Version?.IsDebug() ?? false;
 
-                @if (!string.IsNullOrWhiteSpace(prereleaseIdentifier))
-                {
-                    <span class="badge text-bg-light">@prereleaseIdentifier</span>
-                }
+                    if (version != null)
+                    {
+                        <span class="small">@version</span>
+                    }
 
-                @if (isDebugVersion)
-                {
-                    <span class="badge text-bg-warning">DEBUG</span>
+                    if (!string.IsNullOrWhiteSpace(prereleaseIdentifier))
+                    {
+                        <span class="badge text-bg-light">@prereleaseIdentifier</span>
+                    }
+
+                    if (isDebugVersion)
+                    {
+                        <span class="badge text-bg-warning">DEBUG</span>
+                    }
                 }
             </div>
             <a class="stretched-link" href="/"></a>
         </div>
 
-        <div class="h-100 d-flex align-items-center gap-4 px-4 position-relative">
+        <div class="flex-grow-1"></div>
+
+        <div class="d-flex gap-2">
+            <a class="text-white" href="@Constants.GithubRepository">
+                <i class="bi bi-github fs-4"></i>
+            </a>
+        </div>
+
+        <div class="vr my-3"></div>
+
+        <div class="d-flex align-items-center gap-4 pe-4 position-relative">
             @if (isAuthenticated)
             {
-                <div class="h-100 d-flex align-items-center position-relative fw-semibold">
-                    @UserManager.GetUserName(User)
-                    <a id="manage" class="stretched-link" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage"></a>
-                </div>
+                <button id="manage" class="h-100 p-1 btn btn-link text-white text-decoration-none" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">@UserManager.GetUserName(User)</button>
                 <div>
                     <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                        <div class="h-100 d-flex align-items-center position-relative">
-                            Sign out
-                            <button id="logout" type="submit" class="btn btn-link stretched-link"></button>
-                        </div>
+                        <button id="logout" type="submit" class="h-100 p-1 btn btn-link text-white text-decoration-none">Sign out</button>
                     </form>
                 </div>
             }
             else
             {
-                <div class="h-100 d-flex align-items-center position-relative fw-semibold">
-                    Sign in
-                    <a id="login" class="stretched-link" asp-area="Identity" asp-page="/Account/Login"></a>
-                </div>
+                <button id="login" class="h-100 p-1 btn btn-link text-white text-decoration-none" asp-area="Identity" asp-page="/Account/Login">Sign in</button>
             }
         </div>
     </nav>
