@@ -11,8 +11,6 @@ namespace SudokuVS.Game.Infrastructure.Database.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.Sql("TRUNCATE TABLE [Games]");
-            
             migrationBuilder.DropForeignKey(
                 name: "FK_PlayerStates_Users_UserId",
                 table: "PlayerStates");
