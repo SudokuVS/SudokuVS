@@ -137,7 +137,7 @@ else
 
         if (_playerState == null)
         {
-            _playerState = _instance.GetPlayerState(_user.ExternalId);
+            _playerState = _instance.GetPlayerState(_user.Username);
 
             if (_playerState != null)
             {
@@ -147,7 +147,7 @@ else
 
         if (_otherPlayerState == null)
         {
-            _otherPlayerState = _instance.GetOtherPlayerState(_user.ExternalId);
+            _otherPlayerState = _instance.GetOtherPlayerState(_user.Username);
             if (_otherPlayerState != null)
             {
                 RegisterEvents(_otherPlayerState);

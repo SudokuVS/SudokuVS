@@ -120,7 +120,7 @@ class SudokuGamesInDbContext : SudokuGameCachedRepository
             grid[row, column].IsLocked = true;
         }
 
-        UserIdentity user = new() { ExternalId = state.User.ExternalId, Name = state.User.Name };
+        UserIdentity user = new() { Username = state.User.ExternalId, DisplayName = state.User.Name };
 
         PlayerState result = new(game, grid, side, user);
         result.Restore(hints);

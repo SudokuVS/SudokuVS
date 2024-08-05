@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SudokuVS.Server.Models;
+using SudokuVS.Server.Services;
 
 namespace SudokuVS.Server.Areas.Identity.Pages.Account.Manage;
 
@@ -55,17 +56,22 @@ public class IndexModel : PageModel
         [Phone]
         [Display(Name = "Phone number")]
         public string PhoneNumber { get; set; }
+
+        [Display(Name = "Display name")]
+        public string DisplayName { get; set; }
     }
 
     async Task LoadAsync(AppUser user)
     {
         string userName = await _userManager.GetUserNameAsync(user);
+        string displayName = await _userManager.GetDisplayNameAsync(user);
         string phoneNumber = await _userManager.GetPhoneNumberAsync(user);
 
         Username = userName;
 
         Input = new InputModel
         {
+            DisplayName = displayName,
             PhoneNumber = phoneNumber
         };
     }
@@ -94,6 +100,16 @@ public class IndexModel : PageModel
         {
             await LoadAsync(user);
             return Page();
+        }
+
+        if (Input.DisplayName != user.DisplayName)
+        {
+            IdentityResult setDisplayName = await _userManager.SetDisplayNameAsync(user, Input.DisplayName);
+            if (!setDisplayName.Succeeded)
+            {
+                StatusMessage = "Unexpected error when trying to set display name.";
+                return RedirectToPage();
+            }
         }
 
         string phoneNumber = await _userManager.GetPhoneNumberAsync(user);

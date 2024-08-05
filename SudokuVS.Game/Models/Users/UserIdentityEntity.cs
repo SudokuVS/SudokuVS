@@ -30,13 +30,13 @@ public static class UserIdentityEntityExtensions
 {
     public static async Task<UserIdentityEntity> GetOrCreateAsync(this DbSet<UserIdentityEntity> set, UserIdentity user, CancellationToken cancellationToken = default)
     {
-        UserIdentityEntity? existing = await set.SingleOrDefaultAsync(u => u.ExternalId == user.ExternalId, cancellationToken);
+        UserIdentityEntity? existing = await set.SingleOrDefaultAsync(u => u.ExternalId == user.Username, cancellationToken);
         if (existing != null)
         {
             return existing;
         }
 
-        UserIdentityEntity newUser = new() { ExternalId = user.ExternalId, Name = user.Name };
+        UserIdentityEntity newUser = new() { ExternalId = user.Username, Name = user.DisplayName };
         await set.AddAsync(newUser, cancellationToken);
 
         return newUser;

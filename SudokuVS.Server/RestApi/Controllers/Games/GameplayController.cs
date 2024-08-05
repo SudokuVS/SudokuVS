@@ -40,7 +40,7 @@ public class GameplayController : ControllerBase
         UserIdentity user = ControllerContext.HttpContext.User.GetUserIdentity() ?? throw new AccessDeniedException();
 
         SudokuGame game = await _gameplayService.CreateGameAsync(request.Name, new SudokuGameOptions { MaxHints = request.Hints }, user);
-        PlayerState? playerState = game.GetPlayerState(user.ExternalId);
+        PlayerState? playerState = game.GetPlayerState(user.Username);
         if (playerState == null)
         {
             throw new InternalErrorException("Player has not joined game");

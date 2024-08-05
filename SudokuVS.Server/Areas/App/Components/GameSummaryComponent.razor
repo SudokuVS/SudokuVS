@@ -19,20 +19,20 @@
                 {
                     case PlayerSide.Player1:
                         <div class="flex-grow-1">
-                            <div class="fs-5 fw-semibold text-success text-truncate">@(Game.Player1?.User.Name ?? "???")</div>
-                            <div class="fs-5 fw-semibold text-danger text-truncate">@(Game.Player2?.User.Name ?? "???")</div>
+                            <div class="fs-5 fw-semibold text-success text-truncate">@(Game.Player1?.User.DisplayName ?? "???")</div>
+                            <div class="fs-5 fw-semibold text-danger text-truncate">@(Game.Player2?.User.DisplayName ?? "???")</div>
                         </div>
                         break;
                     case PlayerSide.Player2:
                         <div class="flex-grow-1">
-                            <div class="fs-5 fw-semibold text-danger" text-truncate>@(Game.Player1?.User.Name ?? "???")</div>
-                            <div class="fs-5 fw-semibold text-success" text-truncate>@(Game.Player2?.User.Name ?? "???")</div>
+                            <div class="fs-5 fw-semibold text-danger" text-truncate>@(Game.Player1?.User.DisplayName ?? "???")</div>
+                            <div class="fs-5 fw-semibold text-success" text-truncate>@(Game.Player2?.User.DisplayName ?? "???")</div>
                         </div>
                         break;
                     default:
                         <div class="flex-grow-1">
-                            <div class="fs-5 fw-semibold text-truncate">@(Game.Player1?.User.Name ?? "???")</div>
-                            <div class="fs-5 fw-semibold text-truncate">@(Game.Player2?.User.Name ?? "???")</div>
+                            <div class="fs-5 fw-semibold text-truncate">@(Game.Player1?.User.DisplayName ?? "???")</div>
+                            <div class="fs-5 fw-semibold text-truncate">@(Game.Player2?.User.DisplayName ?? "???")</div>
                         </div>
                         break;
                 }

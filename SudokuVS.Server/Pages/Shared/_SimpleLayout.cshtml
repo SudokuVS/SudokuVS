@@ -56,7 +56,7 @@
         <div class="d-flex align-items-center gap-4 pe-4 position-relative">
             @if (isAuthenticated)
             {
-                <a id="manage" class="h-100 p-1 btn btn-link text-white text-decoration-none" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">@UserManager.GetUserName(User)</a>
+                <a id="manage" class="h-100 p-1 btn btn-link text-white text-decoration-none" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">@(await UserManager.GetPublicName(User))</a>
                 <div>
                     <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
                         <button id="logout" type="submit" class="h-100 p-1 btn btn-link text-white text-decoration-none">Sign out</button>

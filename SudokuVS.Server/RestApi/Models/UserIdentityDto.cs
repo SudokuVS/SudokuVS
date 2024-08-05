@@ -22,5 +22,5 @@ public class UserIdentityDto
 
 static class UserIdentityMappingExtensions
 {
-    public static UserIdentityDto ToDto(this UserIdentity user) => new() { Id = user.ExternalId, Name = user.Name };
+    public static UserIdentityDto ToDto(this UserIdentity user) => new() { Id = user.Username, Name = user.DisplayName };
 }
