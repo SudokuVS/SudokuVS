@@ -80,7 +80,7 @@ try
                 configure.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
             }
         );
-    builder.Services.AddRazorPages(options => { options.Conventions.AuthorizeAreaFolder("AppComponent", "/"); });
+    builder.Services.AddRazorPages(options => { options.Conventions.AuthorizeAreaFolder("App", "/"); });
     builder.Services.AddRazorComponents().AddInteractiveServerComponents().AddMicrosoftIdentityConsentHandler();
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddProblemDetails();
@@ -124,8 +124,8 @@ try
 
     app.MapRazorPages();
     app.MapRazorComponents<AppComponent>().AddInteractiveServerRenderMode();
-    app.MapControllerRoute("AppArea", "App/{controller=Home}/{action=Index}/{id?}").RequireAuthorization();
-    app.MapDefaultControllerRoute();
+    app.MapControllerRoute("areas", "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+    app.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
 
     app.Run();
 
