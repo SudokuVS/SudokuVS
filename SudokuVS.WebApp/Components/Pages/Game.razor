@@ -254,7 +254,7 @@ else
             return;
         }
 
-        _gameModule ??= await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/Pages/Game.razor.js");
+        _gameModule ??= await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/Pages/GameComponent.razor.js");
     }
 
     string GetElapsedTime()
