@@ -5,4 +5,4 @@
 
 Play SUDOKU against your friends.
 
-[https://sudokuvs.azurewebsites.net/app](https://sudokuvs.azurewebsites.net/app)
+[https://sudokuvs.azurewebsites.net](https://sudokuvs.azurewebsites.net)
