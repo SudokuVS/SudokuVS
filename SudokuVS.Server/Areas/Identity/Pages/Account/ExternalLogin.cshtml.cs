@@ -84,6 +84,8 @@ public class ExternalLoginModel : PageModel
         [Required]
         [EmailAddress]
         public string Email { get; set; }
+
+        public string DisplayName { get; set; }
     }
 
     public IActionResult OnGet() => RedirectToPage("./Login");
@@ -154,6 +156,12 @@ public class ExternalLoginModel : PageModel
             await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
 
             IdentityResult result = await _userManager.CreateAsync(user);
+
+            if (result.Succeeded)
+            {
+                result = await _userManager.SetDisplayNameAsync(user, Input.DisplayName);
+            }
+
             if (result.Succeeded)
             {
                 result = await _userManager.AddLoginAsync(user, info);

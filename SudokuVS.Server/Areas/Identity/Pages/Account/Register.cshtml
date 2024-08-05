@@ -14,8 +14,13 @@
             <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
             <div class="form-floating mb-3">
                 <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com"/>
-                <label asp-for="Input.Email">Email</label>
+                <label asp-for="Input.Email">Email/Username</label>
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.DisplayName" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com"/>
+                <label asp-for="Input.DisplayName">Display name</label>
+                <span asp-validation-for="Input.DisplayName" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
                 <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password"/>
@@ -37,12 +42,10 @@
             </div>
             <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
                 <div>
-                    <p>
-                        @foreach (AuthenticationScheme? provider in Model.ExternalLogins!)
-                        {
-                            <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                        }
-                    </p>
+                    @foreach (AuthenticationScheme? provider in Model.ExternalLogins!)
+                    {
+                        <button type="submit" class="w-100 btn btn-outline-primary my-1" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">Register with @provider.DisplayName</button>
+                    }
                 </div>
             </form>
         }
