@@ -69,18 +69,16 @@
 
     public SudokuGame? Game { get; set; }
 
-    protected override async Task OnInitializedAsync() => Game = await GamesService.GetGameAsync(GameId);
+    public async Task OnStateHasChangedAsync() => await UpdateGame();
+
+    protected override async Task OnInitializedAsync() => await UpdateGame();
+    protected override async Task OnParametersSetAsync() => await UpdateGame();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             _gameSummaryModule ??= await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./Areas/App/Components/GameSummaryComponent.razor.js");
-        }
-
-        if (_gameSummaryModule != null && Game is { StartDate: not null })
-        {
-            await _gameSummaryModule.InvokeVoidAsync("startTimer", $"timer-{Game.Id}", Game.StartDate);
         }
     }
 
@@ -111,6 +109,25 @@
         }
 
         return $"{time.TotalMinutes:00}:{time.Seconds:00}";
+    }
+
+    async Task UpdateGame()
+    {
+        Game = await GamesService.GetGameAsync(GameId);
+
+        if (_gameSummaryModule != null)
+        {
+            if (Game is { StartDate: not null })
+            {
+                await _gameSummaryModule.InvokeVoidAsync("startTimer", $"timer-{Game.Id}", Game.StartDate);
+            }
+            else if (Game is not null)
+            {
+                await _gameSummaryModule.InvokeVoidAsync("stopTimer", $"timer-{Game.Id}");
+            }
+        }
+
+        StateHasChanged();
     }
 
 }

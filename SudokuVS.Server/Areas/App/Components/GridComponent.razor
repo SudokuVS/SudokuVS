@@ -161,19 +161,19 @@
 
     static string GetFontStyle(FontModifiers modifiers)
     {
-        List<string> result = [];
+        const string boldStyle = "fw-bold";
+        const string underlineStyle = "text-decoration-underline";
+        const string boldUnderlineStyle = "fw-bold text-decoration-underline";
 
-        if (modifiers.HasFlag(FontModifiers.Bold))
+        switch (modifiers)
         {
-            result.Add("fw-bold");
+            case FontModifiers.Bold: return boldStyle;
+            case FontModifiers.Underline: return underlineStyle;
+            case FontModifiers.Bold | FontModifiers.Underline: return boldUnderlineStyle;
+            case FontModifiers.None:
+            default:
+                return "";
         }
-
-        if (modifiers.HasFlag(FontModifiers.Underline))
-        {
-            result.Add("text-decoration-underline");
-        }
-
-        return string.Join(" ", result);
     }
 
 

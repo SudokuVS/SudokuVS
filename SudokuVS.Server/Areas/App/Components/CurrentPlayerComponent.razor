@@ -77,6 +77,8 @@
     SudokuGame? Game => PlayerState?.Game;
     SudokuGrid? Grid => PlayerState?.Grid;
 
+    public void OnStateChanged() => UpdateGrid();
+
     protected override void OnInitialized() => UpdateGrid();
 
     protected override void OnAfterRender(bool firstRender)
@@ -88,8 +90,6 @@
                 _interop.KeyupEvent += OnKeyPress;
             }
         }
-
-        UpdateGrid();
     }
 
     string GetElementStyle(int? element)
@@ -274,8 +274,6 @@
             SudokuRegion region = Grid.Regions[i];
             _regionBorderColors[region.Row, region.Column] = region is { IsCompleted: true, IsValid: false } ? GridComponent.Color.Red : GridComponent.Color.Default;
         }
-
-        StateHasChanged();
     }
 
     bool IsHint(int row, int column) => PlayerState!.Hints.Contains((row, column));
