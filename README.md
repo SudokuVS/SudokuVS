@@ -25,17 +25,17 @@ dotnet build --no-restore
 either in the `appsettings.json` 
 ```json
 "ConnectionStrings": {
-    "GameDbContext": "", // required, SQL server connection string expected
-    "AppDbContext": "" // required, SQL server connection string expected
+    "GameDbContext": "", // required, expects SQL server connection string
+    "AppDbContext": "" // required, expects SQL server connection string
 },
 "Authentication": {
    "Google": {
-      "ClientId": "", // optional, enabled google auth
-      "ClientSecret": "" // optional, enabled google auth
+      "ClientId": "", // optional, enables google auth
+      "ClientSecret": "" // optional, enables google auth
    }, 
    "Microsoft": {
-      "ClientId": "optional", // optional, enabled microsoft auth
-      "ClientSecret": "optional" // optional, enabled microsoft auth
+      "ClientId": "", // optional, enables microsoft auth
+      "ClientSecret": "" // optional, enables microsoft auth
    }
 }, 
 ```
