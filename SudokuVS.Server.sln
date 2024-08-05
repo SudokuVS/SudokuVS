@@ -1,7 +1,5 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SudokuVS.WebApp", "SudokuVS.WebApp\SudokuVS.WebApp.csproj", "{0B0B0689-65B6-4BB3-AE86-B0DE4F2765BC}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SudokuVS.Sudoku", "SudokuVS.Sudoku\SudokuVS.Sudoku.csproj", "{9C0C32B5-7C21-4D1F-BF3C-95BF357BA2F6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SudokuVS.Game", "SudokuVS.Game\SudokuVS.Game.csproj", "{5932EEF4-FEF7-40AD-95AA-F7D411CE34F5}"
@@ -20,10 +18,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0B0B0689-65B6-4BB3-AE86-B0DE4F2765BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0B0B0689-65B6-4BB3-AE86-B0DE4F2765BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0B0B0689-65B6-4BB3-AE86-B0DE4F2765BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0B0B0689-65B6-4BB3-AE86-B0DE4F2765BC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9C0C32B5-7C21-4D1F-BF3C-95BF357BA2F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9C0C32B5-7C21-4D1F-BF3C-95BF357BA2F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C0C32B5-7C21-4D1F-BF3C-95BF357BA2F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
