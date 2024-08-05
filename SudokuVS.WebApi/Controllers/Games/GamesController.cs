@@ -28,7 +28,7 @@ public class GamesController : ControllerBase
     ///     Search games
     /// </summary>
     [HttpGet]
-    public IAsyncEnumerable<SudokuGameSummaryDto> SearchGames() => _repository.GetAllAsync().Select(game => game.ToSummaryDto());
+    public async Task<IEnumerable<SudokuGameSummaryDto>> SearchGames() => (await _repository.GetAllAsync()).Select(game => game.ToSummaryDto());
 
     /// <summary>
     ///     Get game summary

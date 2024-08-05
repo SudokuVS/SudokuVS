@@ -70,6 +70,7 @@ try
 
     builder.ConfigureGameServices(gameOptions);
     builder.Services.AddTransient<GameplayService>();
+    builder.Services.AddTransient<GamesService>();
 
     builder.Services.AddControllers()
         .AddJsonOptions(

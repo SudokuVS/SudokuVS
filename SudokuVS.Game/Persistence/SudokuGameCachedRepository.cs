@@ -21,8 +21,23 @@ abstract class SudokuGameCachedRepository : ISudokuGamesRepository, IDisposable
         GC.SuppressFinalize(this);
     }
 
-    public IAsyncEnumerable<SudokuGame> GetAllAsync(CancellationToken cancellationToken = default) =>
-        ListIdsAsync(cancellationToken).SelectAwait(async id => await GetAsync(id, cancellationToken)).OfType<SudokuGame>();
+    public async Task<IReadOnlyList<SudokuGame>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        List<SudokuGame> result = new();
+
+        foreach (Guid id in await ListIdsAsync(cancellationToken))
+        {
+            SudokuGame? game = await GetAsync(id, cancellationToken);
+            if (game == null)
+            {
+                continue;
+            }
+
+            result.Add(game);
+        }
+
+        return result;
+    }
 
     public async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default) =>
         await _localCache.ExistsAsync(id, cancellationToken) || await ExistsInDistributedRepositoryAsync(id, cancellationToken);
@@ -65,7 +80,7 @@ abstract class SudokuGameCachedRepository : ISudokuGamesRepository, IDisposable
         await _localCache.DeleteAsync(id, cancellationToken);
     }
 
-    protected abstract IAsyncEnumerable<Guid> ListIdsAsync(CancellationToken cancellationToken);
+    protected abstract Task<IReadOnlyList<Guid>> ListIdsAsync(CancellationToken cancellationToken);
     protected abstract Task<bool> ExistsInDistributedRepositoryAsync(Guid id, CancellationToken cancellationToken);
     protected abstract Task<SudokuGame?> LoadFromDistributedRepositoryAsync(Guid id, CancellationToken cancellationToken);
     protected abstract Task SaveToDistributedRepositoryAsync(SudokuGame game, CancellationToken cancellationToken);

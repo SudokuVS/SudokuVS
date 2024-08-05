@@ -23,11 +23,11 @@ class SudokuGamesInDbContext : SudokuGameCachedRepository
         _serializer = serializer;
     }
 
-    protected override IAsyncEnumerable<Guid> ListIdsAsync(CancellationToken cancellationToken)
+    protected override async Task<IReadOnlyList<Guid>> ListIdsAsync(CancellationToken cancellationToken)
     {
         using IServiceScope scope = _scopeFactory.CreateScope();
         GameDbContext context = scope.ServiceProvider.GetRequiredService<GameDbContext>();
-        return context.Games.Select(g => g.Id).AsAsyncEnumerable();
+        return await context.Games.Select(g => g.Id).ToListAsync(cancellationToken);
     }
 
     protected override async Task<bool> ExistsInDistributedRepositoryAsync(Guid id, CancellationToken cancellationToken)

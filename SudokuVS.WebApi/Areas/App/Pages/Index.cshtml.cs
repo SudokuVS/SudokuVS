@@ -10,16 +10,24 @@ namespace SudokuVS.WebApi.Areas.App.Pages;
 public class Index : PageModel
 {
     readonly GameplayService _gameplayService;
+    readonly GamesService _gamesService;
 
-    public Index(GameplayService gameplayService)
+    public Index(GameplayService gameplayService, GamesService gamesService)
     {
         _gameplayService = gameplayService;
+        _gamesService = gamesService;
     }
 
     [BindProperty]
     public NewGameModel? NewGame { get; set; }
 
-    public void OnGet() => NewGame ??= new NewGameModel();
+    public IReadOnlyList<SudokuGame>? Games { get; set; }
+
+    public async Task OnGetAsync()
+    {
+        NewGame ??= new NewGameModel();
+        Games ??= await _gamesService.GetGamesAsync();
+    }
 
     public async Task<RedirectResult> OnPostAsync()
     {
