@@ -14,7 +14,7 @@
 @if (_instance != null)
 {
     <div class="container-lg py-3">
-        <GameSummaryComponent Game="_instance"></GameSummaryComponent>
+        <GameSummaryComponent GameId="_instance.Id"></GameSummaryComponent>
 
         <hr class="mb-5"/>
 
@@ -90,7 +90,6 @@ else
     SudokuGame? _instance;
     PlayerState? _playerState;
     IHiddenPlayerState? _otherPlayerState;
-    Timer? _timer;
 
     IJSObjectReference? _gameModule;
 
@@ -118,8 +117,6 @@ else
         _instance.GameOver += OnGameOver;
 
         UpdatePlayers();
-
-        _timer = new Timer(__ => _ = InvokeAsync(StateHasChanged), null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
     }
 
     void UpdatePlayers()
@@ -165,9 +162,8 @@ else
         if (_instance is not null)
         {
             _instance.PlayerJoined -= OnPlayerJoined;
+            _instance.GameOver -= OnGameOver;
         }
-
-        _timer?.Dispose();
     }
 
     void OnPlayerJoined(object? __, PlayerSide side) =>

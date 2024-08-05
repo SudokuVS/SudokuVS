@@ -44,7 +44,7 @@
                     @foreach (SudokuGame game in Model.Games)
                     {
                         <a class="list-group-item list-group-item-action" asp-area="App" asp-page="/Game" asp-route-gameId="@game.Id">
-                            <component type="typeof(GameSummaryComponent)" render-mode="Static" param-Game="@game"/>
+                            <component type="typeof(GameSummaryComponent)" render-mode="ServerPrerendered" param-GameId="@game.Id"/>
                         </a>
                     }
                 </div>

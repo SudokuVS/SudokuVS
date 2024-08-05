@@ -12,5 +12,7 @@ public class GamesService
         _repository = repository;
     }
 
+    public async Task<SudokuGame?> GetGameAsync(Guid gameId, CancellationToken cancellationToken = default) => await _repository.GetAsync(gameId, cancellationToken);
+
     public async Task<IReadOnlyList<SudokuGame>> GetGamesAsync(CancellationToken cancellationToken = default) => await _repository.GetAllAsync(cancellationToken);
 }

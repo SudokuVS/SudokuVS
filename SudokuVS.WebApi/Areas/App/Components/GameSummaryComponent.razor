@@ -1,5 +1,9 @@
 ﻿@using SudokuVS.Game
 @using SudokuVS.Game.Models
+@using SudokuVS.WebApi.Services
+@inject IJSRuntime JsRuntime
+@inject GamesService GamesService
+
 <div class="d-flex gap-4">
     @if (Game != null)
     {
@@ -48,7 +52,7 @@
         @if (Game.IsStarted)
         {
             <div class="d-flex align-items-center justify-content-center">
-                <span class="fs-4 fw-semibold">
+                <span class="timer-@Game.Id font-monospace fs-4">
                     @GetElapsedTime()
                 </span>
             </div>
@@ -58,8 +62,27 @@
 
 @code {
 
+    IJSObjectReference? _gameSummaryModule;
+
     [Parameter]
+    public Guid GameId { get; set; }
+
     public SudokuGame? Game { get; set; }
+
+    protected override async Task OnInitializedAsync() => Game = await GamesService.GetGameAsync(GameId);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _gameSummaryModule ??= await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./Areas/App/Components/GameSummaryComponent.razor.js");
+        }
+
+        if (_gameSummaryModule != null && Game is { StartDate: not null })
+        {
+            await _gameSummaryModule.InvokeVoidAsync("startTimer", $"timer-{Game.Id}", Game.StartDate);
+        }
+    }
 
     string GetElapsedTime()
     {
