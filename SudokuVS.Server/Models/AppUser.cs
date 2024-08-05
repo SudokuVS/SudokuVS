@@ -12,7 +12,7 @@ public class AppUser : IdentityUser
 
 static class UserManagerExtensions
 {
-    public static async Task<string?> GetPublicName(this UserManager<AppUser> manager, ClaimsPrincipal claims)
+    public static async Task<string?> GetPublicName(this UserManager<AppUser> manager, ClaimsPrincipal claims, CancellationToken cancellationToken = default)
     {
         AppUser? user = await manager.GetUserAsync(claims);
         return user == null ? null : GetPublicName(user);
@@ -30,9 +30,10 @@ static class UserManagerExtensions
                 : $"user_{user.Id}";
     }
 
-    public static Task<string?> GetDisplayNameAsync(this UserManager<AppUser> manager, AppUser user) => Task.FromResult(user.DisplayName);
+    public static Task<string?> GetDisplayNameAsync(this UserManager<AppUser> manager, AppUser user, CancellationToken cancellationToken = default) =>
+        Task.FromResult(user.DisplayName);
 
-    public static Task<IdentityResult> SetDisplayNameAsync(this UserManager<AppUser> manager, AppUser user, string? displayName)
+    public static Task<IdentityResult> SetDisplayNameAsync(this UserManager<AppUser> manager, AppUser user, string? displayName, CancellationToken cancellationToken = default)
     {
         user.DisplayName = displayName;
         return manager.UpdateAsync(user);
