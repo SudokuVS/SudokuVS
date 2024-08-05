@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using SudokuVS.Game.Users;
 
-namespace SudokuVS.Server.Models;
+namespace SudokuVS.Server.RestApi.Models;
 
 /// <summary>
 ///     Identity of a user.

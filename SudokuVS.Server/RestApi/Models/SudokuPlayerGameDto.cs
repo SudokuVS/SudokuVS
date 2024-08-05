@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using SudokuVS.Game;
 
-namespace SudokuVS.Server.Models;
+namespace SudokuVS.Server.RestApi.Models;
 
 /// <summary>
 ///     State of the game as seen by one of the players

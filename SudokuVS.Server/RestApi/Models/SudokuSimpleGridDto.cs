@@ -2,7 +2,7 @@
 using SudokuVS.Sudoku.Models.Abstractions;
 using SudokuVS.Sudoku.Serialization;
 
-namespace SudokuVS.Server.Models;
+namespace SudokuVS.Server.RestApi.Models;
 
 /// <summary>
 ///     Flat representation of a sudoku grid.

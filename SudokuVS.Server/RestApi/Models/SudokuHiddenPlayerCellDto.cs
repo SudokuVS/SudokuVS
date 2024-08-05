@@ -1,7 +1,7 @@
 ﻿using SudokuVS.Game;
 using SudokuVS.Sudoku.Models.Abstractions;
 
-namespace SudokuVS.Server.Models;
+namespace SudokuVS.Server.RestApi.Models;
 
 /// <summary>
 ///     Cell of the opponent as seen by a player.

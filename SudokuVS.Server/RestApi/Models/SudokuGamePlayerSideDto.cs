@@ -1,6 +1,6 @@
 ﻿using SudokuVS.Game.Models;
 
-namespace SudokuVS.Server.Models;
+namespace SudokuVS.Server.RestApi.Models;
 
 /// <summary>
 ///     Side of a player.

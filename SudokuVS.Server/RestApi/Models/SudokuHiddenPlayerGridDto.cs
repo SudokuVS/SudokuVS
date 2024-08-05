@@ -2,27 +2,27 @@
 using SudokuVS.Game;
 using SudokuVS.Sudoku.Models.Abstractions;
 
-namespace SudokuVS.Server.Models;
+namespace SudokuVS.Server.RestApi.Models;
 
 /// <summary>
 ///     Grid as seen by a player.
 /// </summary>
-public class SudokuPlayerGridDto
+public class SudokuHiddenPlayerGridDto
 {
     /// <summary>
     ///     The cells of the grid.
     /// </summary>
     [Required]
-    public required Dictionary<int, SudokuPlayerCellDto> Cells { get; init; }
+    public required Dictionary<int, SudokuHiddenPlayerCellDto> Cells { get; init; }
 }
 
-static class SudokuPlayerGridMappingExtensions
+static class SudokuHiddenPlayerGridMappingExtensions
 {
-    public static SudokuPlayerGridDto ToPlayerGridDto(this IReadOnlySudokuGrid grid, PlayerState state) =>
+    public static SudokuHiddenPlayerGridDto ToHiddenPlayerGridDto(this IHiddenSudokuGrid grid, IHiddenPlayerState state) =>
         new()
         {
             Cells = grid.Enumerate()
                 .Where(c => !c.IsEmpty || c.HasAnnotations || c.IsLocked || state.Hints.Contains((c.Row, c.Column)))
-                .ToDictionary(c => c.GetFlatIndex(), c => c.ToPlayerCellDto(state))
+                .ToDictionary(c => c.GetFlatIndex(), c => c.ToHiddenPlayerCellDto(state))
         };
 }

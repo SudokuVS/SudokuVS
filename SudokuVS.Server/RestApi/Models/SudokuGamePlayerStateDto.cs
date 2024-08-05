@@ -1,12 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using SudokuVS.Game;
 
-namespace SudokuVS.Server.Models;
+namespace SudokuVS.Server.RestApi.Models;
 
 /// <summary>
-///     State of the opponent of a player.
+///     State of a player.
 /// </summary>
-public class SudokuGameHiddenPlayerStateDto
+public class SudokuGamePlayerStateDto
 {
     /// <summary>
     ///     The user corresponding to the player.
@@ -18,15 +18,15 @@ public class SudokuGameHiddenPlayerStateDto
     ///     The grid as seen by the player.
     /// </summary>
     [Required]
-    public required SudokuHiddenPlayerGridDto Grid { get; set; }
+    public required SudokuPlayerGridDto Grid { get; set; }
 }
 
-static class SudokuGameHiddenPlayerStateMappingExtensions
+static class SudokuGamePlayerStateMappingExtensions
 {
-    public static SudokuGameHiddenPlayerStateDto ToHiddenPlayerStateDto(this IHiddenPlayerState state) =>
+    public static SudokuGamePlayerStateDto ToPlayerStateDto(this PlayerState state) =>
         new()
         {
             User = state.User.ToDto(),
-            Grid = state.Grid.ToHiddenPlayerGridDto(state)
+            Grid = state.Grid.ToPlayerGridDto(state)
         };
 }
