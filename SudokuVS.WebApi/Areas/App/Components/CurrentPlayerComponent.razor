@@ -2,57 +2,60 @@
 @using SudokuVS.Sudoku.Models
 <Interop @ref="_interop" Events='@( ["keyup"])'/>
 
-<div class="d-flex flex-column align-items-center justify-content-center gap-4">
-    <GridComponent Grid="_displayGrid" GridSize="GridComponent.Size.Big" OnCellClicked="OnCellClicked" OnCellRightClicked="OnCellRightClicked" RowBorderColor="_rowBorderColors" ColumnBorderColor="_columnBorderColors" RegionBorderColor="_regionBorderColors"/>
-    <div class="controls d-flex gap-2 align-items-center justify-content-center">
-        @if (_selectedCell.HasValue && !_selectedCellLocked)
-        {
-            @if (_annotationMode)
+@if (Game != null && PlayerState != null)
+{
+    <div class="d-flex flex-column align-items-center justify-content-center gap-4">
+        <GridComponent Grid="_displayGrid" GridSize="GridComponent.Size.Big" OnCellClicked="OnCellClicked" OnCellRightClicked="OnCellRightClicked" RowBorderColor="_rowBorderColors" ColumnBorderColor="_columnBorderColors" RegionBorderColor="_regionBorderColors"/>
+        <div class="controls d-flex gap-2 align-items-center justify-content-center">
+            @if (_selectedCell.HasValue && !_selectedCellLocked)
             {
-                <button class="btn btn-lg btn-outline-primary" @onclick="ToggleAnnotationMode">Element</button>
+                @if (_annotationMode)
+                {
+                    <button class="btn btn-lg btn-outline-primary" @onclick="ToggleAnnotationMode">Element</button>
 
-                <div class="mb-3">
-                    <label for="elements" class="form-label">Annotations</label>
-                    <div id="elements" class="input-group input-group-lg mb-3">
-                        @for (int i = 1; i < 10; i++)
-                        {
-                            int element = i;
-                            <button type="button" class="@GetAnnotationStyle(element)" onclick="@(() => ToggleSelectedCellAnnotation(element))">@element</button>
-                        }
-                        <button type="button" class="@GetAnnotationStyle(null)" @onclick="ClearSelectedCellAnnotations">
-                            <i class="bi bi-x"></i>
-                        </button>
+                    <div class="mb-3">
+                        <label for="elements" class="form-label">Annotations</label>
+                        <div id="elements" class="input-group input-group-lg mb-3">
+                            @for (int i = 1; i < 10; i++)
+                            {
+                                int element = i;
+                                <button type="button" class="@GetAnnotationStyle(element)" onclick="@(() => ToggleSelectedCellAnnotation(element))">@element</button>
+                            }
+                            <button type="button" class="@GetAnnotationStyle(null)" @onclick="ClearSelectedCellAnnotations">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </div>
                     </div>
-                </div>
-            }
-            else
-            {
-                <div class="mb-3">
-                    <label for="elements" class="form-label">Element</label>
-                    <div id="elements" class="input-group input-group-lg mb-3">
-                        @for (int i = 1; i < 10; i++)
-                        {
-                            int element = i;
-                            <button type="button" class="@GetElementStyle(element)" onclick="@(() => SetSelectedCellElement(element))">@element</button>
-                        }
-                        <button type="button" class="@GetElementStyle(null)" onclick="@(() => SetSelectedCellElement(null))">
-                            <i class="bi bi-x"></i>
-                        </button>
+                }
+                else
+                {
+                    <div class="mb-3">
+                        <label for="elements" class="form-label">Element</label>
+                        <div id="elements" class="input-group input-group-lg mb-3">
+                            @for (int i = 1; i < 10; i++)
+                            {
+                                int element = i;
+                                <button type="button" class="@GetElementStyle(element)" onclick="@(() => SetSelectedCellElement(element))">@element</button>
+                            }
+                            <button type="button" class="@GetElementStyle(null)" onclick="@(() => SetSelectedCellElement(null))">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </div>
                     </div>
-                </div>
 
-                <button class="btn btn-lg btn-outline-secondary" @onclick="ToggleAnnotationMode">Annotations</button>
-            }
+                    <button class="btn btn-lg btn-outline-secondary" @onclick="ToggleAnnotationMode">Annotations</button>
+                }
 
-            @if (Game.Options.MaxHints > 0 && !IsHint(_selectedCell.Value.Row, _selectedCell.Value.Column))
-            {
-                <button class="btn btn-lg btn-outline-secondary" @onclick="UseHintAtSelectedCell" disabled="@(PlayerState.RemainingHints <= 0)">
-                    Hint @PlayerState.RemainingHints / @Game.Options.MaxHints
-                </button>
+                @if (Game.Options.MaxHints > 0 && !IsHint(_selectedCell.Value.Row, _selectedCell.Value.Column))
+                {
+                    <button class="btn btn-lg btn-outline-secondary" @onclick="UseHintAtSelectedCell" disabled="@(PlayerState.RemainingHints <= 0)">
+                        Hint @PlayerState.RemainingHints / @Game.Options.MaxHints
+                    </button>
+                }
             }
-        }
+        </div>
     </div>
-</div>
+}
 
 @code {
 
@@ -71,39 +74,29 @@
     [Parameter]
     public required IHiddenPlayerState? OtherPlayerState { get; set; }
 
-    [Parameter]
-    public bool RightToLeft { get; set; }
+    SudokuGame? Game => PlayerState?.Game;
+    SudokuGrid? Grid => PlayerState?.Grid;
 
-    SudokuGame Game => PlayerState.Game;
-    SudokuGrid Grid => PlayerState.Grid;
-
-    protected override void OnInitialized()
-    {
-        UpdateGrid();
-        Grid.CellElementChanged += OnStateChanged;
-        Grid.CellAnnotationsChanged += OnStateChanged;
-        Grid.CellLockChanged += OnStateChanged;
-        PlayerState.HintAdded += OnStateChanged;
-    }
+    protected override void OnInitialized() => UpdateGrid();
 
     protected override void OnAfterRender(bool firstRender)
     {
-        if (!firstRender)
+        if (firstRender)
         {
-            return;
+            if (_interop is not null)
+            {
+                _interop.KeyupEvent += OnKeyPress;
+            }
         }
 
-        if (_interop is not null)
-        {
-            _interop.KeyupEvent += OnKeyPress;
-        }
+        UpdateGrid();
     }
 
     string GetElementStyle(int? element)
     {
         string result = "btn ";
 
-        if (Game.IsOver || !_selectedCell.HasValue || _selectedCellLocked)
+        if (Game == null || Game.IsOver || Grid == null || !_selectedCell.HasValue || _selectedCellLocked)
         {
             result += "disabled";
         }
@@ -127,7 +120,7 @@
     {
         string result = "btn ";
 
-        if (Game.IsOver || !_selectedCell.HasValue || _selectedCellLocked)
+        if (Game == null || Game.IsOver || Grid == null || !_selectedCell.HasValue || _selectedCellLocked)
         {
             result += "disabled";
         }
@@ -149,18 +142,18 @@
 
     void ToggleAnnotationMode()
     {
-        if (Game.IsOver)
+        if (Game == null || Game.IsOver)
         {
             return;
         }
 
         _annotationMode = !_annotationMode;
-        TriggerUpdate();
+        UpdateGrid();
     }
 
     void SetSelectedCellElement(int? element)
     {
-        if (Game.IsOver || !_selectedCell.HasValue || _selectedCellLocked)
+        if (Game == null || Game.IsOver || !_selectedCell.HasValue || _selectedCellLocked)
         {
             return;
         }
@@ -177,7 +170,7 @@
 
     void ToggleSelectedCellAnnotation(int element)
     {
-        if (Game.IsOver || !_selectedCell.HasValue || _selectedCellLocked)
+        if (Game == null || Game.IsOver || !_selectedCell.HasValue || _selectedCellLocked)
         {
             return;
         }
@@ -187,7 +180,7 @@
 
     void ClearSelectedCellAnnotations()
     {
-        if (Game.IsOver || !_selectedCell.HasValue || _selectedCellLocked)
+        if (Game == null || Game.IsOver || !_selectedCell.HasValue || _selectedCellLocked)
         {
             return;
         }
@@ -197,7 +190,7 @@
 
     void UseHintAtSelectedCell()
     {
-        if (Game.IsOver || !_selectedCell.HasValue || _selectedCellLocked)
+        if (Game == null || Game.IsOver || !_selectedCell.HasValue || _selectedCellLocked)
         {
             return;
         }
@@ -207,6 +200,11 @@
 
     void UpdateGrid()
     {
+        if (Grid == null)
+        {
+            return;
+        }
+
         if (_displayGrid == null)
         {
             _displayGrid = new GridComponent.Cell[Grid.Rows.Count, Grid.Columns.Count];
@@ -276,49 +274,41 @@
             SudokuRegion region = Grid.Regions[i];
             _regionBorderColors[region.Row, region.Column] = region is { IsCompleted: true, IsValid: false } ? GridComponent.Color.Red : GridComponent.Color.Default;
         }
+        
+        StateHasChanged();
     }
 
     bool IsHint(int row, int column) => PlayerState!.Hints.Contains((row, column));
 
-    void OnCellClicked((int Row, int Column) cell)
+    async Task OnCellClicked((int Row, int Column) cell)
     {
         SelectCell(cell);
         _annotationMode = false;
 
         UpdateGrid();
-        StateHasChanged();
     }
 
-    void OnCellRightClicked((int Row, int Column) cell)
+    async Task OnCellRightClicked((int Row, int Column) cell)
     {
         SelectCell(cell);
         _annotationMode = true;
 
         UpdateGrid();
-        StateHasChanged();
     }
 
     void SelectCell((int Row, int Column) cell)
     {
+        if (Grid == null)
+        {
+            return;
+        }
 
         SudokuCell c = Grid[cell.Row, cell.Column];
         _selectedCell = cell;
         _selectedCellLocked = c.IsLocked;
     }
 
-    void OnStateChanged(object? sender, (int, int) __) => TriggerUpdate();
-    void OnStateChanged(object? sender, EventArgs __) => TriggerUpdate();
-
-    void TriggerUpdate() =>
-        _ = InvokeAsync(
-            () =>
-            {
-                UpdateGrid();
-                StateHasChanged();
-            }
-        );
-
-    void OnKeyPress(object? _, KeyboardEventArgs args)
+    void OnKeyPress(object? __, KeyboardEventArgs args)
     {
         if (args.Code is "ControlLeft" or "ControlRight" or "ShiftLeft" or "ShiftRight")
         {

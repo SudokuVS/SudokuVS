@@ -11,28 +11,12 @@
 
 @code {
     GridComponent.Cell[,]? _cells;
-    IReadOnlySudokuGrid? _grid;
-    bool _hideState;
 
     [Parameter]
-    public IReadOnlySudokuGrid? Grid {
-        get => _grid;
-
-        set {
-            _grid = value;
-            UpdateGrid();
-        }
-    }
+    public IReadOnlySudokuGrid? Grid { get; set; }
 
     [Parameter]
-    public bool HideState {
-        get => _hideState;
-
-        set {
-            _hideState = value;
-            UpdateGrid();
-        }
-    }
+    public bool HideState { get; set; }
 
     protected override void OnInitialized()
     {
@@ -45,6 +29,8 @@
 
         UpdateGrid();
     }
+
+    protected override void OnParametersSet() => UpdateGrid();
 
     void UpdateGrid()
     {
@@ -60,7 +46,6 @@
             _cells[i, j].BorderColor = GridComponent.Color.Default;
         }
     }
-
 
     static GridComponent.Color GetBackgroundColor(int? element) =>
         element switch

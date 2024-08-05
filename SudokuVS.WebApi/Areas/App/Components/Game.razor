@@ -1,15 +1,14 @@
-﻿@inject NavigationManager Navigation
-@inject AuthenticationStateProvider AuthenticationStateProvider
-@inject IJSRuntime JsRuntime
-@inject ISudokuGamesRepository Repository
-@inject GameplayService GameplayService
-@using Microsoft.AspNetCore.Components.Authorization
+﻿@using Microsoft.AspNetCore.Components.Authorization
 @using SudokuVS.Game
 @using SudokuVS.Game.Models
 @using SudokuVS.Game.Persistence
 @using SudokuVS.Game.Users
 @using SudokuVS.WebApi.Services
-@implements IDisposable
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IJSRuntime JsRuntime
+@inject ISudokuGamesRepository Repository
+@inject GameplayService GameplayService
 
 @if (_instance != null)
 {
@@ -62,7 +61,7 @@
                     }
                 </div>
                 <div>
-                    <CurrentPlayerComponent PlayerState="_playerState" OtherPlayerState="_otherPlayerState" RightToLeft></CurrentPlayerComponent>
+                    <CurrentPlayerComponent PlayerState="_playerState" OtherPlayerState="_otherPlayerState"></CurrentPlayerComponent>
                 </div>
                 <div class="flex-grow-1">
                     <div class="mb-1">
@@ -114,7 +113,7 @@ else
         }
 
         _instance.PlayerJoined += OnPlayerJoined;
-        _instance.GameOver += OnGameOver;
+        _instance.GameOver += (_, _) => OnStateChange();
 
         UpdatePlayers();
     }
@@ -133,8 +132,24 @@ else
             return;
         }
 
-        _playerState = _instance.GetPlayerState(_user.ExternalId);
-        _otherPlayerState = _instance.GetOtherPlayerState(_user.ExternalId);
+        if (_playerState == null)
+        {
+            _playerState = _instance.GetPlayerState(_user.ExternalId);
+
+            if (_playerState != null)
+            {
+                RegisterEvents(_playerState);
+            }
+        }
+
+        if (_otherPlayerState == null)
+        {
+            _otherPlayerState = _instance.GetOtherPlayerState(_user.ExternalId);
+            if (_otherPlayerState != null)
+            {
+                RegisterEvents(_otherPlayerState);
+            }
+        }
     }
 
     async Task JoinGame()
@@ -157,15 +172,6 @@ else
         _gameModule ??= await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./Areas/App/Components/Game.razor.js");
     }
 
-    public void Dispose()
-    {
-        if (_instance is not null)
-        {
-            _instance.PlayerJoined -= OnPlayerJoined;
-            _instance.GameOver -= OnGameOver;
-        }
-    }
-
     void OnPlayerJoined(object? __, PlayerSide side) =>
         _ = InvokeAsync(
             () =>
@@ -175,7 +181,14 @@ else
             }
         );
 
-    void OnGameOver(object? __, PlayerSide ___) => _ = InvokeAsync(StateHasChanged);
+    void OnStateChange() => _ = InvokeAsync(StateHasChanged);
+
+    void RegisterEvents(IHiddenPlayerState state)
+    {
+        state.HintAdded += (_, _) => OnStateChange();
+        state.Grid.CellElementChanged += (_, _) => OnStateChange();
+        state.Grid.CellAnnotationsChanged += (_, _) => OnStateChange();
+    }
 
     string GetOtherPlayerInvitationLink() => _instance == null ? "" : $"{Navigation.BaseUri}app/game/{_instance.Id}";
 

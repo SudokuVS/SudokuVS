@@ -1,85 +1,88 @@
-﻿<div class="@ComputeGridStyle()">
-    @for (int i = 0; i < Grid.GetLength(0); i++)
-    {
-        @for (int j = 0; j < Grid.GetLength(1); j++)
+﻿@if (Grid != null)
+{
+    <div class="@ComputeGridStyle()">
+        @for (int i = 0; i < Grid.GetLength(0); i++)
         {
-            int row = i;
-            int column = j;
+            @for (int j = 0; j < Grid.GetLength(1); j++)
+            {
+                int row = i;
+                int column = j;
 
-            <div class="@ComputeCellStyle(row, column)">
+                <div class="@ComputeCellStyle(row, column)">
 
-                <span class="@ComputeCellContentStyle(row, column)">@Grid[row, column].Content</span>
+                    <span class="@ComputeCellContentStyle(row, column)">@Grid[row, column].Content</span>
 
 
-                @{
-                    string? annotation = Grid[row, column].Annotation;
-                    string? annotationIcon = Grid[row, column].AnnotationIcon;
+                    @{
+                        string? annotation = Grid[row, column].Annotation;
+                        string? annotationIcon = Grid[row, column].AnnotationIcon;
 
-                    if (annotation != null || annotationIcon != null)
-                    {
-                        if (annotationIcon != null)
+                        if (annotation != null || annotationIcon != null)
                         {
-                            <div class="@ComputeAnnotationStyle(row, column)">
-                                <i class="bi bi-@annotationIcon"></i>
-                            </div>
-                        }
+                            if (annotationIcon != null)
+                            {
+                                <div class="@ComputeAnnotationStyle(row, column)">
+                                    <i class="bi bi-@annotationIcon"></i>
+                                </div>
+                            }
 
-                        if (annotation != null)
-                        {
-                            <div class="@ComputeAnnotationStyle(row, column)">
-                                @((MarkupString)annotation!)
-                            </div>
+                            if (annotation != null)
+                            {
+                                <div class="@ComputeAnnotationStyle(row, column)">
+                                    @((MarkupString)annotation!)
+                                </div>
+                            }
                         }
                     }
-                }
 
-                @if (!Disabled)
-                {
-                    <a class="stretched-link" type="button"
-                       @onclick="async () => await CellClickedAsync(row, column)" @onclick:preventDefault="true" @onclick:stopPropagation="true"
-                       @oncontextmenu="async () => await CellRightClickedAsync(row, column)" @oncontextmenu:preventDefault="true" @oncontextmenu:stopPropagation="true">
-                    </a>
-                }
-            </div>
+                    @if (!Disabled)
+                    {
+                        <a class="stretched-link" type="button"
+                           @onclick="async () => await CellClickedAsync(row, column)" @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                           @oncontextmenu="async () => await CellRightClickedAsync(row, column)" @oncontextmenu:preventDefault="true" @oncontextmenu:stopPropagation="true">
+                        </a>
+                    }
+                </div>
+            }
         }
-    }
 
-    <div class="regions">
-        @for (int i = 0; i < Grid.GetLength(0) / RegionSize; i++)
-            @for (int j = 0; j < Grid.GetLength(0) / RegionSize; j++)
-        {
-            <div class="border border-secondary"></div>
-        }
+        <div class="regions">
+            @for (int i = 0; i < Grid.GetLength(0) / RegionSize; i++)
+                @for (int j = 0; j < Grid.GetLength(0) / RegionSize; j++)
+            {
+                <div class="border border-secondary"></div>
+            }
+        </div>
+
+        <div class="rows">
+            @for (int i = 0; i < Grid.GetLength(0); i++)
+            {
+                <div class="@ComputeRowStyle(i)"></div>
+            }
+        </div>
+
+        <div class="columns">
+            @for (int i = 0; i < Grid.GetLength(0); i++)
+            {
+                <div class="@ComputeColumnStyle(i)"></div>
+            }
+        </div>
+
+        <div class="regions">
+            @for (int i = 0; i < Grid.GetLength(0) / RegionSize; i++)
+                @for (int j = 0; j < Grid.GetLength(0) / RegionSize; j++)
+            {
+                <div class="@ComputeRegionStyle(i, j)"></div>
+            }
+        </div>
     </div>
-
-    <div class="rows">
-        @for (int i = 0; i < Grid.GetLength(0); i++)
-        {
-            <div class="@ComputeRowStyle(i)"></div>
-        }
-    </div>
-
-    <div class="columns">
-        @for (int i = 0; i < Grid.GetLength(0); i++)
-        {
-            <div class="@ComputeColumnStyle(i)"></div>
-        }
-    </div>
-
-    <div class="regions">
-        @for (int i = 0; i < Grid.GetLength(0) / RegionSize; i++)
-            @for (int j = 0; j < Grid.GetLength(0) / RegionSize; j++)
-        {
-            <div class="@ComputeRegionStyle(i, j)"></div>
-        }
-    </div>
-</div>
+}
 
 @code {
     const int RegionSize = 3;
 
     [Parameter]
-    public Cell[,] Grid { get; set; } = new Cell[0, 0];
+    public Cell[,]? Grid { get; set; }
 
     [Parameter]
     public Color[] RowBorderColor { get; set; } = [];
@@ -115,18 +118,33 @@
 
     string ComputeCellStyle(int row, int column)
     {
+        if (Grid == null)
+        {
+            return "";
+        }
+
         Cell cell = Grid[row, column];
         return $"cell {GetSizeStyle(GridSize)} {GetBgColorStyle(cell.BackgroundColor)} {GetBorderColorStyle(cell.BorderColor) ?? (HideCellBorders ? null : "border border-secondary-subtle")} position-relative";
     }
 
     string ComputeCellContentStyle(int row, int column)
     {
+        if (Grid == null)
+        {
+            return "";
+        }
+
         Cell cell = Grid[row, column];
         return $"{GetFontStyle(cell.FontModifiers)} {GetTextColorStyle(cell.TextColor)}";
     }
 
     string ComputeAnnotationStyle(int row, int column)
     {
+        if (Grid == null)
+        {
+            return "";
+        }
+
         Cell cell = Grid[row, column];
         return $"annotation {GetBgColorStyle(cell.AnnotationBackgroundColor)} {GetTextColorStyle(cell.TextColor)}";
     }

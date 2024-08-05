@@ -11,4 +11,5 @@ public interface IHiddenPlayerState
     PlayerSide Side { get; }
     IReadOnlyCollection<(int Row, int Column)> Hints { get; }
     int RemainingHints { get; }
+    public event EventHandler? HintAdded;
 }
