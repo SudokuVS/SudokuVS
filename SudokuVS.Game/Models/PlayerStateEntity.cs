@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using SudokuVS.Game.Models.Users;
 using SudokuVS.Sudoku.Serialization;
 
 namespace SudokuVS.Game.Models;
@@ -11,12 +10,12 @@ public class PlayerStateEntity
     public PlayerStateEntity() { }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-    public PlayerStateEntity(SudokuGameEntity game, PlayerSide side, UserIdentityEntity user, string grid)
+    public PlayerStateEntity(SudokuGameEntity game, PlayerSide side, string username, string grid)
     {
         GameId = game.Id;
         Game = game;
         Side = side;
-        User = user;
+        Username = username;
         Grid = grid;
     }
 
@@ -41,7 +40,8 @@ public class PlayerStateEntity
     /// <summary>
     ///     The user associated with the state.
     /// </summary>
-    public UserIdentityEntity User { get; set; }
+    [MaxLength(64)]
+    public string Username { get; set; }
 
     /// <summary>
     ///     The current grid of the player.

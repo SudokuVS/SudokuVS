@@ -1,47 +1,50 @@
-﻿@using SudokuVS.Game
+﻿@using Microsoft.AspNetCore.Identity
+@using SudokuVS.Game
 @using SudokuVS.Game.Models
+@using SudokuVS.Server.Models
 @using SudokuVS.Server.Services
 @inject IJSRuntime JsRuntime
 @inject GamesService GamesService
+@inject UserManager<AppUser> UserManager
 
 <div class="d-flex gap-4">
-    @if (Game != null)
+    @if (_game != null)
     {
         <div class="d-flex align-items-center justify-content-center">
-            <GridIconComponent Grid="Game.InitialGrid" HideState="!Game.IsStarted"></GridIconComponent>
+            <GridIconComponent Grid="_game.InitialGrid" HideState="!_game.IsStarted"></GridIconComponent>
         </div>
         <div class="flex-grow-1 d-flex gap-2">
             <div class="d-flex align-items-center justify-content-center">
                 vs.
             </div>
             <div class="flex-grow-1">
-                @switch (Game.Winner)
+                @switch (_game.Winner)
                 {
                     case PlayerSide.Player1:
                         <div class="flex-grow-1">
-                            <div class="fs-5 fw-semibold text-success text-truncate">@(Game.Player1?.User.DisplayName ?? "???")</div>
-                            <div class="fs-5 fw-semibold text-danger text-truncate">@(Game.Player2?.User.DisplayName ?? "???")</div>
+                            <div class="fs-5 fw-semibold text-success text-truncate">@(_player1Name ?? "???")</div>
+                            <div class="fs-5 fw-semibold text-danger text-truncate">@(_player2Name ?? "???")</div>
                         </div>
                         break;
                     case PlayerSide.Player2:
                         <div class="flex-grow-1">
-                            <div class="fs-5 fw-semibold text-danger" text-truncate>@(Game.Player1?.User.DisplayName ?? "???")</div>
-                            <div class="fs-5 fw-semibold text-success" text-truncate>@(Game.Player2?.User.DisplayName ?? "???")</div>
+                            <div class="fs-5 fw-semibold text-danger" text-truncate>@(_player1Name ?? "???")</div>
+                            <div class="fs-5 fw-semibold text-success" text-truncate>@(_player2Name ?? "???")</div>
                         </div>
                         break;
                     default:
                         <div class="flex-grow-1">
-                            <div class="fs-5 fw-semibold text-truncate">@(Game.Player1?.User.DisplayName ?? "???")</div>
-                            <div class="fs-5 fw-semibold text-truncate">@(Game.Player2?.User.DisplayName ?? "???")</div>
+                            <div class="fs-5 fw-semibold text-truncate">@(_player1Name ?? "???")</div>
+                            <div class="fs-5 fw-semibold text-truncate">@(_player2Name ?? "???")</div>
                         </div>
                         break;
                 }
                 <div class="lead">
-                    @if (Game.IsStarted)
+                    @if (_game.IsStarted)
                     {
                         @:Round 1
                     }
-                    else if (!Game.IsOver)
+                    else if (!_game.IsOver)
                     {
                         @:<i class="bi bi-hourglass-split ps-2"></i> In preparation
                     }
@@ -49,10 +52,10 @@
             </div>
         </div>
 
-        @if (Game.IsStarted)
+        @if (_game.IsStarted)
         {
             <div class="d-flex align-items-center justify-content-center">
-                <span class="timer-@Game.Id font-monospace fs-4">
+                <span class="timer-@_game.Id font-monospace fs-4">
                     @GetElapsedTime()
                 </span>
             </div>
@@ -67,7 +70,9 @@
     [Parameter]
     public Guid GameId { get; set; }
 
-    public SudokuGame? Game { get; set; }
+    SudokuGame? _game;
+    string? _player1Name;
+    string? _player2Name;
 
     public async Task OnStateHasChangedAsync() => await UpdateGame();
 
@@ -84,19 +89,19 @@
 
     string GetElapsedTime()
     {
-        if (Game == null)
+        if (_game == null)
         {
             return "";
         }
 
         TimeSpan time;
-        if (Game.IsOver)
+        if (_game.IsOver)
         {
-            time = Game.EndDate.Value - Game.StartDate.Value;
+            time = _game.EndDate.Value - _game.StartDate.Value;
         }
-        else if (Game.IsStarted)
+        else if (_game.IsStarted)
         {
-            time = DateTime.Now - Game.StartDate.Value;
+            time = DateTime.Now - _game.StartDate.Value;
         }
         else
         {
@@ -113,17 +118,34 @@
 
     async Task UpdateGame()
     {
-        Game = await GamesService.GetGameAsync(GameId);
+        _game = await GamesService.GetGameAsync(GameId);
+
+        if (_game != null)
+        {
+            string? player1Username = _game.Player1?.Username;
+            if (!string.IsNullOrEmpty(player1Username))
+            {
+                AppUser? user = await UserManager.GetUserByIdAsync(player1Username);
+                _player1Name = user?.GetPublicName() ?? player1Username;
+            }
+
+            string? player2Username = _game.Player2?.Username;
+            if (!string.IsNullOrEmpty(player2Username))
+            {
+                AppUser? user = await UserManager.GetUserByIdAsync(player2Username);
+                _player2Name = user?.GetPublicName() ?? player2Username;
+            }
+        }
 
         if (_gameSummaryModule != null)
         {
-            if (Game is { StartDate: not null })
+            if (_game is { StartDate: not null })
             {
-                await _gameSummaryModule.InvokeVoidAsync("startTimer", $"timer-{Game.Id}", Game.StartDate);
+                await _gameSummaryModule.InvokeVoidAsync("startTimer", $"timer-{_game.Id}", _game.StartDate);
             }
-            else if (Game is not null)
+            else if (_game is not null)
             {
-                await _gameSummaryModule.InvokeVoidAsync("stopTimer", $"timer-{Game.Id}");
+                await _gameSummaryModule.InvokeVoidAsync("stopTimer", $"timer-{_game.Id}");
             }
         }
 

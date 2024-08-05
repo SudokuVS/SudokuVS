@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using SudokuVS.Game.Models;
-using SudokuVS.Game.Users;
 using SudokuVS.Sudoku.Generators;
 using SudokuVS.Sudoku.Models;
 using SudokuVS.Sudoku.Solvers;
@@ -42,7 +41,7 @@ public class SudokuGame
     public event EventHandler<PlayerSide>? PlayerJoined;
     public event EventHandler<PlayerSide>? GameOver;
 
-    public PlayerState Join(UserIdentity user, PlayerSide side)
+    public PlayerState Join(string username, PlayerSide side)
     {
         PlayerState? existing = GetPlayerState(side);
         if (existing != null)
@@ -53,7 +52,7 @@ public class SudokuGame
         SudokuGrid grid = SudokuGrid.Clone(InitialGrid);
         grid.CellElementChanged += (_, _) => OnCellValueChanged(side);
 
-        PlayerState newState = new(this, grid, side, user);
+        PlayerState newState = new(this, grid, side, username);
         HiddenPlayerState otherPlayerState = new(newState);
 
         switch (side)
@@ -96,14 +95,14 @@ public class SudokuGame
             _ => null
         };
 
-    public PlayerState? GetPlayerState(string playerId)
+    public PlayerState? GetPlayerState(string username)
     {
-        if (Player1 != null && Player1.User.Username == playerId)
+        if (Player1 != null && Player1.Username == username)
         {
             return Player1;
         }
 
-        if (Player2 != null && Player2.User.Username == playerId)
+        if (Player2 != null && Player2.Username == username)
         {
             return Player2;
         }
@@ -111,14 +110,14 @@ public class SudokuGame
         return null;
     }
 
-    public IHiddenPlayerState? GetOtherPlayerState(string playerId)
+    public IHiddenPlayerState? GetOtherPlayerState(string username)
     {
-        if (Player1 != null && Player1.User.Username == playerId)
+        if (Player1 != null && Player1.Username == username)
         {
             return GetHiddenPlayerState(PlayerSide.Player2);
         }
 
-        if (Player2 != null && Player2.User.Username == playerId)
+        if (Player2 != null && Player2.Username == username)
         {
             return GetHiddenPlayerState(PlayerSide.Player1);
         }
@@ -192,6 +191,6 @@ public class SudokuGame
 
 public static class SudokuGameExtensions
 {
-    public static bool InvolvesPlayer(this SudokuGame game, string userId) =>
-        game.Player1 != null && game.Player1.User.Username == userId || game.Player2 != null && game.Player2.User.Username == userId;
+    public static bool InvolvesPlayer(this SudokuGame game, string username) =>
+        game.Player1 != null && game.Player1.Username == username || game.Player2 != null && game.Player2.Username == username;
 }

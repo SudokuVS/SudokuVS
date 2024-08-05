@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using SudokuVS.Game;
+using SudokuVS.Game.Users;
 
 namespace SudokuVS.Server.RestApi.Models;
 
@@ -23,10 +24,10 @@ public class SudokuGameHiddenPlayerStateDto
 
 static class SudokuGameHiddenPlayerStateMappingExtensions
 {
-    public static SudokuGameHiddenPlayerStateDto ToHiddenPlayerStateDto(this IHiddenPlayerState state) =>
+    public static SudokuGameHiddenPlayerStateDto ToHiddenPlayerStateDto(this IHiddenPlayerState state, UserIdentity user) =>
         new()
         {
-            User = state.User.ToDto(),
+            User = user.ToDto(),
             Grid = state.Grid.ToHiddenPlayerGridDto(state)
         };
 }

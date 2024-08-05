@@ -3,8 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SudokuVS.Game.Infrastructure.Database;
 using SudokuVS.Game.Models;
-using SudokuVS.Game.Models.Users;
-using SudokuVS.Game.Users;
 using SudokuVS.Game.Utils;
 using SudokuVS.Sudoku.Models;
 using SudokuVS.Sudoku.Serialization;
@@ -104,7 +102,7 @@ class SudokuGamesInDbContext : SudokuGameCachedRepository
     }
 
     static async Task<SudokuGameEntity?> FindGame(GameDbContext context, Guid id, CancellationToken cancellationToken) =>
-        await context.Games.Include(g => g.Players).ThenInclude(p => p.User).SingleOrDefaultAsync(g => g.Id == id, cancellationToken);
+        await context.Games.Include(g => g.Players).SingleOrDefaultAsync(g => g.Id == id, cancellationToken);
 
     PlayerState LoadPlayerState(SudokuGame game, PlayerSide side, PlayerStateEntity state)
     {
@@ -120,14 +118,12 @@ class SudokuGamesInDbContext : SudokuGameCachedRepository
             grid[row, column].IsLocked = true;
         }
 
-        UserIdentity user = new() { Username = state.User.ExternalId, DisplayName = state.User.Name };
-
-        PlayerState result = new(game, grid, side, user);
+        PlayerState result = new(game, grid, side, state.Username);
         result.Restore(hints);
         return result;
     }
 
-    async Task SavePlayerState(GameDbContext context, SudokuGame game, PlayerSide side, SudokuGameEntity entity, CancellationToken cancellationToken)
+    async Task SavePlayerState(GameDbContext context, SudokuGame game, PlayerSide side, SudokuGameEntity entity, CancellationToken _ = default)
     {
         PlayerState? state = game.GetPlayerState(side);
         if (state == null)
@@ -142,18 +138,17 @@ class SudokuGamesInDbContext : SudokuGameCachedRepository
         {
             PlayerStateEntity? entityState = entity.GetPlayerState(side);
 
-            UserIdentityEntity user = await context.Users.GetOrCreateAsync(state.User, cancellationToken);
             string grid = _serializer.ToString(state.Grid);
             string hints = string.Join(",", state.Hints.Select(x => SudokuGridCoordinates.ComputeFlatIndex(x.Row, x.Column)));
 
             if (entityState == null)
             {
-                entityState = new PlayerStateEntity(entity, side, user, grid) { Hints = hints };
+                entityState = new PlayerStateEntity(entity, side, state.Username, grid) { Hints = hints };
                 context.PlayerStates.Add(entityState);
             }
             else
             {
-                entityState.User = user;
+                entityState.Username = state.Username;
                 entityState.Grid = grid;
                 entityState.Hints = hints;
             }
