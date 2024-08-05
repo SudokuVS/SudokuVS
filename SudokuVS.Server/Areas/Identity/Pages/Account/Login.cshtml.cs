@@ -8,16 +8,17 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using SudokuVS.Server.Models;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace SudokuVS.Server.Areas.Identity.Pages.Account;
 
 public class LoginModel : PageModel
 {
-    readonly SignInManager<IdentityUser> _signInManager;
+    readonly SignInManager<AppUser> _signInManager;
     readonly ILogger<LoginModel> _logger;
 
-    public LoginModel(SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger)
+    public LoginModel(SignInManager<AppUser> signInManager, ILogger<LoginModel> logger)
     {
         _signInManager = signInManager;
         _logger = logger;
