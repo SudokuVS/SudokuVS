@@ -18,7 +18,9 @@
         @foreach (UserLoginInfo? login in Model.CurrentLogins)
         {
             <tr>
-                <td id="@($"login-provider-{login.LoginProvider}")">@login.ProviderDisplayName</td>
+                <td id="@($"login-provider-{login.LoginProvider}")" class="align-middle">
+                    @login.ProviderDisplayName account <span class="small">(@login.ProviderKey)</span>
+                </td>
                 <td>
                     @if (Model.ShowRemoveButton)
                     {
@@ -49,7 +51,9 @@
             <p>
                 @foreach (AuthenticationScheme? provider in Model.OtherLogins)
                 {
-                    <button id="@($"link-login-button-{provider.Name}")" type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
+                    <button id="@($"link-login-button-{provider.Name}")" type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">
+                        Associate @provider.DisplayName account
+                    </button>
                 }
             </p>
         </div>

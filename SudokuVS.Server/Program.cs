@@ -1,7 +1,6 @@
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Logging;
@@ -14,8 +13,8 @@ using SudokuVS.Game.Utils;
 using SudokuVS.Server;
 using SudokuVS.Server.Areas.App.Components;
 using SudokuVS.Server.Exceptions;
+using SudokuVS.Server.Infrastructure.Authentication;
 using SudokuVS.Server.Infrastructure.Database;
-using SudokuVS.Server.Infrastructure.Emails;
 using SudokuVS.Server.Infrastructure.Logging;
 using SudokuVS.Server.Services;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
@@ -63,10 +62,8 @@ try
             }
         )
         .AddEntityFrameworkStores<AppDbContext>();
+    builder.AddAuthentication(bootstrapLogger);
     builder.Services.AddAuthorization();
-
-    builder.Services.AddTransient<IEmailSender, GmailEmailSender>();
-    builder.Services.Configure<GmailAccountConfiguration>(builder.Configuration.GetSection("Gmail"));
 
     builder.ConfigureGameServices(gameOptions);
     builder.Services.AddTransient<GameplayService>();
