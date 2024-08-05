@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using SudokuVS.Game.Users;
 
-namespace SudokuVS.Server.Models;
+namespace SudokuVS.Server.RestApi.Models;
 
 /// <summary>
 ///     Identity of a user.
@@ -22,5 +22,5 @@ public class UserIdentityDto
 
 static class UserIdentityMappingExtensions
 {
-    public static UserIdentityDto ToDto(this UserIdentity user) => new() { Id = user.ExternalId, Name = user.Name };
+    public static UserIdentityDto ToDto(this UserIdentity user) => new() { Id = user.Username, Name = user.DisplayName };
 }

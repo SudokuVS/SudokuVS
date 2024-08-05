@@ -65,8 +65,8 @@ public class SudokuGameJsonSerializer
     static SerializedPlayerState Serialize(PlayerState player) =>
         new()
         {
-            PlayerId = player.User.ExternalId,
-            PlayerName = player.User.Name,
+            PlayerId = player.User.Username,
+            PlayerName = player.User.DisplayName,
             Grid = Serialize(player.Grid),
             Hints = player.Hints.Select(x => SudokuGridCoordinates.ComputeFlatIndex(x.Row, x.Column)).ToArray()
         };
@@ -87,7 +87,7 @@ public class SudokuGameJsonSerializer
     static PlayerState Deserialize(SudokuGame game, PlayerSide side, SerializedPlayerState player)
     {
         SudokuGrid grid = Deserialize(player.Grid);
-        PlayerState state = new(game, grid, side, new UserIdentity { ExternalId = player.PlayerId, Name = player.PlayerName });
+        PlayerState state = new(game, grid, side, new UserIdentity { Username = player.PlayerId, DisplayName = player.PlayerName });
 
         IEnumerable<(int Row, int Column)> hints = player.Hints.Select(SudokuGridCoordinates.ComputeCoordinates);
         state.Restore(hints);

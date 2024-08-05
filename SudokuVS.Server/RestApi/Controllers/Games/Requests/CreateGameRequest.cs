@@ -1,4 +1,4 @@
-﻿namespace SudokuVS.Server.Controllers.Games.Requests;
+﻿namespace SudokuVS.Server.RestApi.Controllers.Games.Requests;
 
 /// <summary>
 ///     Create a new game.

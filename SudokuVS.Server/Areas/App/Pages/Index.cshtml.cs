@@ -36,7 +36,7 @@ public class Index : PageModel
         UserIdentity user = HttpContext.User.GetUserIdentity() ?? throw new AccessDeniedException();
 
         SudokuGame game = await _gameplayService.CreateGameAsync(NewGame.Name, new SudokuGameOptions { MaxHints = NewGame.MaxHints }, user);
-        PlayerState? playerState = game.GetPlayerState(user.ExternalId);
+        PlayerState? playerState = game.GetPlayerState(user.Username);
         if (playerState == null)
         {
             throw new InternalErrorException("Player has not joined game");

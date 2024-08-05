@@ -1,6 +1,5 @@
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Logging;
@@ -16,6 +15,7 @@ using SudokuVS.Server.Exceptions;
 using SudokuVS.Server.Infrastructure.Authentication;
 using SudokuVS.Server.Infrastructure.Database;
 using SudokuVS.Server.Infrastructure.Logging;
+using SudokuVS.Server.Models;
 using SudokuVS.Server.Services;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
@@ -54,7 +54,7 @@ try
         bootstrapLogger.LogInformation("Connection to Game database configured.");
     }
 
-    builder.Services.AddDefaultIdentity<IdentityUser>(
+    builder.Services.AddDefaultIdentity<AppUser>(
             options =>
             {
                 // FIXME: enable when email sender configured properly

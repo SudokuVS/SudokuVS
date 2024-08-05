@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using SudokuVS.Game;
 
-namespace SudokuVS.Server.Models;
+namespace SudokuVS.Server.RestApi.Models;
 
 /// <summary>
 ///     State of the game as seen by one of the players
@@ -64,7 +64,7 @@ static class SudokuGameMappingExtensions
             Id = game.Id,
             Name = game.Name,
             Player = playerState.ToPlayerStateDto(),
-            Opponent = game.GetOtherPlayerState(playerState.User.ExternalId)?.ToHiddenPlayerStateDto(),
+            Opponent = game.GetOtherPlayerState(playerState.User.Username)?.ToHiddenPlayerStateDto(),
             IsStarted = game.IsStarted,
             StartDate = game.StartDate,
             IsOver = game.IsOver,

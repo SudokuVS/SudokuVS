@@ -4,12 +4,12 @@ using NSwag.Annotations;
 using SudokuVS.Game;
 using SudokuVS.Game.Persistence;
 using SudokuVS.Game.Users;
-using SudokuVS.Server.Controllers.Games.Requests;
 using SudokuVS.Server.Exceptions;
-using SudokuVS.Server.Models;
+using SudokuVS.Server.RestApi.Controllers.Games.Requests;
+using SudokuVS.Server.RestApi.Models;
 using SudokuVS.Server.Services;
 
-namespace SudokuVS.Server.Controllers.Games;
+namespace SudokuVS.Server.RestApi.Controllers.Games;
 
 /// <summary>
 ///     Gameplay
@@ -40,7 +40,7 @@ public class GameplayController : ControllerBase
         UserIdentity user = ControllerContext.HttpContext.User.GetUserIdentity() ?? throw new AccessDeniedException();
 
         SudokuGame game = await _gameplayService.CreateGameAsync(request.Name, new SudokuGameOptions { MaxHints = request.Hints }, user);
-        PlayerState? playerState = game.GetPlayerState(user.ExternalId);
+        PlayerState? playerState = game.GetPlayerState(user.Username);
         if (playerState == null)
         {
             throw new InternalErrorException("Player has not joined game");

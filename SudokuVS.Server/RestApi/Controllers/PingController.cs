@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace SudokuVS.Server.Controllers;
+namespace SudokuVS.Server.RestApi.Controllers;
 
 /// <summary>
 ///     Ping

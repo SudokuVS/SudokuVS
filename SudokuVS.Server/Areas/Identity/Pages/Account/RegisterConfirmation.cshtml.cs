@@ -7,15 +7,16 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using SudokuVS.Server.Models;
 
 namespace SudokuVS.Server.Areas.Identity.Pages.Account;
 
 [AllowAnonymous]
 public class RegisterConfirmationModel : PageModel
 {
-    readonly UserManager<IdentityUser> _userManager;
+    readonly UserManager<AppUser> _userManager;
 
-    public RegisterConfirmationModel(UserManager<IdentityUser> userManager)
+    public RegisterConfirmationModel(UserManager<AppUser> userManager)
     {
         _userManager = userManager;
     }
@@ -33,7 +34,7 @@ public class RegisterConfirmationModel : PageModel
             return RedirectToPage("/Index");
         }
 
-        IdentityUser user = await _userManager.FindByEmailAsync(email);
+        AppUser user = await _userManager.FindByEmailAsync(email);
         if (user == null)
         {
             return NotFound($"Unable to load user with email '{email}'.");

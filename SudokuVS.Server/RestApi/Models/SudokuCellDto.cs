@@ -1,6 +1,6 @@
 ﻿using SudokuVS.Sudoku.Models.Abstractions;
 
-namespace SudokuVS.Server.Models;
+namespace SudokuVS.Server.RestApi.Models;
 
 /// <summary>
 ///     Cell in a Sudoku grid.
