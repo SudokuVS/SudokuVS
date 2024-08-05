@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SudokuVS.Game.Models;
-using SudokuVS.Game.Models.Users;
 
 namespace SudokuVS.Game.Infrastructure.Database;
 
@@ -10,7 +9,6 @@ public class GameDbContext : DbContext
     {
     }
 
-    public DbSet<UserIdentityEntity> Users { get; private set; }
     public DbSet<PlayerStateEntity> PlayerStates { get; private set; }
     public DbSet<SudokuGameEntity> Games { get; private set; }
 
