@@ -1,6 +1,32 @@
 /* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification\
 for details on configuring this project to bundle and minify static web assets. */
 
+/* region Variable */
+
+html {
+    --color-light-grey: lightgray;
+    --color-grey: gray;
+    --color-light-pink: pink;
+    --color-pink: hotpink;
+    --color-light-blue: lightcyan;
+    --color-blue: lightblue;
+    --color-yellow: gold;
+    --color-red: red;
+    --color-green: green;
+    --color-orange: orangered;
+    --color-dark1: #F0F0F0;
+    --color-dark2: #E0E0E0;
+    --color-dark3: #D0D0D0;
+    --color-dark4: #C0C0C0;
+    --color-dark5: #B0B0B0;
+    --color-dark6: #A0A0A0;
+    --color-dark7: #909090;
+    --color-dark8: #808080;
+    --color-dark9: #707070;
+}
+
+/* endregion */
+
 a.navbar-brand {
     white-space: normal;
     text-align: center;

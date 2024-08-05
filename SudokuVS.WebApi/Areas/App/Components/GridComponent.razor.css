@@ -100,225 +100,225 @@
 }
 
 .sudoku-grid .border-light-grey {
-    box-shadow: inset 0 0 0 2px lightgray;
+    box-shadow: inset 0 0 0 2px var(--color-light-grey);
 }
 
 .sudoku-grid .border-grey {
-    box-shadow: inset 0 0 0 2px gray;
+    box-shadow: inset 0 0 0 2px var(--color-grey);
 }
 
 .sudoku-grid .border-light-pink {
-    box-shadow: inset 0 0 0 2px pink;
+    box-shadow: inset 0 0 0 2px var(--color-light-pink);
 }
 
 .sudoku-grid .border-pink {
-    box-shadow: inset 0 0 0 2px hotpink;
+    box-shadow: inset 0 0 0 2px var(--color-pink);
 }
 
 .sudoku-grid .border-light-blue {
-    box-shadow: inset 0 0 0 2px lightcyan;
+    box-shadow: inset 0 0 0 2px var(--color-light-blue);
 }
 
 .sudoku-grid .border-blue {
-    box-shadow: inset 0 0 0 2px lightblue;
+    box-shadow: inset 0 0 0 2px var(--color-blue);
 }
 
 .sudoku-grid .border-yellow {
-    box-shadow: inset 0 0 0 2px gold;
+    box-shadow: inset 0 0 0 2px var(--color-yellow);
 }
 
 .sudoku-grid .border-red {
-    box-shadow: inset 0 0 0 2px red;
+    box-shadow: inset 0 0 0 2px var(--color-red);
 }
 
 .sudoku-grid .border-green {
-    box-shadow: inset 0 0 0 2px green;
-}
-
-.sudoku-grid .border-dark1 {
-    color: #F0F0F0;
-}
-
-.sudoku-grid .border-dark2 {
-    color: #E0E0E0;
-}
-
-.sudoku-grid .border-dark3 {
-    color: #D0D0D0;
-}
-
-.sudoku-grid .border-dark4 {
-    color: #C0C0C0;
-}
-
-.sudoku-grid .border-dark5 {
-    color: #B0B0B0;
-}
-
-.sudoku-grid .border-dark6 {
-    color: #A0A0A0;
-}
-
-.sudoku-grid .border-dark7 {
-    color: #909090;
-}
-
-.sudoku-grid .border-dark8 {
-    color: #808080;
-}
-
-.sudoku-grid .border-dark9 {
-    color: #707070;
+    box-shadow: inset 0 0 0 2px var(--color-green);
 }
 
 .sudoku-grid .border-orange {
-    box-shadow: inset 0 0 0 2px orangered;
+    box-shadow: inset 0 0 0 2px var(--color-orange);
+}
+
+.sudoku-grid .border-dark1 {
+    box-shadow: inset 0 0 0 2px var(--color-dark1);
+}
+
+.sudoku-grid .border-dark2 {
+    box-shadow: inset 0 0 0 2px var(--color-dark2);
+}
+
+.sudoku-grid .border-dark3 {
+    box-shadow: inset 0 0 0 2px var(--color-dark3);
+}
+
+.sudoku-grid .border-dark4 {
+    box-shadow: inset 0 0 0 2px var(--color-dark4);
+}
+
+.sudoku-grid .border-dark5 {
+    box-shadow: inset 0 0 0 2px var(--color-dark5);
+}
+
+.sudoku-grid .border-dark6 {
+    box-shadow: inset 0 0 0 2px var(--color-dark6);
+}
+
+.sudoku-grid .border-dark7 {
+    box-shadow: inset 0 0 0 2px var(--color-dark7);
+}
+
+.sudoku-grid .border-dark8 {
+    box-shadow: inset 0 0 0 2px var(--color-dark8);
+}
+
+.sudoku-grid .border-dark9 {
+    box-shadow: inset 0 0 0 2px var(--color-dark9);
 }
 
 .sudoku-grid .bg-light-grey {
-    background-color: lightgray;
+    background-color: var(--color-light-grey);
 }
 
 .sudoku-grid .bg-grey {
-    background-color: gray;
+    background-color: var(--color-grey);
 }
 
 .sudoku-grid .bg-light-pink {
-    background-color: lightpink;
+    background-color: var(--color-light-pink);
 }
 
 .sudoku-grid .bg-pink {
-    background-color: pink;
+    background-color: var(--color-pink);
 }
 
 .sudoku-grid .bg-light-blue {
-    background-color: lightcyan;
+    background-color: var(--color-light-blue);
 }
 
 .sudoku-grid .bg-blue {
-    background-color: lightblue;
+    background-color: var(--color-blue);
 }
 
 .sudoku-grid .bg-yellow {
-    background-color: gold;
+    background-color: var(--color-yellow);
 }
 
 .sudoku-grid .bg-red {
-    background-color: red;
+    background-color: var(--color-red);
 }
 
-.sudoku-grid .bg-orangered {
-    background-color: orangered;
+.sudoku-grid .bg-orange {
+    background-color: var(--color-orange);
 }
 
 .sudoku-grid .bg-dark1 {
-    background-color: #F0F0F0;
+    background-color: var(--color-dark1);
 }
 
 .sudoku-grid .bg-dark2 {
-    background-color: #E0E0E0;
+    background-color: var(--color-dark2);
 }
 
 .sudoku-grid .bg-dark3 {
-    background-color: #D0D0D0;
+    background-color: var(--color-dark3);
 }
 
 .sudoku-grid .bg-dark4 {
-    background-color: #C0C0C0;
+    background-color: var(--color-dark4);
 }
 
 .sudoku-grid .bg-dark5 {
-    background-color: #B0B0B0;
+    background-color: var(--color-dark5);
 }
 
 .sudoku-grid .bg-dark6 {
-    background-color: #A0A0A0;
+    background-color: var(--color-dark6);
 }
 
 .sudoku-grid .bg-dark7 {
-    background-color: #909090;
+    background-color: var(--color-dark7);
 }
 
 .sudoku-grid .bg-dark8 {
-    background-color: #808080;
+    background-color: var(--color-dark8);
 }
 
 .sudoku-grid .bg-dark9 {
-    background-color: #707070;
+    background-color: var(--color-dark9);
 }
 
 .sudoku-grid .txt-light-grey {
-    color: lightgray;
+    color: var(--color-light-grey);
 }
 
 .sudoku-grid .txt-grey {
-    color: gray;
+    color: var(--color-grey);
 }
 
 .sudoku-grid .txt-light-pink {
-    color: lightpink;
+    color: var(--color-light-pink);
 }
 
 .sudoku-grid .txt-pink {
-    color: pink;
+    color: var(--color-pink);
 }
 
 .sudoku-grid .txt-light-blue {
-    color: lightcyan;
+    color: var(--color-light-blue);
 }
 
 .sudoku-grid .txt-blue {
-    color: lightblue;
+    color: var(--color-blue);
 }
 
 .sudoku-grid .txt-yellow {
-    color: gold;
+    color: var(--color-yellow);
 }
 
 .sudoku-grid .txt-red {
-    color: red;
+    color: var(--color-red);
 }
 
 .sudoku-grid .txt-green {
-    color: green;
+    color: var(--color-green);
 }
 
 .sudoku-grid .txt-orange {
-    color: orangered;
+    color: var(--color-orange);
 }
 
 .sudoku-grid .txt-dark1 {
-    color: #F0F0F0;
+    color: var(--color-dark1);
 }
 
 .sudoku-grid .txt-dark2 {
-    color: #E0E0E0;
+    color: var(--color-dark2);
 }
 
 .sudoku-grid .txt-dark3 {
-    color: #D0D0D0;
+    color: var(--color-dark3);
 }
 
 .sudoku-grid .txt-dark4 {
-    color: #C0C0C0;
+    color: var(--color-dark4);
 }
 
 .sudoku-grid .txt-dark5 {
-    color: #B0B0B0;
+    color: var(--color-dark5);
 }
 
 .sudoku-grid .txt-dark6 {
-    color: #A0A0A0;
+    color: var(--color-dark6);
 }
 
 .sudoku-grid .txt-dark7 {
-    color: #909090;
+    color: var(--color-dark7);
 }
 
 .sudoku-grid .txt-dark8 {
-    color: #808080;
+    color: var(--color-dark8);
 }
 
 .sudoku-grid .txt-dark9 {
-    color: #707070;
+    color: var(--color-dark9);
 }
