@@ -1,19 +1,22 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SudokuVS.Game;
-using SudokuVS.Game.Users;
 using SudokuVS.Server.Exceptions;
+using SudokuVS.Server.Models;
 using SudokuVS.Server.Services;
 
 namespace SudokuVS.Server.Areas.App.Pages;
 
 public class Index : PageModel
 {
+    readonly UserManager<AppUser> _userManager;
     readonly GameplayService _gameplayService;
     readonly GamesService _gamesService;
 
-    public Index(GameplayService gameplayService, GamesService gamesService)
+    public Index(UserManager<AppUser> userManager, GameplayService gameplayService, GamesService gamesService)
     {
+        _userManager = userManager;
         _gameplayService = gameplayService;
         _gamesService = gamesService;
     }
@@ -33,10 +36,9 @@ public class Index : PageModel
     {
         NewGame ??= new NewGameModel();
 
-        UserIdentity user = HttpContext.User.GetUserIdentity() ?? throw new AccessDeniedException();
-
+        string user = _userManager.GetUserName(HttpContext.User) ?? throw new AccessDeniedException();
         SudokuGame game = await _gameplayService.CreateGameAsync(NewGame.Name, new SudokuGameOptions { MaxHints = NewGame.MaxHints }, user);
-        PlayerState? playerState = game.GetPlayerState(user.Username);
+        PlayerState? playerState = game.GetPlayerState(user);
         if (playerState == null)
         {
             throw new InternalErrorException("Player has not joined game");

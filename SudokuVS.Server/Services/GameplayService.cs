@@ -1,7 +1,6 @@
 ﻿using SudokuVS.Game;
 using SudokuVS.Game.Models;
 using SudokuVS.Game.Persistence;
-using SudokuVS.Game.Users;
 using SudokuVS.Server.Exceptions;
 
 namespace SudokuVS.Server.Services;
@@ -15,7 +14,7 @@ public class GameplayService
         _repository = repository;
     }
 
-    public async Task<SudokuGame> CreateGameAsync(string? gameName, SudokuGameOptions gameOptions, UserIdentity creatorUser, CancellationToken cancellationToken = default)
+    public async Task<SudokuGame> CreateGameAsync(string? gameName, SudokuGameOptions gameOptions, string creatorUser, CancellationToken cancellationToken = default)
     {
         SudokuGame? game = SudokuGame.Create(gameName, gameOptions);
         if (game == null)
@@ -29,7 +28,7 @@ public class GameplayService
         return game;
     }
 
-    public async Task JoinGameAsync(Guid gameId, UserIdentity user, CancellationToken cancellationToken = default)
+    public async Task JoinGameAsync(Guid gameId, string user, CancellationToken cancellationToken = default)
     {
         SudokuGame game = await _repository.RequireAsync(gameId, cancellationToken);
 

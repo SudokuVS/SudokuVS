@@ -1,6 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using SudokuVS.Game;
+using SudokuVS.Game.Users;
 
 namespace SudokuVS.Server.Models;
 
@@ -12,22 +15,24 @@ public class AppUser : IdentityUser
 
 static class UserManagerExtensions
 {
+    public static UserIdentity ToUserIdentity(this AppUser user) => new() { Username = GetUserName(user), DisplayName = GetPublicName(user) };
+
     public static async Task<string?> GetPublicName(this UserManager<AppUser> manager, ClaimsPrincipal claims, CancellationToken cancellationToken = default)
     {
         AppUser? user = await manager.GetUserAsync(claims);
         return user == null ? null : GetPublicName(user);
     }
 
-    static string GetPublicName(AppUser user)
+    public static string GetPublicName(this AppUser user)
+    {
+        string? displayName = user.DisplayName;
+        return !string.IsNullOrWhiteSpace(displayName) ? displayName : GetUserName(user);
+    }
+
+    public static string GetUserName(this AppUser user)
     {
         string? username = user.UserName;
-        string? displayName = user.DisplayName;
-
-        return !string.IsNullOrWhiteSpace(displayName)
-            ? displayName
-            : !string.IsNullOrWhiteSpace(username)
-                ? username
-                : $"user_{user.Id}";
+        return !string.IsNullOrWhiteSpace(username) ? username : $"user_{user.Id}";
     }
 
     public static Task<string?> GetDisplayNameAsync(this UserManager<AppUser> manager, AppUser user, CancellationToken cancellationToken = default) =>
@@ -37,5 +42,17 @@ static class UserManagerExtensions
     {
         user.DisplayName = displayName;
         return manager.UpdateAsync(user);
+    }
+
+    public static async Task<AppUser?> GetUserByIdAsync(this UserManager<AppUser> manager, string username) =>
+        await manager.Users.SingleOrDefaultAsync(u => u.UserName == username);
+}
+
+static class PlayerStateUserExtensions
+{
+    public static async Task<UserIdentity> GetUserIdentity(this IHiddenPlayerState state, UserManager<AppUser> userManager)
+    {
+        AppUser? opponent = await userManager.GetUserByIdAsync(state.Username);
+        return opponent?.ToUserIdentity() ?? new UserIdentity { Username = state.Username, DisplayName = state.Username };
     }
 }

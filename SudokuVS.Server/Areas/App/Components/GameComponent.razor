@@ -1,11 +1,13 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
 @using SudokuVS.Game
 @using SudokuVS.Game.Models
 @using SudokuVS.Game.Persistence
-@using SudokuVS.Game.Users
+@using SudokuVS.Server.Models
 @using SudokuVS.Server.Services
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<AppUser> UserManager
 @inject IJSRuntime JsRuntime
 @inject ISudokuGamesRepository Repository
 @inject GameplayService GameplayService
@@ -85,7 +87,7 @@ else
     [Parameter]
     public string? GameId { get; set; }
 
-    UserIdentity? _user;
+    string? _user;
     SudokuGame? _instance;
     PlayerState? _playerState;
     IHiddenPlayerState? _otherPlayerState;
@@ -102,7 +104,7 @@ else
         }
 
         AuthenticationState authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        _user = authState.User.GetUserIdentity();
+        _user = UserManager.GetUserName(authState.User);
         if (_user == null)
         {
             return;
@@ -137,7 +139,7 @@ else
 
         if (_playerState == null)
         {
-            _playerState = _instance.GetPlayerState(_user.Username);
+            _playerState = _instance.GetPlayerState(_user);
 
             if (_playerState != null)
             {
@@ -147,7 +149,7 @@ else
 
         if (_otherPlayerState == null)
         {
-            _otherPlayerState = _instance.GetOtherPlayerState(_user.Username);
+            _otherPlayerState = _instance.GetOtherPlayerState(_user);
             if (_otherPlayerState != null)
             {
                 RegisterEvents(_otherPlayerState);
