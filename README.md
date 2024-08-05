@@ -47,7 +47,7 @@ dotnet user-secrets --project SudokuVS.Server set "ConnectionStrings:AppDbContex
 ```
 or in any other source supported by the default ASP.NET Core configuration builder
 
-4. Run the app: in ``
+4. Run the app
 ```
 cd bin/Debug/net8.0
 ./SudokuVS.Server.exe 
