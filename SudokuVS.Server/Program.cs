@@ -9,7 +9,6 @@ using NSwag;
 using NSwag.AspNetCore;
 using NSwag.Generation.Processors.Security;
 using Serilog;
-using SudokuVS.Apps.Common.Logging;
 using SudokuVS.Game.Infrastructure.Database;
 using SudokuVS.Game.Utils;
 using SudokuVS.Server;
@@ -17,6 +16,7 @@ using SudokuVS.Server.Areas.App.Components;
 using SudokuVS.Server.Exceptions;
 using SudokuVS.Server.Infrastructure.Database;
 using SudokuVS.Server.Infrastructure.Emails;
+using SudokuVS.Server.Infrastructure.Logging;
 using SudokuVS.Server.Services;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 

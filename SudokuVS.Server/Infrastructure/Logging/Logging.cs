@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Hosting;
-using Serilog;
+﻿using Serilog;
 using Serilog.Events;
 using Serilog.Extensions.Hosting;
 
-namespace SudokuVS.Apps.Common.Logging;
+namespace SudokuVS.Server.Infrastructure.Logging;
 
 public static class Logging
 {

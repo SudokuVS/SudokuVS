@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Serilog;
+﻿using Serilog;
 
-namespace SudokuVS.Apps.Common.Logging;
+namespace SudokuVS.Server.Infrastructure.Logging;
 
 public static class SerilogAspNetExtensions
 {
