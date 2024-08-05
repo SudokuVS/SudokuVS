@@ -1,0 +1,25 @@
+﻿@page
+@using SudokuVS.Server
+
+<div class="h-100 w-100 d-flex align-items-center justify-content-center">
+    <div class="w-100 px-4 pt-5 my-5 text-center">
+        <h1 class="display-4 fw-bold text-body-emphasis">Play Sudoku against your friends</h1>
+        <div class="col-lg-6 mx-auto">
+            <p></p>
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4 mb-5">
+                <a class="btn btn-primary btn-lg p-2 px-4 me-sm-3" href="/app">
+                    <i class="bi bi-window pe-1"></i>
+                    Web App
+                    <i class="bi bi-arrow-right ps-2"></i>
+                </a>
+                <a class="btn btn-outline-primary btn-lg p-2 px-4 me-sm-3" href="@Constants.GithubRepository">
+                    View on github
+                    <i class="bi bi-box-arrow-up-right ps-2"></i>
+                </a>
+            </div>
+        </div>
+        <div class="container px-5">
+            <img class="img-fluid border rouunded-3 shadow-lg mb-4" src="img/game_screenshot.png" alt="Screenshot of the web app" loading="lazy"/>
+        </div>
+    </div>
+</div>

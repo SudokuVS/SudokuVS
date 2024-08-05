@@ -1,0 +1,20 @@
+﻿@page "{gameId}"
+@using Microsoft.AspNetCore.Components.Web
+@using SudokuVS.Server.Areas.App.Components
+@model SudokuVS.Server.Areas.App.Pages.GamePage
+
+@{
+    Layout = "_SimpleLayout";
+}
+
+<component type="typeof(GameComponent)" render-mode="ServerPrerendered" param-GameId="@Model.GameId"/>
+
+@section Head {
+    <link href="/SudokuVS.Server.styles.css" rel="stylesheet">
+    <base href="/"/>
+    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered"/>
+}
+
+@section Scripts {
+    <script src="/_framework/blazor.web.js"></script>
+}
