@@ -3,4 +3,6 @@
 
 # SudokuVS
 
-Play SUDOKU against friends.
+Play SUDOKU against your friends.
+
+[https://sudokuvs.azurewebsites.net](https://sudokuvs.azurewebsites.net)
