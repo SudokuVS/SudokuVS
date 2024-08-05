@@ -6,7 +6,7 @@ class SudokuGamesInMemory : ISudokuGamesRepository
 {
     readonly ConcurrentDictionary<Guid, SudokuGame> _games = new();
 
-    public IAsyncEnumerable<SudokuGame> GetAllAsync(CancellationToken cancellationToken = default) => _games.Values.ToAsyncEnumerable();
+    public Task<IReadOnlyList<SudokuGame>> GetAllAsync(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<SudokuGame>>(_games.Values.ToArray());
     public Task<bool> ExistsAsync(Guid id, CancellationToken _ = default) => Task.FromResult(_games.ContainsKey(id));
     public Task<SudokuGame?> GetAsync(Guid id, CancellationToken _ = default) => Task.FromResult(_games.GetValueOrDefault(id));
 

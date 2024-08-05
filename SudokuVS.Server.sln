@@ -1,14 +1,10 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SudokuVS.WebApp", "SudokuVS.WebApp\SudokuVS.WebApp.csproj", "{0B0B0689-65B6-4BB3-AE86-B0DE4F2765BC}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SudokuVS.Sudoku", "SudokuVS.Sudoku\SudokuVS.Sudoku.csproj", "{9C0C32B5-7C21-4D1F-BF3C-95BF357BA2F6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SudokuVS.Game", "SudokuVS.Game\SudokuVS.Game.csproj", "{5932EEF4-FEF7-40AD-95AA-F7D411CE34F5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SudokuVS.WebApi", "SudokuVS.WebApi\SudokuVS.WebApi.csproj", "{F8F3DA61-4182-4B77-BC17-E5081B104526}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SudokuVS.Apps.Common", "SudokuVS.Apps.Common\SudokuVS.Apps.Common.csproj", "{4894C8F1-09C8-40E8-AD05-8E8266BD96B0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SudokuVS.Server", "SudokuVS.Server\SudokuVS.Server.csproj", "{F8F3DA61-4182-4B77-BC17-E5081B104526}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Sudoku", "Tests.Sudoku\Tests.Sudoku.csproj", "{CC767DA9-73E6-4F90-9380-57AC039021A1}"
 EndProject
@@ -20,10 +16,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0B0B0689-65B6-4BB3-AE86-B0DE4F2765BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0B0B0689-65B6-4BB3-AE86-B0DE4F2765BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0B0B0689-65B6-4BB3-AE86-B0DE4F2765BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0B0B0689-65B6-4BB3-AE86-B0DE4F2765BC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9C0C32B5-7C21-4D1F-BF3C-95BF357BA2F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9C0C32B5-7C21-4D1F-BF3C-95BF357BA2F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C0C32B5-7C21-4D1F-BF3C-95BF357BA2F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -36,10 +28,6 @@ Global
 		{F8F3DA61-4182-4B77-BC17-E5081B104526}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F8F3DA61-4182-4B77-BC17-E5081B104526}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F8F3DA61-4182-4B77-BC17-E5081B104526}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4894C8F1-09C8-40E8-AD05-8E8266BD96B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4894C8F1-09C8-40E8-AD05-8E8266BD96B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4894C8F1-09C8-40E8-AD05-8E8266BD96B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4894C8F1-09C8-40E8-AD05-8E8266BD96B0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CC767DA9-73E6-4F90-9380-57AC039021A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CC767DA9-73E6-4F90-9380-57AC039021A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CC767DA9-73E6-4F90-9380-57AC039021A1}.Release|Any CPU.ActiveCfg = Release|Any CPU

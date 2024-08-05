@@ -10,7 +10,7 @@ using SudokuVS.Game.Infrastructure.Database;
 
 namespace SudokuVS.Game.Infrastructure.Database.Migrations
 {
-    [DbContext(typeof(AppDbContext))]
+    [DbContext(typeof(GameDbContext))]
     partial class AppDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

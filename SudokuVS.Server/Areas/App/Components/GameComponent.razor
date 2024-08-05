@@ -1,0 +1,211 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using SudokuVS.Game
+@using SudokuVS.Game.Models
+@using SudokuVS.Game.Persistence
+@using SudokuVS.Game.Users
+@using SudokuVS.Server.Services
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IJSRuntime JsRuntime
+@inject ISudokuGamesRepository Repository
+@inject GameplayService GameplayService
+
+@if (_instance != null)
+{
+    <div class="container-lg py-3">
+        <GameSummaryComponent GameId="_instance.Id"></GameSummaryComponent>
+
+        <hr class="mb-5"/>
+
+        @if (_playerState == null)
+        {
+            // Player is not the game, they can join as player 1
+            <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+                <button class="btn btn-outline-primary" @onclick="JoinGame">Join</button>
+            </div>
+        }
+        else if (!_instance.IsStarted)
+        {
+            // Player is in the game, this side is empty and waiting for an opponent
+            <div class="w-100 h-100 d-flex flex-column gap-2 align-items-center justify-content-center">
+                <h3>No opponent has joined yet!</h3>
+                <div class="position-relative d-flex align-items-center gap-4 border border-secondary-subtle rounded px-2 text-nowrap">
+                    <div id="invitation-link-container" class="font-monospace text-secondary">
+                        @GetOtherPlayerInvitationLink()
+                    </div>
+                    <a class="btn btn-outline-primary my-2 stretched-link" @onclick="CopyInvitationLinkAsync" id="copy-invitation-link-button">
+                        <i class="bi bi-clipboard"></i>
+                    </a>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="w-100 d-flex gap-5">
+                <div class="flex-grow-1">
+                    <div class="mb-1">
+                        <ProgressBarComponent Label="Total" LabelCols="3" Value="@GetFilledCellsCount()" MaxValue="@GetToFillCellsCount()" ProgressBarColor="ProgressBarComponent.Color.Yellow"/>
+                    </div>
+                    @for (int i = 1; i <= 9; i++)
+                    {
+                        <div class="mb-1">
+                            <ProgressBarComponent Label="@i.ToString()" LabelCols="3" Value="@GetFilledCellsCount(i)" MaxValue="@GetToFillCellsCount(i)" ProgressBarColor="ProgressBarComponent.Color.Yellow"/>
+                        </div>
+                    }
+
+                    @if (_instance.Options.MaxHints > 0)
+                    {
+                        <div class="mb-1">
+                            <ProgressBarComponent Label="Hints" LabelCols="3" Value="@_playerState.RemainingHints" MaxValue="@_instance.Options.MaxHints" ProgressBarColor="ProgressBarComponent.Color.Orange"/>
+                        </div>
+                    }
+                </div>
+                <div>
+                    <CurrentPlayerComponent PlayerState="_playerState" OtherPlayerState="_otherPlayerState"></CurrentPlayerComponent>
+                </div>
+                <div class="flex-grow-1">
+                    <div class="mb-1">
+                        <ProgressBarComponent Label="Total" LabelCols="3" Value="@GetOtherPlayerFilledCellsCount()" MaxValue="@GetToFillCellsCount()" ProgressBarColor="ProgressBarComponent.Color.Blue"/>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center">
+        <div class="text-danger">Game not found</div>
+        <a href="/">Go back</a>
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public string? GameId { get; set; }
+
+    UserIdentity? _user;
+    SudokuGame? _instance;
+    PlayerState? _playerState;
+    IHiddenPlayerState? _otherPlayerState;
+
+    IJSObjectReference? _gameModule;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (GameId == null || !Guid.TryParse(GameId, out Guid gameId))
+        {
+            return;
+        }
+
+        AuthenticationState authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        _user = authState.User.GetUserIdentity();
+        if (_user == null)
+        {
+            return;
+        }
+
+        _instance = await Repository.GetAsync(gameId);
+        if (_instance == null)
+        {
+            return;
+        }
+
+        _instance.PlayerJoined += OnPlayerJoined;
+        _instance.GameOver += (_, _) => OnStateChange();
+
+        UpdatePlayers();
+    }
+
+    void UpdatePlayers()
+    {
+        if (_instance == null)
+        {
+            _playerState = null;
+            return;
+        }
+
+        if (_user == null)
+        {
+            _playerState = null;
+            return;
+        }
+
+        if (_playerState == null)
+        {
+            _playerState = _instance.GetPlayerState(_user.ExternalId);
+
+            if (_playerState != null)
+            {
+                RegisterEvents(_playerState);
+            }
+        }
+
+        if (_otherPlayerState == null)
+        {
+            _otherPlayerState = _instance.GetOtherPlayerState(_user.ExternalId);
+            if (_otherPlayerState != null)
+            {
+                RegisterEvents(_otherPlayerState);
+            }
+        }
+    }
+
+    async Task JoinGame()
+    {
+        if (_instance == null || _user == null)
+        {
+            return;
+        }
+
+        await GameplayService.JoinGameAsync(_instance.Id, _user);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _gameModule ??= await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./Areas/App/Components/GameComponent.razor.js");
+    }
+
+    void OnPlayerJoined(object? __, PlayerSide side) =>
+        _ = InvokeAsync(
+            () =>
+            {
+                UpdatePlayers();
+                StateHasChanged();
+            }
+        );
+
+    void OnStateChange() => _ = InvokeAsync(StateHasChanged);
+
+    void RegisterEvents(IHiddenPlayerState state)
+    {
+        state.HintAdded += (_, _) => OnStateChange();
+        state.Grid.CellElementChanged += (_, _) => OnStateChange();
+        state.Grid.CellAnnotationsChanged += (_, _) => OnStateChange();
+    }
+
+    string GetOtherPlayerInvitationLink() => _instance == null ? "" : $"{Navigation.BaseUri}app/game/{_instance.Id}";
+
+    async Task CopyInvitationLinkAsync()
+    {
+        if (_gameModule == null)
+        {
+            return;
+        }
+
+        await _gameModule.InvokeVoidAsync("copyInvitationLink", GetOtherPlayerInvitationLink());
+    }
+
+    int GetFilledCellsCount() => _instance == null || _playerState == null ? 0 : _playerState.Grid.Enumerate().Count(cell => _instance.InitialGrid[cell.Row, cell.Column].IsEmpty && !cell.IsEmpty);
+    int GetOtherPlayerFilledCellsCount() => _instance == null || _otherPlayerState == null ? 0 : _otherPlayerState.Grid.Enumerate().Count(cell => _instance.InitialGrid[cell.Row, cell.Column].IsEmpty && !cell.IsEmpty);
+    int GetToFillCellsCount() => _instance?.InitialGrid.Enumerate().Count(cell => cell is { IsEmpty: true }) ?? 1;
+
+    int GetFilledCellsCount(int element) => _instance == null || _playerState == null ? 0 : _playerState.Grid.Enumerate().Count(cell => _instance.InitialGrid[cell.Row, cell.Column].IsEmpty && cell.Element == element);
+    int GetToFillCellsCount(int element) => _instance == null ? 9 : 9 - _instance.InitialGrid.Enumerate().Count(cell => cell.Element == element);
+}

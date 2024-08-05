@@ -1,0 +1,330 @@
+﻿@if (Grid != null)
+{
+    <div class="@ComputeGridStyle()">
+        @for (int i = 0; i < Grid.GetLength(0); i++)
+        {
+            @for (int j = 0; j < Grid.GetLength(1); j++)
+            {
+                int row = i;
+                int column = j;
+
+                <div class="@ComputeCellStyle(row, column)">
+
+                    <span class="@ComputeCellContentStyle(row, column)">@Grid[row, column].Content</span>
+
+
+                    @{
+                        string? annotation = Grid[row, column].Annotation;
+                        string? annotationIcon = Grid[row, column].AnnotationIcon;
+
+                        if (annotation != null || annotationIcon != null)
+                        {
+                            if (annotationIcon != null)
+                            {
+                                <div class="@ComputeAnnotationStyle(row, column)">
+                                    <i class="bi bi-@annotationIcon"></i>
+                                </div>
+                            }
+
+                            if (annotation != null)
+                            {
+                                <div class="@ComputeAnnotationStyle(row, column)">
+                                    @((MarkupString)annotation!)
+                                </div>
+                            }
+                        }
+                    }
+
+                    @if (!Disabled)
+                    {
+                        <a class="stretched-link" type="button"
+                           @onclick="async () => await CellClickedAsync(row, column)" @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                           @oncontextmenu="async () => await CellRightClickedAsync(row, column)" @oncontextmenu:preventDefault="true" @oncontextmenu:stopPropagation="true">
+                        </a>
+                    }
+                </div>
+            }
+        }
+
+        <div class="regions">
+            @for (int i = 0; i < Grid.GetLength(0) / RegionSize; i++)
+                @for (int j = 0; j < Grid.GetLength(0) / RegionSize; j++)
+            {
+                <div class="border border-secondary"></div>
+            }
+        </div>
+
+        <div class="rows">
+            @for (int i = 0; i < Grid.GetLength(0); i++)
+            {
+                <div class="@ComputeRowStyle(i)"></div>
+            }
+        </div>
+
+        <div class="columns">
+            @for (int i = 0; i < Grid.GetLength(0); i++)
+            {
+                <div class="@ComputeColumnStyle(i)"></div>
+            }
+        </div>
+
+        <div class="regions">
+            @for (int i = 0; i < Grid.GetLength(0) / RegionSize; i++)
+                @for (int j = 0; j < Grid.GetLength(0) / RegionSize; j++)
+            {
+                <div class="@ComputeRegionStyle(i, j)"></div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    const int RegionSize = 3;
+
+    [Parameter]
+    public Cell[,]? Grid { get; set; }
+
+    [Parameter]
+    public Color[] RowBorderColor { get; set; } = [];
+
+    [Parameter]
+    public Color[] ColumnBorderColor { get; set; } = [];
+
+    [Parameter]
+    public Color[,] RegionBorderColor { get; set; } = new Color[0, 0];
+
+    [Parameter]
+    public bool HideCellBorders { get; set; }
+
+    [Parameter]
+    public Size GridSize { get; set; } = Size.Medium;
+
+    [Parameter]
+    public bool Disabled { get; set; } = false;
+
+    [Parameter]
+    public EventCallback<(int, int)> OnCellClicked { get; set; }
+
+    [Parameter]
+    public EventCallback<(int, int)> OnCellRightClicked { get; set; }
+
+    string ComputeGridStyle() => $"sudoku-grid {GetSizeStyle(GridSize)} position-relative";
+
+    string? ComputeRowStyle(int row) => row < RowBorderColor.Length ? GetBorderColorStyle(RowBorderColor[row]) : null;
+
+    string? ComputeColumnStyle(int row) => row < ColumnBorderColor.Length ? GetBorderColorStyle(ColumnBorderColor[row]) : null;
+
+    string? ComputeRegionStyle(int row, int column) => row < RegionBorderColor.GetLength(0) && column < RegionBorderColor.GetLength(1) ? GetBorderColorStyle(RegionBorderColor[row, column]) : null;
+
+    string ComputeCellStyle(int row, int column)
+    {
+        if (Grid == null)
+        {
+            return "";
+        }
+
+        Cell cell = Grid[row, column];
+        return $"cell {GetSizeStyle(GridSize)} {GetBgColorStyle(cell.BackgroundColor)} {GetBorderColorStyle(cell.BorderColor) ?? (HideCellBorders ? null : "border border-secondary-subtle")} position-relative";
+    }
+
+    string ComputeCellContentStyle(int row, int column)
+    {
+        if (Grid == null)
+        {
+            return "";
+        }
+
+        Cell cell = Grid[row, column];
+        return $"{GetFontStyle(cell.FontModifiers)} {GetTextColorStyle(cell.TextColor)}";
+    }
+
+    string ComputeAnnotationStyle(int row, int column)
+    {
+        if (Grid == null)
+        {
+            return "";
+        }
+
+        Cell cell = Grid[row, column];
+        return $"annotation {GetBgColorStyle(cell.AnnotationBackgroundColor)} {GetTextColorStyle(cell.TextColor)}";
+    }
+
+    static string GetSizeStyle(Size size) =>
+        size switch
+        {
+            Size.XSmall => "xsmall",
+            Size.Small => "small",
+            Size.Medium => "medium",
+            Size.Big => "big",
+            _ => ""
+        };
+
+    static string GetFontStyle(FontModifiers modifiers)
+    {
+        List<string> result = [];
+
+        if (modifiers.HasFlag(FontModifiers.Bold))
+        {
+            result.Add("fw-bold");
+        }
+
+        if (modifiers.HasFlag(FontModifiers.Underline))
+        {
+            result.Add("text-decoration-underline");
+        }
+
+        return string.Join(" ", result);
+    }
+
+
+    string? GetBorderColorStyle(Color color) =>
+        color switch
+        {
+            Color.Default => null,
+            Color.LightGrey => "border-light-grey",
+            Color.Grey => "border-grey",
+            Color.LightPink => "border-light-pink",
+            Color.Pink => "border-pink",
+            Color.LightBlue => "border-light-blue",
+            Color.Blue => "border-blue",
+            Color.Yellow => "border-yellow",
+            Color.Red => "border-red",
+            Color.Green => "border-green",
+            Color.Orange => "border-orange",
+            Color.Dark1 => "border-dark1",
+            Color.Dark2 => "border-dark2",
+            Color.Dark3 => "border-dark3",
+            Color.Dark4 => "border-dark4",
+            Color.Dark5 => "border-dark5",
+            Color.Dark6 => "border-dark6",
+            Color.Dark7 => "border-dark7",
+            Color.Dark8 => "border-dark8",
+            Color.Dark9 => "border-dark9",
+            _ => null
+        };
+
+    static string GetBgColorStyle(Color color) =>
+        color switch
+        {
+            Color.Default => "",
+            Color.LightGrey => "bg-light-grey",
+            Color.Grey => "bg-grey",
+            Color.LightPink => "bg-light-pink",
+            Color.Pink => "bg-pink",
+            Color.LightBlue => "bg-light-blue",
+            Color.Blue => "bg-blue",
+            Color.Yellow => "bg-yellow",
+            Color.Red => "bg-red",
+            Color.Green => "bg-green",
+            Color.Orange => "bg-orange",
+            Color.Dark1 => "bg-dark1",
+            Color.Dark2 => "bg-dark2",
+            Color.Dark3 => "bg-dark3",
+            Color.Dark4 => "bg-dark4",
+            Color.Dark5 => "bg-dark5",
+            Color.Dark6 => "bg-dark6",
+            Color.Dark7 => "bg-dark7",
+            Color.Dark8 => "bg-dark8",
+            Color.Dark9 => "bg-dark9",
+            _ => ""
+        };
+
+    static string GetTextColorStyle(Color color) =>
+        color switch
+        {
+            Color.Default => "",
+            Color.LightGrey => "txt-light-grey",
+            Color.Grey => "txt-grey",
+            Color.LightPink => "txt-light-pink",
+            Color.Pink => "txt-pink",
+            Color.LightBlue => "txt-light-blue",
+            Color.Blue => "txt-blue",
+            Color.Yellow => "txt-yellow",
+            Color.Red => "txt-red",
+            Color.Green => "txt-green",
+            Color.Orange => "txt-orange",
+            Color.Dark1 => "txt-dark1",
+            Color.Dark2 => "txt-dark2",
+            Color.Dark3 => "txt-dark3",
+            Color.Dark4 => "txt-dark4",
+            Color.Dark5 => "txt-dark5",
+            Color.Dark6 => "txt-dark6",
+            Color.Dark7 => "txt-dark7",
+            Color.Dark8 => "txt-dark8",
+            Color.Dark9 => "txt-dark9",
+            _ => ""
+        };
+
+    async Task CellClickedAsync(int row, int column)
+    {
+        if (Disabled)
+        {
+            return;
+        }
+
+        await OnCellClicked.InvokeAsync((row, column));
+    }
+
+    async Task CellRightClickedAsync(int row, int column)
+    {
+        if (Disabled)
+        {
+            return;
+        }
+
+        await OnCellRightClicked.InvokeAsync((row, column));
+    }
+
+    public class Cell
+    {
+        public string? Content { get; set; }
+        public string? Annotation { get; set; }
+        public string? AnnotationIcon { get; set; }
+        public FontModifiers FontModifiers { get; set; }
+        public Color TextColor { get; set; }
+        public Color BorderColor { get; set; }
+        public Color BackgroundColor { get; set; }
+        public Color AnnotationBackgroundColor { get; set; }
+    }
+
+    public enum Color
+    {
+        Default,
+        LightGrey,
+        Grey,
+        LightPink,
+        Pink,
+        LightBlue,
+        Blue,
+        Yellow,
+        Red,
+        Green,
+        Orange,
+        Dark1,
+        Dark2,
+        Dark3,
+        Dark4,
+        Dark5,
+        Dark6,
+        Dark7,
+        Dark8,
+        Dark9
+    }
+
+    public enum Size
+    {
+        XSmall,
+        Small,
+        Medium,
+        Big
+    }
+
+    [Flags]
+    public enum FontModifiers
+    {
+        None = 0,
+        Bold = 1<<1,
+        Underline = 1<<2
+    }
+
+}

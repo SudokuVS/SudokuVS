@@ -13,6 +13,8 @@ public class HiddenPlayerState : IHiddenPlayerState
         _state = state;
     }
 
+    public event EventHandler? HintAdded { add => _state.HintAdded += value; remove => _state.HintAdded -= value; }
+
     public UserIdentity User => _state.User;
     public IHiddenSudokuGrid Grid => _state.Grid;
     public PlayerSide Side => _state.Side;

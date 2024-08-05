@@ -1,0 +1,154 @@
+/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification\
+for details on configuring this project to bundle and minify static web assets. */
+
+/* region Variable */
+
+html {
+    --color-light-grey: lightgray;
+    --color-grey: gray;
+    --color-light-pink: pink;
+    --color-pink: hotpink;
+    --color-light-blue: lightcyan;
+    --color-blue: lightblue;
+    --color-yellow: gold;
+    --color-red: red;
+    --color-green: green;
+    --color-orange: orangered;
+    --color-dark1: #F0F0F0;
+    --color-dark2: #E0E0E0;
+    --color-dark3: #D0D0D0;
+    --color-dark4: #C0C0C0;
+    --color-dark5: #B0B0B0;
+    --color-dark6: #A0A0A0;
+    --color-dark7: #909090;
+    --color-dark8: #808080;
+    --color-dark9: #707070;
+}
+
+/* endregion */
+
+a.navbar-brand {
+    white-space: normal;
+    text-align: center;
+    word-break: break-all;
+}
+
+a {
+    color: #0077cc;
+}
+
+.form-control:focus {
+    border-color: #0077cc;
+    box-shadow: 0 0 0 0.2rem #0077cc;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
+}
+
+.btn-link.nav-link:focus {
+    outline: black auto 1px;
+}
+
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+.pricing-header {
+    max-width: 700px;
+}
+
+.border-top {
+    border-top: 1px solid #e5e5e5;
+}
+
+.border-bottom {
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.box-shadow {
+    box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+button.accept-policy {
+    font-size: 1rem;
+    line-height: inherit;
+}
+
+.wrap-anywhere {
+    overflow-wrap: anywhere;
+    word-break: break-all
+}
+
+html, body {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.header {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    height: 64px;
+}
+
+.main {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    padding-top: 64px;
+    padding-bottom: 32px;
+    z-index: -9999;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    height: 32px;
+    background-color: white;
+}
+
+/* Sign in */
+
+.signin-form, .register-form {
+    width: 330px;
+    padding: 1rem;
+}
+
+.signin-form .form-floating:focus-within {
+    z-index: 2;
+}
+
+.signin-form input[type="email"] {
+    margin-bottom: -1px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.signin-form input[type="password"] {
+    margin-bottom: 10px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+/* endregion */

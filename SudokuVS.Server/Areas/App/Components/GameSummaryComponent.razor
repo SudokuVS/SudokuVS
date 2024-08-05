@@ -1,0 +1,116 @@
+﻿@using SudokuVS.Game
+@using SudokuVS.Game.Models
+@using SudokuVS.Server.Services
+@inject IJSRuntime JsRuntime
+@inject GamesService GamesService
+
+<div class="d-flex gap-4">
+    @if (Game != null)
+    {
+        <div class="d-flex align-items-center justify-content-center">
+            <GridIconComponent Grid="Game.InitialGrid" HideState="!Game.IsStarted"></GridIconComponent>
+        </div>
+        <div class="flex-grow-1 d-flex gap-2">
+            <div class="d-flex align-items-center justify-content-center">
+                vs.
+            </div>
+            <div class="flex-grow-1">
+                @switch (Game.Winner)
+                {
+                    case PlayerSide.Player1:
+                        <div class="flex-grow-1">
+                            <div class="fs-5 fw-semibold text-success text-truncate">@(Game.Player1?.User.Name ?? "???")</div>
+                            <div class="fs-5 fw-semibold text-danger text-truncate">@(Game.Player2?.User.Name ?? "???")</div>
+                        </div>
+                        break;
+                    case PlayerSide.Player2:
+                        <div class="flex-grow-1">
+                            <div class="fs-5 fw-semibold text-danger" text-truncate>@(Game.Player1?.User.Name ?? "???")</div>
+                            <div class="fs-5 fw-semibold text-success" text-truncate>@(Game.Player2?.User.Name ?? "???")</div>
+                        </div>
+                        break;
+                    default:
+                        <div class="flex-grow-1">
+                            <div class="fs-5 fw-semibold text-truncate">@(Game.Player1?.User.Name ?? "???")</div>
+                            <div class="fs-5 fw-semibold text-truncate">@(Game.Player2?.User.Name ?? "???")</div>
+                        </div>
+                        break;
+                }
+                <div class="lead">
+                    @if (Game.IsStarted)
+                    {
+                        @:Round 1
+                    }
+                    else if (!Game.IsOver)
+                    {
+                        @:<i class="bi bi-hourglass-split ps-2"></i> In preparation
+                    }
+                </div>
+            </div>
+        </div>
+
+        @if (Game.IsStarted)
+        {
+            <div class="d-flex align-items-center justify-content-center">
+                <span class="timer-@Game.Id font-monospace fs-4">
+                    @GetElapsedTime()
+                </span>
+            </div>
+        }
+    }
+</div>
+
+@code {
+
+    IJSObjectReference? _gameSummaryModule;
+
+    [Parameter]
+    public Guid GameId { get; set; }
+
+    public SudokuGame? Game { get; set; }
+
+    protected override async Task OnInitializedAsync() => Game = await GamesService.GetGameAsync(GameId);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _gameSummaryModule ??= await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./Areas/App/Components/GameSummaryComponent.razor.js");
+        }
+
+        if (_gameSummaryModule != null && Game is { StartDate: not null })
+        {
+            await _gameSummaryModule.InvokeVoidAsync("startTimer", $"timer-{Game.Id}", Game.StartDate);
+        }
+    }
+
+    string GetElapsedTime()
+    {
+        if (Game == null)
+        {
+            return "";
+        }
+
+        TimeSpan time;
+        if (Game.IsOver)
+        {
+            time = Game.EndDate.Value - Game.StartDate.Value;
+        }
+        else if (Game.IsStarted)
+        {
+            time = DateTime.Now - Game.StartDate.Value;
+        }
+        else
+        {
+            time = TimeSpan.Zero;
+        }
+
+        if (time.TotalHours >= 1)
+        {
+            return $"{time.TotalHours:0.}:{time.Minutes:00}:{time.Seconds:00}";
+        }
+
+        return $"{time.TotalMinutes:00}:{time.Seconds:00}";
+    }
+
+}
