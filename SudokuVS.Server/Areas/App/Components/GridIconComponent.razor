@@ -45,6 +45,8 @@
             _cells[i, j].BackgroundColor = HideState ? GridComponent.Color.Default : GetBackgroundColor(Grid[i, j].Element);
             _cells[i, j].BorderColor = GridComponent.Color.Default;
         }
+
+        StateHasChanged();
     }
 
     static GridComponent.Color GetBackgroundColor(int? element) =>

@@ -7,7 +7,7 @@
     <div class="d-flex flex-column align-items-center justify-content-center gap-4">
         <GridComponent Grid="_displayGrid" GridSize="GridComponent.Size.Big" OnCellClicked="OnCellClicked" OnCellRightClicked="OnCellRightClicked" RowBorderColor="_rowBorderColors" ColumnBorderColor="_columnBorderColors" RegionBorderColor="_regionBorderColors"/>
         <div class="controls d-flex gap-2 align-items-center justify-content-center">
-            @if (_selectedCell.HasValue && !_selectedCellLocked)
+            @if (_selectedCell.HasValue && !SelectedCellLocked)
             {
                 @if (_annotationMode)
                 {
@@ -65,7 +65,6 @@
     GridComponent.Color[]? _columnBorderColors;
     GridComponent.Color[,]? _regionBorderColors;
     (int Row, int Column)? _selectedCell;
-    bool _selectedCellLocked;
     bool _annotationMode;
 
     [Parameter]
@@ -76,6 +75,9 @@
 
     SudokuGame? Game => PlayerState?.Game;
     SudokuGrid? Grid => PlayerState?.Grid;
+    bool SelectedCellLocked => Grid == null || _selectedCell == null || Grid[_selectedCell.Value.Row, _selectedCell.Value.Column].IsLocked;
+
+    public void OnStateChanged() => UpdateGrid();
 
     protected override void OnInitialized() => UpdateGrid();
 
@@ -88,15 +90,13 @@
                 _interop.KeyupEvent += OnKeyPress;
             }
         }
-
-        UpdateGrid();
     }
 
     string GetElementStyle(int? element)
     {
         string result = "btn ";
 
-        if (Game == null || Game.IsOver || Grid == null || !_selectedCell.HasValue || _selectedCellLocked)
+        if (Game == null || Game.IsOver || Grid == null || !_selectedCell.HasValue || SelectedCellLocked)
         {
             result += "disabled";
         }
@@ -120,7 +120,7 @@
     {
         string result = "btn ";
 
-        if (Game == null || Game.IsOver || Grid == null || !_selectedCell.HasValue || _selectedCellLocked)
+        if (Game == null || Game.IsOver || Grid == null || !_selectedCell.HasValue || SelectedCellLocked)
         {
             result += "disabled";
         }
@@ -153,7 +153,7 @@
 
     void SetSelectedCellElement(int? element)
     {
-        if (Game == null || Game.IsOver || !_selectedCell.HasValue || _selectedCellLocked)
+        if (Game == null || Game.IsOver || !_selectedCell.HasValue || SelectedCellLocked)
         {
             return;
         }
@@ -170,7 +170,7 @@
 
     void ToggleSelectedCellAnnotation(int element)
     {
-        if (Game == null || Game.IsOver || !_selectedCell.HasValue || _selectedCellLocked)
+        if (Game == null || Game.IsOver || !_selectedCell.HasValue || SelectedCellLocked)
         {
             return;
         }
@@ -180,7 +180,7 @@
 
     void ClearSelectedCellAnnotations()
     {
-        if (Game == null || Game.IsOver || !_selectedCell.HasValue || _selectedCellLocked)
+        if (Game == null || Game.IsOver || !_selectedCell.HasValue || SelectedCellLocked)
         {
             return;
         }
@@ -190,7 +190,7 @@
 
     void UseHintAtSelectedCell()
     {
-        if (Game == null || Game.IsOver || !_selectedCell.HasValue || _selectedCellLocked)
+        if (Game == null || Game.IsOver || !_selectedCell.HasValue || SelectedCellLocked)
         {
             return;
         }
@@ -274,8 +274,6 @@
             SudokuRegion region = Grid.Regions[i];
             _regionBorderColors[region.Row, region.Column] = region is { IsCompleted: true, IsValid: false } ? GridComponent.Color.Red : GridComponent.Color.Default;
         }
-
-        StateHasChanged();
     }
 
     bool IsHint(int row, int column) => PlayerState!.Hints.Contains((row, column));
@@ -305,7 +303,6 @@
 
         SudokuCell c = Grid[cell.Row, cell.Column];
         _selectedCell = cell;
-        _selectedCellLocked = c.IsLocked;
     }
 
     void OnKeyPress(object? __, KeyboardEventArgs args)
@@ -314,6 +311,11 @@
         {
             ToggleAnnotationMode();
             return;
+        }
+
+        if (args.Code is "h")
+        {
+            UseHintAtSelectedCell();
         }
 
         if (!TryGetElementFromCode(args.Code, out int? element))

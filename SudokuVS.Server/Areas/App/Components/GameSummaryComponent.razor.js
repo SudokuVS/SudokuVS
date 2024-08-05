@@ -43,4 +43,20 @@ export function startTimer(containerElementId, startTime) {
     }
 
     elementsToRegister[containerElementId] = new Date(startTime);
-} 
+}
+
+export function stopTimer(containerElementId) {
+    if (containerElementId in elementsToRegister) {
+        delete elementsToRegister[containerElementId];
+    }
+
+    if (elementsToUpdate) {
+        if (containerElementId in elementsToUpdate) {
+            for (const element of elementsToUpdate[containerElementId].elements) {
+                element.innerText = null;
+            }
+
+            delete elementsToRegister[containerElementId];
+        }
+    }
+}
