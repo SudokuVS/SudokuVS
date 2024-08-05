@@ -1,10 +1,10 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using SudokuVS.Server.Models;
 
 namespace SudokuVS.Server.Infrastructure.Database;
 
-class AppDbContext : IdentityDbContext<IdentityUser>
+class AppDbContext : IdentityDbContext<AppUser>
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
