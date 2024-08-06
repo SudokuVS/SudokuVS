@@ -37,10 +37,10 @@ public class GameplayController : ControllerBase
     ///     Create game
     /// </summary>
     [HttpPost]
-    public async Task<SudokuPlayerGameDto> CreateGameAsync(CreateGameRequest request)
+    public async Task<SudokuPlayerGameDto> StartNewGameAsync(CreateGameRequest request)
     {
         string user = _userManager.GetUserName(HttpContext.User) ?? throw new AccessDeniedException();
-        SudokuGame game = await _gameplayService.CreateGameAsync(request.Name, new SudokuGameOptions { MaxHints = request.Hints }, user);
+        SudokuGame game = await _gameplayService.StartNewGameAsync(request.Name, new SudokuGameOptions { MaxHints = request.Hints }, user);
         PlayerState playerState = game.GetPlayerState(user) ?? throw new InternalErrorException("Player has not joined game");
         return await ComputePlayerGameDto(game, playerState);
     }

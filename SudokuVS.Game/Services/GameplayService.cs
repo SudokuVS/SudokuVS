@@ -12,7 +12,7 @@ public class GameplayService
         _repository = repository;
     }
 
-    public async Task<SudokuGame> CreateGameAsync(string? gameName, SudokuGameOptions gameOptions, string creatorUser, CancellationToken cancellationToken = default)
+    public async Task<SudokuGame> StartNewGameAsync(string? gameName, SudokuGameOptions gameOptions, string creatorUser, CancellationToken cancellationToken = default)
     {
         SudokuGame? game = SudokuGame.Create(gameName, gameOptions);
         if (game == null)
