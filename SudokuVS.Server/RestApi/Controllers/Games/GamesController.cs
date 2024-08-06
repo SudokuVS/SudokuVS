@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SudokuVS.Game;
 using SudokuVS.Game.Abstractions;
-using SudokuVS.Game.Users;
 using SudokuVS.Server.Exceptions;
 using SudokuVS.Server.Infrastructure.Database.Models;
 using SudokuVS.Server.RestApi.Models;

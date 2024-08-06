@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using SudokuVS.Game.Users;
+using SudokuVS.Game;
 
 namespace SudokuVS.Server.RestApi.Models;
 

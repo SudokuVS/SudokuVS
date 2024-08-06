@@ -1,4 +1,4 @@
-﻿namespace SudokuVS.Game.Users;
+﻿namespace SudokuVS.Game;
 
 public class UserIdentity
 {

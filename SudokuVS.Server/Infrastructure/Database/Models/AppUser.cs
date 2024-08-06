@@ -3,7 +3,6 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SudokuVS.Game;
-using SudokuVS.Game.Users;
 
 namespace SudokuVS.Server.Infrastructure.Database.Models;
 
