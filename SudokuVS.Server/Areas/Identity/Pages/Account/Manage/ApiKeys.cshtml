@@ -1,0 +1,123 @@
+﻿@page
+@using System.Globalization
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using SudokuVS.Server.Areas.Identity.Pages.Account.Manage
+@using SudokuVS.Server.Infrastructure.Authentication
+@model SudokuVS.Server.Areas.Identity.Pages.Account.Manage.ApiKeys
+@{
+    ViewData["Title"] = "Manage your API keys";
+    ViewData["ActivePage"] = ManageNavPages.ApiKeys;
+}
+
+<partial name="_StatusMessage" for="StatusMessage"/>
+
+
+<div class="mb-4">
+    <form asp-page-handler="CreateKey" method="post">
+        <h3>New API key</h3>
+
+        <div class="form-floating mb-3">
+            <input id="name" class="form-control" placeholder="My awesome app"/>
+            <label for="name">Name (optional)</label>
+        </div>
+
+        <button type="submit" class="btn btn-outline-primary" title="Create new API key.">Create</button>
+    </form>
+</div>
+
+<h3>Keys</h3>
+<ul class="list-group">
+    @if (Model.Keys.Count == 0)
+    {
+        <li class="list-group-item text-muted text-center">No API keys.</li>
+    }
+    else
+    {
+        @foreach ((int index, ApiKey? key) in Model.Keys.Select((k, i) => (Index: i, Key: k)))
+        {
+            string keyName = key.Name ?? $"Key {index}";
+            string keyDate = key.CreationDate.ToString("f", CultureInfo.InvariantCulture);
+
+            <li class="list-group-item">
+                <div class="d-flex align-items-center justify-content-center">
+                    <div class="flex-grow-1">
+                        <div class="lead fw-semibold">
+                            @keyName
+                        </div>
+                        <div class="text-muted small">
+                            Created on @keyDate
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modal" title="See API key." onclick="setModalContent('@keyName', '@key.Token')">
+                            <i class="bi bi-eye"></i>
+                        </button>
+
+                        <form id="@($"remove-login-{keyName}")" asp-page-handler="RevokeKey" method="post">
+                            <input asp-for="@key.Token" name="token" type="hidden"/>
+                            <button type="submit" class="btn btn-outline-danger" title="Revoke this API key.">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </li>
+        }
+    }
+</ul>
+
+<!-- Modal -->
+<div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="modalLabel">API Key</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="api-key-name" class="form-label">Name</label>
+                    <input id="api-key-name" class="form-control" readonly/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="api-key-name" class="form-label">Token</label>
+                    <div id="api-key-token" class="form-control wrap-anywhere"></div>
+                </div>
+
+                <div class="d-flex justify-content-center my-2">
+                    <button class="btn btn-outline-primary" onclick="copyToken(this)">Copy token</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.setModalContent = (name, token) => {
+        const nameElement = document.getElementById("api-key-name");
+        if (nameElement) {
+            nameElement.value = name;
+        }
+        
+        const tokenElement = document.getElementById("api-key-token");
+        if (tokenElement) {
+            tokenElement.innerText = token;
+        }
+    };
+    
+    window.copyToken = button => {
+        const tokenElement = document.getElementById("api-key-token");
+        if (!tokenElement) {
+            return;
+        }
+
+
+        navigator.clipboard.writeText(tokenElement.innerText).then(() => {
+            button.textContent = "Copied!";
+            button.classList.remove("btn-outline-primary");
+            button.classList.add("btn-outline-secondary");
+        });
+        
+    }
+</script>
