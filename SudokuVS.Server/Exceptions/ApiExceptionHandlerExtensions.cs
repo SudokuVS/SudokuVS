@@ -65,7 +65,7 @@ static class ApiExceptionHandlerExtensions
         int statusCode = domainException switch
         {
             InvalidArgumentException => StatusCodes.Status400BadRequest,
-            InvalidKeyException => StatusCodes.Status400BadRequest,
+            ObjectNotFound => StatusCodes.Status400BadRequest,
             _ => StatusCodes.Status500InternalServerError
         };
 

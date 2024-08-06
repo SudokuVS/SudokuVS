@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using SudokuVS.Game;
-using SudokuVS.Game.Abstractions;
 using SudokuVS.Game.Services;
 using SudokuVS.Server.Exceptions;
 using SudokuVS.Server.Infrastructure.Database.Models;
@@ -22,16 +21,16 @@ namespace SudokuVS.Server.RestApi.Controllers.Games;
 public class GameplayController : ControllerBase
 {
     readonly UserManager<AppUser> _userManager;
-    readonly ISudokuGamesRepository _repository;
+    readonly GamesService _gamesService;
     readonly GameplayService _gameplayService;
 
     /// <summary>
     /// </summary>
-    public GameplayController(UserManager<AppUser> userManager, ISudokuGamesRepository repository, GameplayService gameplayService)
+    public GameplayController(UserManager<AppUser> userManager, GamesService gamesService, GameplayService gameplayService)
     {
         _userManager = userManager;
-        _repository = repository;
         _gameplayService = gameplayService;
+        _gamesService = gamesService;
     }
 
     /// <summary>
@@ -42,12 +41,7 @@ public class GameplayController : ControllerBase
     {
         string user = _userManager.GetUserName(HttpContext.User) ?? throw new AccessDeniedException();
         SudokuGame game = await _gameplayService.CreateGameAsync(request.Name, new SudokuGameOptions { MaxHints = request.Hints }, user);
-        PlayerState? playerState = game.GetPlayerState(user);
-        if (playerState == null)
-        {
-            throw new InternalErrorException("Player has not joined game");
-        }
-
+        PlayerState playerState = game.GetPlayerState(user) ?? throw new InternalErrorException("Player has not joined game");
         return await ComputePlayerGameDto(game, playerState);
     }
 
@@ -68,10 +62,8 @@ public class GameplayController : ControllerBase
     public async Task<SudokuPlayerGameDto> JoinGameAsync(Guid gameId, CancellationToken cancellationToken)
     {
         string user = _userManager.GetUserName(HttpContext.User) ?? throw new AccessDeniedException();
-
         SudokuGame game = await _gameplayService.JoinGameAsync(gameId, user, cancellationToken);
         PlayerState playerState = game.GetPlayerState(user) ?? throw new InternalErrorException("Player should have joined the game.");
-
         return await ComputePlayerGameDto(game, playerState);
     }
 
@@ -149,8 +141,10 @@ public class GameplayController : ControllerBase
     async Task<(SudokuGame game, PlayerState playerState)> GetGameAndPlayerStateAsync(Guid gameId, CancellationToken cancellationToken)
     {
         string user = _userManager.GetUserName(HttpContext.User) ?? throw new AccessDeniedException();
-        SudokuGame game = await _repository.GetAsync(gameId, cancellationToken) ?? throw new NotFoundException();
-        PlayerState playerState = game.GetPlayerState(user) ?? throw new NotFoundException();
+
+        SudokuGame game = await _gamesService.RequireGameAsync(gameId, cancellationToken);
+        PlayerState playerState = game.GetPlayerState(user) ?? throw new AccessDeniedException();
+
         return (game, playerState);
     }
 
