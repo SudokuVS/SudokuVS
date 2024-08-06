@@ -7,14 +7,14 @@
 @inject GamesService GamesService
 @inject UserManager<AppUser> UserManager
 
-<div class="w-100 overflow-hidden d-flex gap-4">
+<div class="w-100 overflow-hidden">
     @if (_game != null)
     {
-        <div class="d-flex align-items-center justify-content-center">
-            <GridIconComponent Grid="_game.InitialGrid" HideState="!_game.IsStarted"></GridIconComponent>
-        </div>
-        <div class="overflow-hidden flex-grow-1">
-            <div class="w-100">
+        <div class="d-flex gap-4">
+            <div class="d-flex align-items-center justify-content-center">
+                <GridIconComponent Grid="_game.InitialGrid" HideState="!_game.IsStarted"></GridIconComponent>
+            </div>
+            <div class="overflow-hidden flex-grow-1">
                 @{
                     string player1WinLoseStyle = _game.Winner switch { PlayerSide.Player1 => "text-success", PlayerSide.Player2 => "text-danger", _ => "" };
                     string player2WinLoseStyle = _game.Winner switch { PlayerSide.Player1 => "text-danger", PlayerSide.Player2 => "text-success", _ => "" };
@@ -31,25 +31,24 @@
                     </span>
                 </div>
             </div>
-
-            <div class="lead">
-                @if (_game.IsStarted)
-                {
-                    @:Round 1
-                }
-                else if (!_game.IsOver)
-                {
-                    @:<i class="bi bi-hourglass-split ps-2"></i> In preparation
-                }
-            </div>
         </div>
 
-        @if (_game.IsStarted)
+        @if (!_game.IsOver)
         {
-            <div class="d-flex align-items-center justify-content-center">
-                <span class="timer-@_game.Id font-monospace fs-4">
-                    @GetElapsedTime()
-                </span>
+            <div class="text-center">
+                @if (_game.IsStarted)
+                {
+                    <span class="timer-@_game.Id font-monospace fs-4">
+                        @GetElapsedTime()
+                    </span>
+                }
+                else
+                {
+                    <i class="bi bi-hourglass-split ps-2"></i>
+                    <span class="lead">
+                        In preparation
+                    </span>
+                }
             </div>
         }
     }
