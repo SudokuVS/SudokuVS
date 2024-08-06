@@ -26,10 +26,11 @@ public class Index : PageModel
 
     public IReadOnlyList<SudokuGame>? Games { get; set; }
 
-    public async Task OnGetAsync()
+    public void OnGet()
     {
+        string user = _userManager.GetUserName(HttpContext.User) ?? throw new AccessDeniedException();
         NewGame ??= new NewGameModel();
-        Games ??= await _gamesService.GetGamesAsync();
+        Games ??= _gamesService.GetGames(user).ToList();
     }
 
     public async Task<RedirectResult> OnPostAsync()

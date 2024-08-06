@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SudokuVS.Game;
-using SudokuVS.Game.Abstractions;
+using SudokuVS.Game.Services;
 using SudokuVS.Server.Exceptions;
 using SudokuVS.Server.Infrastructure.Database.Models;
 using SudokuVS.Server.RestApi.Models;
@@ -18,21 +18,33 @@ namespace SudokuVS.Server.RestApi.Controllers.Games;
 public class GamesController : ControllerBase
 {
     readonly UserManager<AppUser> _userManager;
-    readonly ISudokuGamesRepository _repository;
+    readonly GamesService _gamesService;
 
     /// <summary>
     /// </summary>
-    public GamesController(UserManager<AppUser> userManager, ISudokuGamesRepository repository)
+    public GamesController(UserManager<AppUser> userManager, GamesService gamesService)
     {
-        _repository = repository;
         _userManager = userManager;
+        _gamesService = gamesService;
     }
 
     /// <summary>
     ///     Search games
     /// </summary>
     [HttpGet]
-    public async Task<IEnumerable<SudokuGameSummaryDto>> SearchGames() => await Task.WhenAll((await _repository.GetAllAsync()).Select(ToSummaryDto));
+    public async Task<IEnumerable<SudokuGameSummaryDto>> SearchGames()
+    {
+        string user = _userManager.GetUserName(HttpContext.User) ?? throw new AccessDeniedException();
+        List<SudokuGame> games = _gamesService.GetGames(user).ToList();
+
+        List<SudokuGameSummaryDto> result = [];
+        foreach (SudokuGame game in games)
+        {
+            result.Add(await ToSummaryDto(game));
+        }
+
+        return result;
+    }
 
     /// <summary>
     ///     Get game summary
@@ -40,7 +52,7 @@ public class GamesController : ControllerBase
     [HttpGet("{id:guid}/summary")]
     public async Task<SudokuGameSummaryDto> GetGameSummary(Guid id)
     {
-        SudokuGame? game = await _repository.GetAsync(id);
+        SudokuGame? game = await _gamesService.GetGameAsync(id);
         if (game == null)
         {
             throw new NotFoundException();
