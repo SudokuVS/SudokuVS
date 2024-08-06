@@ -65,16 +65,17 @@
     string? _player1Name;
     string? _player2Name;
 
-    public async Task OnStateHasChangedAsync() => await UpdateGame();
+    public async Task OnStateHasChangedAsync() => await UpdateGameAsync();
 
-    protected override async Task OnInitializedAsync() => await UpdateGame();
-    protected override async Task OnParametersSetAsync() => await UpdateGame();
+    protected override async Task OnInitializedAsync() => await UpdateGameAsync();
+    protected override async Task OnParametersSetAsync() => await UpdateGameAsync();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             _gameSummaryModule ??= await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./Areas/App/Components/GameSummaryComponent.razor.js");
+            await UpdateGameAsync();
         }
     }
 
@@ -107,7 +108,7 @@
         return $"{time.TotalMinutes:00}:{time.Seconds:00}";
     }
 
-    async Task UpdateGame()
+    async Task UpdateGameAsync()
     {
         await using AppDbContext appContext = await AppContextFactory.CreateDbContextAsync();
 

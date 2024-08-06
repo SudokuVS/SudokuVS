@@ -38,7 +38,7 @@ public class Index : PageModel
         NewGame ??= new NewGameModel();
 
         string user = _userManager.GetUserName(HttpContext.User) ?? throw new AccessDeniedException();
-        SudokuGame game = await _gameplayService.CreateGameAsync(NewGame.Name, new SudokuGameOptions { MaxHints = NewGame.MaxHints }, user);
+        SudokuGame game = await _gameplayService.StartNewGameAsync(NewGame.Name, new SudokuGameOptions { MaxHints = NewGame.MaxHints }, user);
         PlayerState? playerState = game.GetPlayerState(user);
         if (playerState == null)
         {
