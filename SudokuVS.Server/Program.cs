@@ -8,7 +8,6 @@ using NSwag.AspNetCore;
 using NSwag.Generation.Processors.Security;
 using Serilog;
 using SudokuVS.Game;
-using SudokuVS.Game.Infrastructure.Database;
 using SudokuVS.Game.Utils;
 using SudokuVS.Server;
 using SudokuVS.Server.Areas.App.Components;
@@ -43,19 +42,7 @@ try
 
     builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(appConnectionString));
     bootstrapLogger.LogInformation("Connection to AppComponent database configured.");
-
-    string? gameConnectionString = builder.Configuration.GetConnectionString("GameDbContext");
-    if (string.IsNullOrWhiteSpace(gameConnectionString))
-    {
-        bootstrapLogger.LogInformation("No connection string provided for GameDbContext, falling back to in-memory repository.");
-        builder.Services.AddSingleton<ISudokuGamesRepository, SudokuGamesInMemory>();
-    }
-    else
-    {
-        builder.Services.AddDbContext<GameDbContext>(options => options.UseSqlServer(gameConnectionString));
-        bootstrapLogger.LogInformation("Connection to Game database configured.");
-        builder.Services.AddSingleton<ISudokuGamesRepository, SudokuGamesInDbContext>();
-    }
+    builder.Services.AddSingleton<ISudokuGamesRepository, SudokuGamesInDbContext>();
 
     builder.Services.AddDefaultIdentity<AppUser>(
             options =>
@@ -90,9 +77,6 @@ try
     WebApplication app = builder.Build();
 
     await ApplyMigrations<AppDbContext>(app);
-    await ApplyMigrations<GameDbContext>(app);
-
-    await app.UseGameServicesAsync();
 
     if (app.Environment.IsDevelopment())
     {
