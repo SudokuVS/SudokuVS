@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Logging;
@@ -53,8 +52,9 @@ try
             }
         )
         .AddEntityFrameworkStores<AppDbContext>();
+
     builder.AddAuthentication(bootstrapLogger);
-    builder.Services.AddAuthorization();
+    builder.AddAuthorization(bootstrapLogger);
 
     builder.ConfigureGameServices(gameOptions);
 
@@ -137,29 +137,24 @@ void ConfigureOpenApiDocument(WebApplicationBuilder builder)
             settings.Version = Metadata.Version?.ToString();
             settings.DocumentName = "game-server";
 
-            string? hostName = builder.Configuration.GetValue<string>("Host");
-            if (string.IsNullOrWhiteSpace(hostName))
+            string? apiKeySecret = builder.Configuration.GetValue<string>("Authentication:ApiKey:Secret");
+            if (string.IsNullOrWhiteSpace(apiKeySecret))
             {
-                Log.Information("Swagger UI authentication not configured, please set configurations Host.");
+                Log.Information("Swagger UI authentication not configured, please set configurations Authentication:ApiKey:Secret.");
                 return;
             }
 
-            string discovery = "https://api.passwordless.id/.well-known/openid-configuration";
-            Log.Information("Swagger UI authentication configured: {path}.", discovery);
+            Log.Information("Swagger UI API key authentication.");
 
-            const string schemeName = "Microsoft Entra";
+            const string schemeName = "API key";
             settings.AddSecurity(
                 schemeName,
                 new OpenApiSecurityScheme
                 {
-                    Description = "Bearer {access_token}",
-                    Name = "Authorization",
+                    Description = "Please enter your API key.",
                     In = OpenApiSecurityApiKeyLocation.Header,
-                    Scheme = JwtBearerDefaults.AuthenticationScheme,
-                    BearerFormat = "JWT",
-                    Type = OpenApiSecuritySchemeType.OpenIdConnect,
-                    Flow = OpenApiOAuth2Flow.AccessCode,
-                    OpenIdConnectUrl = discovery
+                    Name = ApiKeySchemeOptions.HeaderName,
+                    Type = OpenApiSecuritySchemeType.ApiKey
                 }
             );
             settings.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor(schemeName));

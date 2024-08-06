@@ -45,7 +45,7 @@ static class UserManagerExtensions
         return manager.UpdateAsync(user);
     }
 
-    public static async Task<AppUser?> GetUserByIdAsync(this UserManager<AppUser> manager, string username) =>
+    public static async Task<AppUser?> GetUserByUserNameAsync(this UserManager<AppUser> manager, string username) =>
         await manager.Users.SingleOrDefaultAsync(u => u.UserName == username);
 }
 
@@ -58,7 +58,7 @@ static class PlayerStateUserExtensions
 {
     public static async Task<UserIdentityDto> GetUserIdentity(this IHiddenPlayerState state, UserManager<AppUser> userManager)
     {
-        AppUser? opponent = await userManager.GetUserByIdAsync(state.Username);
+        AppUser? opponent = await userManager.GetUserByUserNameAsync(state.Username);
         return opponent?.ToUserIdentity() ?? new UserIdentityDto { Username = state.Username, PublicName = state.Username };
     }
 }

@@ -44,8 +44,10 @@ static class ApiExceptionHandlerExtensions
         HttpContext context,
         ApiException apiException,
         bool hideDetails
-    ) =>
-        await problemDetailsService.TryWriteAsync(
+    )
+    {
+        context.Response.StatusCode = apiException.StatusCode;
+        return await problemDetailsService.TryWriteAsync(
             new ProblemDetailsContext
             {
                 HttpContext = context,
@@ -53,6 +55,7 @@ static class ApiExceptionHandlerExtensions
                 ProblemDetails = problemDetailsFactory.CreateProblemDetails(context, apiException.StatusCode, apiException.Title, detail: hideDetails ? null : apiException.Detail)
             }
         );
+    }
 
     static async Task<bool> TryWriteDomainException(
         IProblemDetailsService problemDetailsService,
@@ -68,6 +71,7 @@ static class ApiExceptionHandlerExtensions
             ObjectNotFound => StatusCodes.Status400BadRequest,
             _ => StatusCodes.Status500InternalServerError
         };
+        context.Response.StatusCode = statusCode;
 
         return await problemDetailsService.TryWriteAsync(
             new ProblemDetailsContext

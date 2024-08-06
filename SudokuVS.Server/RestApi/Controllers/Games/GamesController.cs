@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using SudokuVS.Game;
 using SudokuVS.Game.Services;
 using SudokuVS.Server.Exceptions;
+using SudokuVS.Server.Infrastructure.Authentication;
 using SudokuVS.Server.Infrastructure.Database.Models;
 using SudokuVS.Server.RestApi.Models;
 
@@ -13,7 +14,7 @@ namespace SudokuVS.Server.RestApi.Controllers.Games;
 ///     Games
 /// </summary>
 [Route("/api/games")]
-[Authorize]
+[Authorize(ApiKeyConstants.AuthenticationScheme)]
 [ApiController]
 public class GamesController : ControllerBase
 {
