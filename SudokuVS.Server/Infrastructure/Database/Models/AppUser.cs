@@ -15,7 +15,7 @@ public class AppUser : IdentityUser
 
 static class UserManagerExtensions
 {
-    public static UserIdentityDto ToUserIdentity(this AppUser user) => new() { Id = GetUserName(user), Name = GetPublicName(user) };
+    public static UserIdentityDto ToUserIdentity(this AppUser user) => new() { Username = GetUserName(user), PublicName = GetPublicName(user) };
 
     public static async Task<string?> GetPublicName(this UserManager<AppUser> manager, ClaimsPrincipal claims, CancellationToken cancellationToken = default)
     {
@@ -53,6 +53,6 @@ static class PlayerStateUserExtensions
     public static async Task<UserIdentityDto> GetUserIdentity(this IHiddenPlayerState state, UserManager<AppUser> userManager)
     {
         AppUser? opponent = await userManager.GetUserByIdAsync(state.Username);
-        return opponent?.ToUserIdentity() ?? new UserIdentityDto { Id = state.Username, Name = state.Username };
+        return opponent?.ToUserIdentity() ?? new UserIdentityDto { Username = state.Username, PublicName = state.Username };
     }
 }
