@@ -53,6 +53,7 @@ try
             }
         )
         .AddEntityFrameworkStores<AppDbContext>();
+
     builder.AddAuthentication(bootstrapLogger);
     builder.Services.AddAuthorization();
 

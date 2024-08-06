@@ -10,6 +10,7 @@ public static class AspNetAuthenticationExtensions
 
         AddGoogleAuthentication(builder, logger, authBuilder);
         AddMicrosoftAccountAuthentication(builder, logger, authBuilder);
+        AddApiKeyAuthentication(builder, logger, authBuilder);
     }
 
     static void AddGoogleAuthentication(WebApplicationBuilder builder, ILogger? logger, AuthenticationBuilder authenticationBuilder)
@@ -54,5 +55,21 @@ public static class AspNetAuthenticationExtensions
         );
 
         logger?.LogInformation("Microsoft Account auth configured.");
+    }
+
+    static void AddApiKeyAuthentication(WebApplicationBuilder builder, ILogger? logger, AuthenticationBuilder authenticationBuilder)
+    {
+        string? secret = builder.Configuration.GetValue<string>("Authentication:ApiKey:Secret");
+        if (string.IsNullOrWhiteSpace(secret))
+        {
+            logger?.LogInformation("API Key not configured.");
+            return;
+        }
+
+        builder.Services.Configure<ApiKeyOptions>(opt => opt.Secret = secret);
+        builder.Services.AddScoped<ApiKeyService>();
+        authenticationBuilder.AddScheme<ApiKeySchemeOptions, ApiKeyAuthenticationHandler>(ApiKeySchemeOptions.Scheme, _ => { });
+
+        logger?.LogInformation("API Key auth configured.");
     }
 }
