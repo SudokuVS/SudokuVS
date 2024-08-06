@@ -167,5 +167,5 @@ public class EnableAuthenticatorModel : PageModel
     }
 
     string GenerateQrCodeUri(string email, string unformattedKey) =>
-        string.Format(CultureInfo.InvariantCulture, AuthenticatorUriFormat, _urlEncoder.Encode("Microsoft.AspNetCore.Identity.UI"), _urlEncoder.Encode(email), unformattedKey);
+        string.Format(CultureInfo.InvariantCulture, AuthenticatorUriFormat, _urlEncoder.Encode("SudokuVS"), _urlEncoder.Encode(email), unformattedKey);
 }
