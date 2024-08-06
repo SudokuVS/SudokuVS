@@ -26,7 +26,7 @@ public class GameplayService
         return game;
     }
 
-    public async Task JoinGameAsync(Guid gameId, string user, CancellationToken cancellationToken = default)
+    public async Task<SudokuGame> JoinGameAsync(Guid gameId, string user, CancellationToken cancellationToken = default)
     {
         SudokuGame game = await _repository.RequireAsync(gameId, cancellationToken);
 
@@ -42,5 +42,7 @@ public class GameplayService
         {
             throw new InvalidOperationException("Game full");
         }
+
+        return game;
     }
 }

@@ -66,12 +66,12 @@ public class GameplayController : ControllerBase
     ///     Join game
     /// </summary>
     [HttpPost("{gameId:guid}")]
-    public async Task<SudokuPlayerGameDto> JoinGameAsync(Guid gameId, SudokuGamePlayerSideDto side, CancellationToken cancellationToken)
+    public async Task<SudokuPlayerGameDto> JoinGameAsync(Guid gameId, CancellationToken cancellationToken)
     {
         string user = _userManager.GetUserName(HttpContext.User) ?? throw new AccessDeniedException();
-        (SudokuGame game, PlayerState playerState) = await GetGameAndPlayerStateAsync(gameId, cancellationToken);
 
-        game.Join(user, side.FromDto());
+        SudokuGame game = await _gameplayService.JoinGameAsync(gameId, user, cancellationToken);
+        PlayerState playerState = game.GetPlayerState(user) ?? throw new InternalErrorException("Player should have joined the game.");
 
         return await ComputePlayerGameDto(game, playerState);
     }
