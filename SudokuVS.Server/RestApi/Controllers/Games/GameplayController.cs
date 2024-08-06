@@ -3,13 +3,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using SudokuVS.Game;
-using SudokuVS.Game.Persistence;
-using SudokuVS.Game.Users;
+using SudokuVS.Game.Abstractions;
+using SudokuVS.Game.Services;
 using SudokuVS.Server.Exceptions;
-using SudokuVS.Server.Models;
+using SudokuVS.Server.Infrastructure.Database.Models;
 using SudokuVS.Server.RestApi.Controllers.Games.Requests;
 using SudokuVS.Server.RestApi.Models;
-using SudokuVS.Server.Services;
 
 namespace SudokuVS.Server.RestApi.Controllers.Games;
 
@@ -66,12 +65,12 @@ public class GameplayController : ControllerBase
     ///     Join game
     /// </summary>
     [HttpPost("{gameId:guid}")]
-    public async Task<SudokuPlayerGameDto> JoinGameAsync(Guid gameId, SudokuGamePlayerSideDto side, CancellationToken cancellationToken)
+    public async Task<SudokuPlayerGameDto> JoinGameAsync(Guid gameId, CancellationToken cancellationToken)
     {
         string user = _userManager.GetUserName(HttpContext.User) ?? throw new AccessDeniedException();
-        (SudokuGame game, PlayerState playerState) = await GetGameAndPlayerStateAsync(gameId, cancellationToken);
 
-        game.Join(user, side.FromDto());
+        SudokuGame game = await _gameplayService.JoinGameAsync(gameId, user, cancellationToken);
+        PlayerState playerState = game.GetPlayerState(user) ?? throw new InternalErrorException("Player should have joined the game.");
 
         return await ComputePlayerGameDto(game, playerState);
     }
@@ -149,7 +148,7 @@ public class GameplayController : ControllerBase
 
     async Task<(SudokuGame game, PlayerState playerState)> GetGameAndPlayerStateAsync(Guid gameId, CancellationToken cancellationToken)
     {
-        string user = ControllerContext.RequireAuthenticatedUserId();
+        string user = _userManager.GetUserName(HttpContext.User) ?? throw new AccessDeniedException();
         SudokuGame game = await _repository.GetAsync(gameId, cancellationToken) ?? throw new NotFoundException();
         PlayerState playerState = game.GetPlayerState(user) ?? throw new NotFoundException();
         return (game, playerState);
@@ -157,10 +156,10 @@ public class GameplayController : ControllerBase
 
     async Task<SudokuPlayerGameDto> ComputePlayerGameDto(SudokuGame game, PlayerState playerState)
     {
-        UserIdentity playerIdentity = await playerState.GetUserIdentity(_userManager);
+        UserIdentityDto playerIdentity = await playerState.GetUserIdentity(_userManager);
 
         IHiddenPlayerState? otherPlayerState = game.GetOtherPlayerState(playerState.Username);
-        UserIdentity? opponentIdentity = otherPlayerState == null ? null : await otherPlayerState.GetUserIdentity(_userManager);
+        UserIdentityDto? opponentIdentity = otherPlayerState == null ? null : await otherPlayerState.GetUserIdentity(_userManager);
 
         return game.ToPlayerGameDto(playerState, playerIdentity, opponentIdentity);
     }

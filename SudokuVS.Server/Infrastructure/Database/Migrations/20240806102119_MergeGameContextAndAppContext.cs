@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace SudokuVS.Game.Infrastructure.Database.Migrations
+namespace SudokuVS.Server.Infrastructure.Database.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class MergeGameContextAndAppContext : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -30,26 +30,13 @@ namespace SudokuVS.Game.Infrastructure.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Users",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ExternalId = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Users", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "PlayerStates",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     GameId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Side = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Username = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
                     Grid = table.Column<string>(type: "nvarchar(1053)", maxLength: 1053, nullable: false),
                     Hints = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false)
                 },
@@ -62,29 +49,12 @@ namespace SudokuVS.Game.Infrastructure.Database.Migrations
                         principalTable: "Games",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_PlayerStates_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_PlayerStates_GameId",
                 table: "PlayerStates",
                 column: "GameId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PlayerStates_UserId",
-                table: "PlayerStates",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Users_ExternalId",
-                table: "Users",
-                column: "ExternalId",
-                unique: true);
         }
 
         /// <inheritdoc />
@@ -95,9 +65,6 @@ namespace SudokuVS.Game.Infrastructure.Database.Migrations
 
             migrationBuilder.DropTable(
                 name: "Games");
-
-            migrationBuilder.DropTable(
-                name: "Users");
         }
     }
 }

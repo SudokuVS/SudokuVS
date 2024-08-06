@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using SudokuVS.Game;
-using SudokuVS.Game.Users;
 
 namespace SudokuVS.Server.RestApi.Models;
 
@@ -59,7 +58,7 @@ public class SudokuPlayerGameDto
 
 static class SudokuGameMappingExtensions
 {
-    public static SudokuPlayerGameDto ToPlayerGameDto(this SudokuGame game, PlayerState playerState, UserIdentity player, UserIdentity? opponent) =>
+    public static SudokuPlayerGameDto ToPlayerGameDto(this SudokuGame game, PlayerState playerState, UserIdentityDto player, UserIdentityDto? opponent) =>
         new()
         {
             Id = game.Id,

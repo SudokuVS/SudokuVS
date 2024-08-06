@@ -1,6 +1,6 @@
 ﻿using SudokuVS.Game.Exceptions;
 
-namespace SudokuVS.Game.Persistence;
+namespace SudokuVS.Game.Abstractions;
 
 public interface ISudokuGamesRepository
 {
@@ -14,5 +14,5 @@ public interface ISudokuGamesRepository
 public static class SudokuGamesRepositoryExtensions
 {
     public static async Task<SudokuGame> RequireAsync(this ISudokuGamesRepository repository, Guid id, CancellationToken cancellationToken = default) =>
-        await repository.GetAsync(id, cancellationToken) ?? throw new EntityNotFoundException<SudokuGame>(id);
+        await repository.GetAsync(id, cancellationToken) ?? throw new InvalidKeyException<SudokuGame>(id);
 }

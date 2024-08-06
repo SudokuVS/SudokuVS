@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
-using SudokuVS.Server.Models;
+using SudokuVS.Server.Infrastructure.Database.Models;
 
 namespace SudokuVS.Server.Areas.Identity.Pages.Account.Manage;
 

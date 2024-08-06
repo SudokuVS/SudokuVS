@@ -1,7 +1,7 @@
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @using SudokuVS.Server.Areas.Identity.Pages.Account.Manage
-@using SudokuVS.Server.Models
+@using SudokuVS.Server.Infrastructure.Database.Models
 @inject SignInManager<AppUser> SignInManager
 @{
     bool hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();

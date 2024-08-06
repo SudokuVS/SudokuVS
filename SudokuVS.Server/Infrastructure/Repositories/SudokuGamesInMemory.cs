@@ -1,6 +1,8 @@
 ﻿using System.Collections.Concurrent;
+using SudokuVS.Game;
+using SudokuVS.Game.Abstractions;
 
-namespace SudokuVS.Game.Persistence;
+namespace SudokuVS.Server.Infrastructure.Repositories;
 
 class SudokuGamesInMemory : ISudokuGamesRepository
 {

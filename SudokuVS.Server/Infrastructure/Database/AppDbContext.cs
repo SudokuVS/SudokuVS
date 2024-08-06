@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using SudokuVS.Server.Models;
+using SudokuVS.Server.Infrastructure.Database.Models;
+using SudokuVS.Server.Infrastructure.Database.Models.Game;
 
 namespace SudokuVS.Server.Infrastructure.Database;
 
@@ -10,8 +11,13 @@ class AppDbContext : IdentityDbContext<AppUser>
     {
     }
 
-    protected override void OnModelCreating(ModelBuilder builder) => base.OnModelCreating(builder);
-    // Customize the ASP.NET Identity model and override the defaults if needed.
-    // For example, you can rename the ASP.NET Identity table names and more.
-    // Add your customizations after calling base.OnModelCreating(builder);
+    public DbSet<PlayerStateEntity> PlayerStates { get; private set; }
+    public DbSet<SudokuGameEntity> Games { get; private set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<SudokuGameEntity>().HasMany(e => e.Players).WithOne(s => s.Game).HasForeignKey(s => s.GameId).IsRequired();
+    }
 }

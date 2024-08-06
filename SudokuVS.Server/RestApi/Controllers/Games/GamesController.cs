@@ -2,10 +2,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SudokuVS.Game;
-using SudokuVS.Game.Persistence;
-using SudokuVS.Game.Users;
+using SudokuVS.Game.Abstractions;
 using SudokuVS.Server.Exceptions;
-using SudokuVS.Server.Models;
+using SudokuVS.Server.Infrastructure.Database.Models;
 using SudokuVS.Server.RestApi.Models;
 
 namespace SudokuVS.Server.RestApi.Controllers.Games;
@@ -52,8 +51,8 @@ public class GamesController : ControllerBase
 
     async Task<SudokuGameSummaryDto> ToSummaryDto(SudokuGame game)
     {
-        UserIdentity? player1 = game.Player1 == null ? null : await game.Player1.GetUserIdentity(_userManager);
-        UserIdentity? player2 = game.Player2 == null ? null : await game.Player2.GetUserIdentity(_userManager);
+        UserIdentityDto? player1 = game.Player1 == null ? null : await game.Player1.GetUserIdentity(_userManager);
+        UserIdentityDto? player2 = game.Player2 == null ? null : await game.Player2.GetUserIdentity(_userManager);
 
         return game.ToSummaryDto(player1, player2);
     }

@@ -8,7 +8,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using SudokuVS.Server.Models;
+using SudokuVS.Server.Infrastructure.Database.Models;
 
 namespace SudokuVS.Server.Areas.Identity.Pages.Account.Manage;
 
@@ -36,7 +36,7 @@ public class DownloadPersonalDataModel : PageModel
         _logger.LogInformation("User with ID '{UserId}' asked for their personal data.", _userManager.GetUserId(User));
 
         // Only include personal data for download
-        Dictionary<string, string> personalData = new Dictionary<string, string>();
+        Dictionary<string, string> personalData = new();
         IEnumerable<PropertyInfo> personalDataProps = typeof(AppUser).GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(PersonalDataAttribute)));
         foreach (PropertyInfo p in personalDataProps)
         {

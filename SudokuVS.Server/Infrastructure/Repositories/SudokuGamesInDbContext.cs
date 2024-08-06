@@ -1,14 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using SudokuVS.Game.Infrastructure.Database;
-using SudokuVS.Game.Models;
+using SudokuVS.Game;
 using SudokuVS.Game.Utils;
+using SudokuVS.Server.Infrastructure.Database;
+using SudokuVS.Server.Infrastructure.Database.Models.Game;
 using SudokuVS.Sudoku.Models;
 using SudokuVS.Sudoku.Serialization;
 using SudokuVS.Sudoku.Utils;
 
-namespace SudokuVS.Game.Persistence;
+namespace SudokuVS.Server.Infrastructure.Repositories;
 
 class SudokuGamesInDbContext : SudokuGameCachedRepository
 {
@@ -24,21 +23,21 @@ class SudokuGamesInDbContext : SudokuGameCachedRepository
     protected override async Task<IReadOnlyList<Guid>> ListIdsAsync(CancellationToken cancellationToken)
     {
         using IServiceScope scope = _scopeFactory.CreateScope();
-        GameDbContext context = scope.ServiceProvider.GetRequiredService<GameDbContext>();
+        AppDbContext context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         return await context.Games.Select(g => g.Id).ToListAsync(cancellationToken);
     }
 
     protected override async Task<bool> ExistsInDistributedRepositoryAsync(Guid id, CancellationToken cancellationToken)
     {
         using IServiceScope scope = _scopeFactory.CreateScope();
-        GameDbContext context = scope.ServiceProvider.GetRequiredService<GameDbContext>();
+        AppDbContext context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         return await context.Games.AnyAsync(g => g.Id == id, cancellationToken);
     }
 
     protected override async Task<SudokuGame?> LoadFromDistributedRepositoryAsync(Guid id, CancellationToken cancellationToken)
     {
         using IServiceScope scope = _scopeFactory.CreateScope();
-        GameDbContext context = scope.ServiceProvider.GetRequiredService<GameDbContext>();
+        AppDbContext context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         SudokuGameEntity? entity = await FindGame(context, id, cancellationToken);
         if (entity == null)
@@ -66,7 +65,7 @@ class SudokuGamesInDbContext : SudokuGameCachedRepository
     protected override async Task SaveToDistributedRepositoryAsync(SudokuGame game, CancellationToken cancellationToken)
     {
         using IServiceScope scope = _scopeFactory.CreateScope();
-        GameDbContext context = scope.ServiceProvider.GetRequiredService<GameDbContext>();
+        AppDbContext context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         SudokuGameEntity? entity = await FindGame(context, game.Id, cancellationToken);
         if (entity == null)
@@ -81,8 +80,8 @@ class SudokuGamesInDbContext : SudokuGameCachedRepository
             entity.SolvedGrid = _serializer.ToString(game.SolvedGrid);
         }
 
-        await SavePlayerState(context, game, PlayerSide.Player1, entity, cancellationToken);
-        await SavePlayerState(context, game, PlayerSide.Player2, entity, cancellationToken);
+        SavePlayerState(context, game, PlayerSide.Player1, entity, cancellationToken);
+        SavePlayerState(context, game, PlayerSide.Player2, entity, cancellationToken);
 
         entity.StartDate = game.StartDate;
         entity.EndDate = game.EndDate;
@@ -94,14 +93,14 @@ class SudokuGamesInDbContext : SudokuGameCachedRepository
     protected override async Task DeleteFromDistributedRepositoryAsync(Guid id, CancellationToken cancellationToken)
     {
         using IServiceScope scope = _scopeFactory.CreateScope();
-        GameDbContext context = scope.ServiceProvider.GetRequiredService<GameDbContext>();
+        AppDbContext context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         SudokuGameEntity entity = await context.Games.RequireAsync(id, cancellationToken);
         context.Games.Remove(entity);
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    static async Task<SudokuGameEntity?> FindGame(GameDbContext context, Guid id, CancellationToken cancellationToken) =>
+    static async Task<SudokuGameEntity?> FindGame(AppDbContext context, Guid id, CancellationToken cancellationToken) =>
         await context.Games.Include(g => g.Players).SingleOrDefaultAsync(g => g.Id == id, cancellationToken);
 
     PlayerState LoadPlayerState(SudokuGame game, PlayerSide side, PlayerStateEntity state)
@@ -123,7 +122,7 @@ class SudokuGamesInDbContext : SudokuGameCachedRepository
         return result;
     }
 
-    async Task SavePlayerState(GameDbContext context, SudokuGame game, PlayerSide side, SudokuGameEntity entity, CancellationToken _ = default)
+    void SavePlayerState(AppDbContext context, SudokuGame game, PlayerSide side, SudokuGameEntity entity, CancellationToken _ = default)
     {
         PlayerState? state = game.GetPlayerState(side);
         if (state == null)

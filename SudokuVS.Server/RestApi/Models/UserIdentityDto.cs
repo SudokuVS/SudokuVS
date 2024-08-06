@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using SudokuVS.Game.Users;
 
 namespace SudokuVS.Server.RestApi.Models;
 
@@ -9,18 +8,13 @@ namespace SudokuVS.Server.RestApi.Models;
 public class UserIdentityDto
 {
     /// <summary>
-    ///     The unique identifier of the user.
+    ///     The username of the user. This is the unique identifier of the user.
     /// </summary>
-    public required string Id { get; init; }
+    public required string Username { get; init; }
 
     /// <summary>
-    ///     The name of the user.
+    ///     The public name of the user. This is the name the should be used as a display value when referring to the user.
     /// </summary>
     [Required]
-    public required string Name { get; init; }
-}
-
-static class UserIdentityMappingExtensions
-{
-    public static UserIdentityDto ToDto(this UserIdentity user) => new() { Id = user.Username, Name = user.DisplayName };
+    public required string PublicName { get; init; }
 }

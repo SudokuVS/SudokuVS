@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
-using SudokuVS.Server.Models;
+using SudokuVS.Server.Infrastructure.Database.Models;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace SudokuVS.Server.Areas.Identity.Pages.Account;
@@ -85,7 +85,7 @@ public class ExternalLoginModel : PageModel
         [EmailAddress]
         public string Email { get; set; }
 
-        [Display(Name="Display name")]
+        [Display(Name = "Display name")]
         public string DisplayName { get; set; }
     }
 

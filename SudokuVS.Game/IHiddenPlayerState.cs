@@ -1,5 +1,4 @@
-﻿using SudokuVS.Game.Models;
-using SudokuVS.Sudoku.Models.Abstractions;
+﻿using SudokuVS.Sudoku.Models.Abstractions;
 
 namespace SudokuVS.Game;
 

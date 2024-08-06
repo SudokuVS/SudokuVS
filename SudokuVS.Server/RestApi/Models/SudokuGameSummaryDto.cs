@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using SudokuVS.Game;
-using SudokuVS.Game.Users;
 
 namespace SudokuVS.Server.RestApi.Models;
 
@@ -64,14 +63,14 @@ public class SudokuGameSummaryDto
 
 static class SudokuGameSummaryMappingExtensions
 {
-    public static SudokuGameSummaryDto ToSummaryDto(this SudokuGame game, UserIdentity? player1, UserIdentity? player2) =>
+    public static SudokuGameSummaryDto ToSummaryDto(this SudokuGame game, UserIdentityDto? player1, UserIdentityDto? player2) =>
         new()
         {
             Id = game.Id,
             Name = game.Name,
             Grid = game.InitialGrid.ToSimpleDto(),
-            Player1 = player1?.ToDto(),
-            Player2 = player2?.ToDto(),
+            Player1 = player1,
+            Player2 = player2,
             IsStarted = game.IsStarted,
             StartDate = game.StartDate,
             IsOver = game.IsOver,

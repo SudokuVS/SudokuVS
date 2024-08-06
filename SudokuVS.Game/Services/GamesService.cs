@@ -1,7 +1,6 @@
-﻿using SudokuVS.Game;
-using SudokuVS.Game.Persistence;
+﻿using SudokuVS.Game.Abstractions;
 
-namespace SudokuVS.Server.Services;
+namespace SudokuVS.Game.Services;
 
 public class GamesService
 {

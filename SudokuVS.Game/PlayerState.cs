@@ -1,5 +1,4 @@
-﻿using SudokuVS.Game.Models;
-using SudokuVS.Sudoku.Models;
+﻿using SudokuVS.Sudoku.Models;
 using SudokuVS.Sudoku.Models.Abstractions;
 using SudokuVS.Sudoku.Utils;
 
@@ -55,7 +54,7 @@ public class PlayerState : IHiddenPlayerState
         return true;
     }
 
-    internal void Restore(IEnumerable<(int, int)> hints)
+    public void Restore(IEnumerable<(int, int)> hints)
     {
         _hints.Clear();
         foreach ((int, int) hint in hints)
