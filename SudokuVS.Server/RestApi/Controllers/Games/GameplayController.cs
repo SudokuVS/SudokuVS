@@ -46,8 +46,11 @@ public class GameplayController : ControllerBase
     }
 
     /// <summary>
-    ///     Get game
+    ///     Get game state
     /// </summary>
+    /// <remarks>
+    ///     Get the state of the game as seen by the current user.
+    /// </remarks>
     [HttpGet("{gameId:guid}")]
     public async Task<SudokuPlayerGameDto> GetGameAsync(Guid gameId, CancellationToken cancellationToken)
     {
