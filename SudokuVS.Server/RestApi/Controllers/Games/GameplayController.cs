@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using SudokuVS.Game;
-using SudokuVS.Game.Abstractions;
 using SudokuVS.Game.Services;
 using SudokuVS.Server.Exceptions;
 using SudokuVS.Server.Infrastructure.Database.Models;
@@ -22,42 +21,44 @@ namespace SudokuVS.Server.RestApi.Controllers.Games;
 public class GameplayController : ControllerBase
 {
     readonly UserManager<AppUser> _userManager;
-    readonly ISudokuGamesRepository _repository;
+    readonly GamesService _gamesService;
     readonly GameplayService _gameplayService;
 
     /// <summary>
     /// </summary>
-    public GameplayController(UserManager<AppUser> userManager, ISudokuGamesRepository repository, GameplayService gameplayService)
+    public GameplayController(UserManager<AppUser> userManager, GamesService gamesService, GameplayService gameplayService)
     {
         _userManager = userManager;
-        _repository = repository;
         _gameplayService = gameplayService;
+        _gamesService = gamesService;
     }
 
     /// <summary>
     ///     Create game
     /// </summary>
     [HttpPost]
-    public async Task<SudokuPlayerGameDto> CreateGameAsync(CreateGameRequest request)
+    public async Task<SudokuPlayerGameDto> StartNewGameAsync(CreateGameRequest request)
     {
         string user = _userManager.GetUserName(HttpContext.User) ?? throw new AccessDeniedException();
-        SudokuGame game = await _gameplayService.CreateGameAsync(request.Name, new SudokuGameOptions { MaxHints = request.Hints }, user);
-        PlayerState? playerState = game.GetPlayerState(user);
-        if (playerState == null)
-        {
-            throw new InternalErrorException("Player has not joined game");
-        }
-
+        SudokuGame game = await _gameplayService.StartNewGameAsync(request.Name, new SudokuGameOptions { MaxHints = request.Hints }, user);
+        PlayerState playerState = game.GetPlayerState(user) ?? throw new InternalErrorException("Player has not joined game");
         return await ComputePlayerGameDto(game, playerState);
     }
 
     /// <summary>
-    ///     Get game
+    ///     Get game state
     /// </summary>
+    /// <remarks>
+    ///     Get the state of the game as seen by the current user.
+    /// </remarks>
     [HttpGet("{gameId:guid}")]
     public async Task<SudokuPlayerGameDto> GetGameAsync(Guid gameId, CancellationToken cancellationToken)
     {
-        (SudokuGame game, PlayerState playerState) = await GetGameAndPlayerStateAsync(gameId, cancellationToken);
+        string user = _userManager.GetUserName(HttpContext.User) ?? throw new AccessDeniedException();
+
+        SudokuGame game = await _gamesService.RequireGameAsync(gameId, cancellationToken);
+        PlayerState playerState = game.GetPlayerState(user) ?? throw new AccessDeniedException();
+
         return await ComputePlayerGameDto(game, playerState);
     }
 
@@ -68,10 +69,8 @@ public class GameplayController : ControllerBase
     public async Task<SudokuPlayerGameDto> JoinGameAsync(Guid gameId, CancellationToken cancellationToken)
     {
         string user = _userManager.GetUserName(HttpContext.User) ?? throw new AccessDeniedException();
-
         SudokuGame game = await _gameplayService.JoinGameAsync(gameId, user, cancellationToken);
         PlayerState playerState = game.GetPlayerState(user) ?? throw new InternalErrorException("Player should have joined the game.");
-
         return await ComputePlayerGameDto(game, playerState);
     }
 
@@ -81,8 +80,9 @@ public class GameplayController : ControllerBase
     [HttpPut("{gameId:guid}/cell/{cellIndex:int}/element/{element:int}")]
     public async Task<SudokuPlayerGameDto> SetElementAsync(Guid gameId, int cellIndex, int element, CancellationToken cancellationToken)
     {
-        (SudokuGame game, PlayerState playerState) = await GetGameAndPlayerStateAsync(gameId, cancellationToken);
-        playerState.SetElement(cellIndex, element);
+        string user = _userManager.GetUserName(HttpContext.User) ?? throw new AccessDeniedException();
+        SudokuGame game = await _gameplayService.SetElementAsync(gameId, user, cellIndex, element, cancellationToken);
+        PlayerState playerState = game.GetPlayerState(user) ?? throw new InternalErrorException("Player should have joined the game.");
         return await ComputePlayerGameDto(game, playerState);
     }
 
@@ -92,8 +92,9 @@ public class GameplayController : ControllerBase
     [HttpDelete("{gameId:guid}/cell/{cellIndex:int}/element")]
     public async Task<SudokuPlayerGameDto> ClearElementAsync(Guid gameId, int cellIndex, CancellationToken cancellationToken)
     {
-        (SudokuGame game, PlayerState playerState) = await GetGameAndPlayerStateAsync(gameId, cancellationToken);
-        playerState.ClearElement(cellIndex);
+        string user = _userManager.GetUserName(HttpContext.User) ?? throw new AccessDeniedException();
+        SudokuGame game = await _gameplayService.ClearElementAsync(gameId, user, cellIndex, cancellationToken);
+        PlayerState playerState = game.GetPlayerState(user) ?? throw new InternalErrorException("Player should have joined the game.");
         return await ComputePlayerGameDto(game, playerState);
     }
 
@@ -103,8 +104,9 @@ public class GameplayController : ControllerBase
     [HttpPut("{gameId:guid}/cell/{cellIndex:int}/annotations/{annotation:int}")]
     public async Task<SudokuPlayerGameDto> AddAnnotationAsync(Guid gameId, int cellIndex, int annotation, CancellationToken cancellationToken)
     {
-        (SudokuGame game, PlayerState playerState) = await GetGameAndPlayerStateAsync(gameId, cancellationToken);
-        playerState.ClearElement(cellIndex);
+        string user = _userManager.GetUserName(HttpContext.User) ?? throw new AccessDeniedException();
+        SudokuGame game = await _gameplayService.AddAnnotationAsync(gameId, user, annotation, cellIndex, cancellationToken);
+        PlayerState playerState = game.GetPlayerState(user) ?? throw new InternalErrorException("Player should have joined the game.");
         return await ComputePlayerGameDto(game, playerState);
     }
 
@@ -114,8 +116,9 @@ public class GameplayController : ControllerBase
     [HttpDelete("{gameId:guid}/cell/{cellIndex:int}/annotations/{annotation:int}")]
     public async Task<SudokuPlayerGameDto> RemoveAnnotationAsync(Guid gameId, int cellIndex, int annotation, CancellationToken cancellationToken)
     {
-        (SudokuGame game, PlayerState playerState) = await GetGameAndPlayerStateAsync(gameId, cancellationToken);
-        playerState.ClearElement(cellIndex);
+        string user = _userManager.GetUserName(HttpContext.User) ?? throw new AccessDeniedException();
+        SudokuGame game = await _gameplayService.RemoveAnnotationAsync(gameId, user, annotation, cellIndex, cancellationToken);
+        PlayerState playerState = game.GetPlayerState(user) ?? throw new InternalErrorException("Player should have joined the game.");
         return await ComputePlayerGameDto(game, playerState);
     }
 
@@ -125,8 +128,9 @@ public class GameplayController : ControllerBase
     [HttpDelete("{gameId:guid}/cell/{cellIndex:int}/annotations")]
     public async Task<SudokuPlayerGameDto> ClearAnnotationsAsync(Guid gameId, int cellIndex, CancellationToken cancellationToken)
     {
-        (SudokuGame game, PlayerState playerState) = await GetGameAndPlayerStateAsync(gameId, cancellationToken);
-        playerState.ClearAnnotations(cellIndex);
+        string user = _userManager.GetUserName(HttpContext.User) ?? throw new AccessDeniedException();
+        SudokuGame game = await _gameplayService.ClearAnnotationsAsync(gameId, user, cellIndex, cancellationToken);
+        PlayerState playerState = game.GetPlayerState(user) ?? throw new InternalErrorException("Player should have joined the game.");
         return await ComputePlayerGameDto(game, playerState);
     }
 
@@ -136,22 +140,10 @@ public class GameplayController : ControllerBase
     [HttpPost("{gameId:guid}/cell/{cellIndex:int}/hint")]
     public async Task<SudokuPlayerGameDto> UseHintAsync(Guid gameId, int cellIndex, CancellationToken cancellationToken)
     {
-        (SudokuGame game, PlayerState playerState) = await GetGameAndPlayerStateAsync(gameId, cancellationToken);
-
-        if (!playerState.TryUseHint(cellIndex))
-        {
-            throw new BadRequestException();
-        }
-
-        return await ComputePlayerGameDto(game, playerState);
-    }
-
-    async Task<(SudokuGame game, PlayerState playerState)> GetGameAndPlayerStateAsync(Guid gameId, CancellationToken cancellationToken)
-    {
         string user = _userManager.GetUserName(HttpContext.User) ?? throw new AccessDeniedException();
-        SudokuGame game = await _repository.GetAsync(gameId, cancellationToken) ?? throw new NotFoundException();
-        PlayerState playerState = game.GetPlayerState(user) ?? throw new NotFoundException();
-        return (game, playerState);
+        SudokuGame game = await _gameplayService.UseHintAsync(gameId, user, cellIndex, cancellationToken);
+        PlayerState playerState = game.GetPlayerState(user) ?? throw new InternalErrorException("Player should have joined the game.");
+        return await ComputePlayerGameDto(game, playerState);
     }
 
     async Task<SudokuPlayerGameDto> ComputePlayerGameDto(SudokuGame game, PlayerState playerState)

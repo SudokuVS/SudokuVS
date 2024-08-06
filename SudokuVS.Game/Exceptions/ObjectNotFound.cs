@@ -2,9 +2,9 @@
 
 namespace SudokuVS.Game.Exceptions;
 
-public class InvalidKeyException : DomainException
+public class ObjectNotFound : DomainException
 {
-    public InvalidKeyException(Type type, object? key = null, string? message = null) : base(GetMessage(type, key, message))
+    public ObjectNotFound(Type type, object? key = null, string? message = null) : base(GetMessage(type, key, message))
     {
     }
 
@@ -23,9 +23,9 @@ public class InvalidKeyException : DomainException
     }
 }
 
-public class InvalidKeyException<TObject> : InvalidKeyException
+public class ObjectNotFound<TObject> : ObjectNotFound
 {
-    public InvalidKeyException(object? key = null, string? message = null) : base(typeof(TObject), key, message)
+    public ObjectNotFound(object? key = null, string? message = null) : base(typeof(TObject), key, message)
     {
     }
 }

@@ -1,19 +1,19 @@
 ﻿let elementsToRegister = {};
 let elementsToUpdate = undefined;
-let millisecondsInAnHour = 60 /* minutes */ * 60 /* seconds */ * 1000 /* milliseconds */;
 
-function formatDate(date) {
-    const minutes = date.getMinutes();
-    const minutesStr = minutes >= 10 ? minutes.toString() : "0" + minutes;
+function formatMilliseconds(milliseconds) {
+    const totalSeconds = Math.floor(milliseconds / 1000);
+    const totalMinutes = Math.floor(totalSeconds / 60);
+    const totalHours = Math.floor(totalMinutes / 60);
 
-    const seconds = date.getSeconds();
+    const seconds = totalSeconds - 60 * totalMinutes;
     const secondsStr = seconds >= 10 ? seconds.toString() : "0" + seconds;
 
-    if (date.getTime() >= millisecondsInAnHour) {
-        const hours = Math.trunc(date.getTime() / millisecondsInAnHour);
-        const hoursStr = hours >= 10 ? hours.toString() : "0" + hours;
+    const minutes = totalMinutes - 60 * totalHours;
+    const minutesStr = minutes >= 10 ? minutes.toString() : "0" + minutes;
 
-        return hoursStr + ":" + minutesStr + ":" + secondsStr;
+    if (totalHours > 0) {
+        return totalHours + ":" + minutesStr + ":" + secondsStr;
     } else {
         return minutesStr + ":" + secondsStr;
     }
@@ -33,7 +33,7 @@ export function startTimer(containerElementId, startTime) {
             elementsToRegister = {};
 
             for (const value of Object.values(elementsToUpdate)) {
-                const dateStr = formatDate(new Date(new Date() - value.date));
+                const dateStr = formatMilliseconds(new Date().getTime() - value.date.getTime());
 
                 for (const element of value.elements) {
                     element.innerText = dateStr;

@@ -31,6 +31,9 @@ public class GamesController : ControllerBase
     /// <summary>
     ///     Search games
     /// </summary>
+    /// <remarks>
+    ///     Get the games of the current user.
+    /// </remarks>
     [HttpGet]
     public async Task<IEnumerable<SudokuGameSummaryDto>> SearchGames()
     {
@@ -49,6 +52,9 @@ public class GamesController : ControllerBase
     /// <summary>
     ///     Get game summary
     /// </summary>
+    /// <remarks>
+    ///     Get basic info about a game.
+    /// </remarks>
     [HttpGet("{id:guid}/summary")]
     public async Task<SudokuGameSummaryDto> GetGameSummary(Guid id)
     {

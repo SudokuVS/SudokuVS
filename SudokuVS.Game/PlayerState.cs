@@ -1,4 +1,5 @@
-﻿using SudokuVS.Sudoku.Models;
+﻿using System.Diagnostics.CodeAnalysis;
+using SudokuVS.Sudoku.Models;
 using SudokuVS.Sudoku.Models.Abstractions;
 using SudokuVS.Sudoku.Utils;
 
@@ -33,24 +34,28 @@ public class PlayerState : IHiddenPlayerState
     public void RemoveAnnotation(int row, int column, int element) => Grid[row, column].Annotations.Remove(element);
     public void ClearAnnotations(int row, int column) => Grid[row, column].Annotations.Clear();
 
-    public bool TryUseHint(int row, int column)
+    public bool TryUseHint(int row, int column, [NotNullWhen(false)] out string? whyNot)
     {
-        if (!_hints.Add((row, column)))
+        if (_hints.Contains((row, column)))
         {
+            whyNot = "Cell is already a hint";
             return false;
         }
 
         SudokuCell cell = Grid[row, column];
         if (cell.IsLocked)
         {
+            whyNot = "Cell is locked";
             return false;
         }
 
+        _hints.Add((row, column));
         cell.Element = Game.SolvedGrid[row, column].Element;
         cell.IsLocked = true;
 
         HintAdded?.Invoke(this, EventArgs.Empty);
 
+        whyNot = null;
         return true;
     }
 
@@ -96,10 +101,10 @@ public static class PlayerStateExtensions
         state.ClearAnnotations(row, column);
     }
 
-    public static bool TryUseHint(this PlayerState state, int index)
+    public static bool TryUseHint(this PlayerState state, int index, [NotNullWhen(false)] out string? whyNot)
     {
         (int row, int column) = SudokuGridCoordinates.ComputeCoordinates(index);
-        return state.TryUseHint(row, column);
+        return state.TryUseHint(row, column, out whyNot);
     }
 
     public static void ToggleAnnotation(this PlayerState state, int row, int column, int element)
