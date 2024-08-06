@@ -54,7 +54,7 @@ public class ApiKeyService
     /// </summary>
     public async Task<IReadOnlyList<ApiKey>> GetApiKeysAsync(AppUser user)
     {
-        List<ApiKeyEntity> keys = await _context.ApiKeys.Where(k => k.User == user).AsNoTracking().ToListAsync();
+        List<ApiKeyEntity> keys = await AllApiKeys.Where(k => k.User == user).AsNoTracking().ToListAsync();
         return keys.Select(ToApiKey).ToList();
     }
 
@@ -128,7 +128,7 @@ public class ApiKeyService
             return null;
         }
 
-        return await AllApiKeys.AsNoTracking().SingleOrDefaultAsync(k => k.Id == keyId.Value);
+        return await AllApiKeys.SingleOrDefaultAsync(k => k.Id == keyId.Value);
     }
 
     Guid? GetApiKeyIdFromToken(string tokenStr)
