@@ -152,6 +152,7 @@
     static string GetSizeStyle(Size size) =>
         size switch
         {
+            Size.XXSmall => "xxsmall",
             Size.XSmall => "xsmall",
             Size.Small => "small",
             Size.Medium => "medium",
@@ -313,6 +314,7 @@
 
     public enum Size
     {
+        XXSmall,
         XSmall,
         Small,
         Medium,

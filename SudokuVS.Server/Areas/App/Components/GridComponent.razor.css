@@ -24,6 +24,11 @@
     height: 96px;
 }
 
+.sudoku-grid.xxsmall {
+    width: 48px;
+    height: 48px;
+}
+
 .sudoku-grid .rows {
     position: absolute;
     inset: 0;
