@@ -40,9 +40,64 @@ public class GameplayService
         }
         else
         {
-            throw new InvalidOperationException("Game full");
+            throw new DomainException("Game full");
         }
 
         return game;
+    }
+
+    public async Task<SudokuGame> SetElementAsync(Guid gameId, string user, int cellIndex, int element, CancellationToken cancellationToken)
+    {
+        (SudokuGame game, PlayerState playerState) = await GetGameAndPlayerState(gameId, user, cancellationToken);
+        playerState.SetElement(cellIndex, element);
+        return game;
+    }
+
+    public async Task<SudokuGame> ClearElementAsync(Guid gameId, string user, int cellIndex, CancellationToken cancellationToken)
+    {
+        (SudokuGame game, PlayerState playerState) = await GetGameAndPlayerState(gameId, user, cancellationToken);
+        playerState.ClearElement(cellIndex);
+        return game;
+    }
+
+    public async Task<SudokuGame> AddAnnotationAsync(Guid gameId, string user, int cellIndex, int annotation, CancellationToken cancellationToken)
+    {
+        (SudokuGame game, PlayerState playerState) = await GetGameAndPlayerState(gameId, user, cancellationToken);
+        playerState.AddAnnotation(cellIndex, annotation);
+        return game;
+    }
+
+    public async Task<SudokuGame> RemoveAnnotationAsync(Guid gameId, string user, int cellIndex, int annotation, CancellationToken cancellationToken)
+    {
+        (SudokuGame game, PlayerState playerState) = await GetGameAndPlayerState(gameId, user, cancellationToken);
+        playerState.RemoveAnnotation(cellIndex, annotation);
+        return game;
+    }
+
+    public async Task<SudokuGame> ClearAnnotationsAsync(Guid gameId, string user, int cellIndex, CancellationToken cancellationToken)
+    {
+        (SudokuGame game, PlayerState playerState) = await GetGameAndPlayerState(gameId, user, cancellationToken);
+        playerState.ClearAnnotations(cellIndex);
+        return game;
+    }
+
+    public async Task<SudokuGame> UseHintAsync(Guid gameId, string user, int cellIndex, CancellationToken cancellationToken)
+    {
+        (SudokuGame game, PlayerState playerState) = await GetGameAndPlayerState(gameId, user, cancellationToken);
+
+        if (!playerState.TryUseHint(cellIndex, out string? whyNot))
+        {
+            throw new DomainException(whyNot);
+        }
+
+        return game;
+    }
+
+    async Task<(SudokuGame game, PlayerState playerState)> GetGameAndPlayerState(Guid gameId, string user, CancellationToken cancellationToken)
+    {
+        SudokuGame game = await _repository.RequireAsync(gameId, cancellationToken);
+        PlayerState playerState = game.GetPlayerState(user) ?? throw new DomainException("Player is not part of the game");
+
+        return (game, playerState);
     }
 }
