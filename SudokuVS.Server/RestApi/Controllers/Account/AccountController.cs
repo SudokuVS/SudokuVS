@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SudokuVS.Server.Exceptions;
 using SudokuVS.Server.Infrastructure.Authentication;
 using SudokuVS.Server.Infrastructure.Database.Models;
+using SudokuVS.Server.RestApi.Models;
 
 namespace SudokuVS.Server.RestApi.Controllers.Account;
 
@@ -26,10 +27,11 @@ public class AccountController : ControllerBase
     ///     Create a new API key for the current account.
     /// </remarks>
     [HttpPost]
-    public async Task<string> CreateApiKey()
+    public async Task<ApiKeyDto> CreateApiKey(string? name = null)
     {
         AppUser user = await _userManager.GetUserAsync(HttpContext.User) ?? throw new AccessDeniedException();
-        return await _apiKeyService.CreateNewApiKeyAsync(user);
+        ApiKey key = await _apiKeyService.CreateNewApiKeyAsync(user, name);
+        return key.ToDto();
     }
 
     /// <summary>
@@ -39,10 +41,11 @@ public class AccountController : ControllerBase
     ///     Return all the API keys of the current account.
     /// </remarks>
     [HttpGet]
-    public async Task<IReadOnlyList<string>> GetApiKeys()
+    public async Task<IReadOnlyList<ApiKeyDto>> GetApiKeys()
     {
         AppUser user = await _userManager.GetUserAsync(HttpContext.User) ?? throw new AccessDeniedException();
-        return await _apiKeyService.GetApiKeysAsync(user);
+        IReadOnlyList<ApiKey> keys = await _apiKeyService.GetApiKeysAsync(user);
+        return keys.Select(k => k.ToDto()).ToArray();
     }
 
     /// <summary>

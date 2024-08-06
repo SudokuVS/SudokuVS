@@ -38,29 +38,29 @@ public class ApiKeyService
     /// <summary>
     ///     Create a new api key for the given user and return a valid token for the key.
     /// </summary>
-    public async Task<string> CreateNewApiKeyAsync(AppUser user)
+    public async Task<ApiKey> CreateNewApiKeyAsync(AppUser user, string? name = null)
     {
-        ApiKeyEntity key = new(user);
+        ApiKeyEntity key = new(user, name);
         await _context.ApiKeys.AddAsync(key);
         await _context.SaveChangesAsync();
-        return GenerateKeyToken(key);
+        return ToApiKey(key);
     }
 
     /// <summary>
     ///     Get the API keys of the user.
     /// </summary>
-    public async Task<IReadOnlyList<string>> GetApiKeysAsync(AppUser user)
+    public async Task<IReadOnlyList<ApiKey>> GetApiKeysAsync(AppUser user)
     {
         List<ApiKeyEntity> keys = await _context.ApiKeys.Where(k => k.User == user).AsNoTracking().ToListAsync();
-        return keys.Select(GenerateKeyToken).ToList();
+        return keys.Select(ToApiKey).ToList();
     }
 
     /// <summary>
     ///     Revoke the given api key of the given user
     /// </summary>
-    public async Task RevokeApiKeyAsync(AppUser user, string apiKey)
+    public async Task RevokeApiKeyAsync(AppUser user, string token)
     {
-        ApiKeyEntity key = await GetApiKeyAsync(apiKey) ?? throw new BadRequestException("Bad api key");
+        ApiKeyEntity key = await GetApiKeyAsync(token) ?? throw new BadRequestException("Bad api key");
         if (key.User != user)
         {
             throw new BadRequestException("Bad api key");
@@ -87,7 +87,16 @@ public class ApiKeyService
 
     string GenerateKeyToken(ApiKeyEntity keyEntity)
     {
-        Claim[] claims = [new Claim(ApiKeySchemeOptions.KeyIdClaimType, keyEntity.Id.ToString())];
+        List<Claim> claims =
+        [
+            new Claim(ApiKeyConstants.KeyIdClaimType, keyEntity.Id.ToString())
+        ];
+
+        if (!string.IsNullOrWhiteSpace(keyEntity.Name))
+        {
+            claims.Add(new Claim(ApiKeyConstants.KeyNameClaimType, keyEntity.Name));
+        }
+
         JwtSecurityToken token = new(claims: claims, signingCredentials: _credentials);
         return _tokenHandler.WriteToken(token);
     }
@@ -95,7 +104,7 @@ public class ApiKeyService
     async Task<ApiKeyEntity?> GetApiKeyAsync(string tokenStr)
     {
         JwtSecurityToken token = _tokenHandler.ReadJwtToken(tokenStr);
-        string? keyIdStr = token.Claims.FirstOrDefault(c => c.Type == ApiKeySchemeOptions.KeyIdClaimType)?.Value;
+        string? keyIdStr = token.Claims.FirstOrDefault(c => c.Type == ApiKeyConstants.KeyIdClaimType)?.Value;
         if (keyIdStr == null || !Guid.TryParse(keyIdStr, out Guid keyId))
         {
             return null;
@@ -103,4 +112,6 @@ public class ApiKeyService
 
         return await _context.ApiKeys.SingleOrDefaultAsync(k => k.Id == keyId);
     }
+
+    ApiKey ToApiKey(ApiKeyEntity key) => new(key.Id, key.CreationDate, key.Name, GenerateKeyToken(key));
 }
