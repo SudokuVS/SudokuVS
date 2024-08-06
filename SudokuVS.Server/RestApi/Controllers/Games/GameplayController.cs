@@ -4,12 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using SudokuVS.Game;
 using SudokuVS.Game.Abstractions;
+using SudokuVS.Game.Services;
 using SudokuVS.Game.Users;
 using SudokuVS.Server.Exceptions;
 using SudokuVS.Server.Infrastructure.Database.Models;
 using SudokuVS.Server.RestApi.Controllers.Games.Requests;
 using SudokuVS.Server.RestApi.Models;
-using SudokuVS.Server.Services;
 
 namespace SudokuVS.Server.RestApi.Controllers.Games;
 

@@ -1,8 +1,7 @@
-﻿using SudokuVS.Game;
-using SudokuVS.Game.Abstractions;
-using SudokuVS.Server.Exceptions;
+﻿using SudokuVS.Game.Abstractions;
+using SudokuVS.Game.Exceptions;
 
-namespace SudokuVS.Server.Services;
+namespace SudokuVS.Game.Services;
 
 public class GameplayService
 {
@@ -18,7 +17,7 @@ public class GameplayService
         SudokuGame? game = SudokuGame.Create(gameName, gameOptions);
         if (game == null)
         {
-            throw new InternalErrorException("Failed to create game.");
+            throw new DomainException("Failed to create game.");
         }
 
         game.Join(creatorUser, PlayerSide.Player1);

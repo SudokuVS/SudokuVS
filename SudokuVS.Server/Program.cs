@@ -8,6 +8,7 @@ using NSwag.AspNetCore;
 using NSwag.Generation.Processors.Security;
 using Serilog;
 using SudokuVS.Game.Abstractions;
+using SudokuVS.Game.Services;
 using SudokuVS.Game.Utils;
 using SudokuVS.Server;
 using SudokuVS.Server.Areas.App.Components;
@@ -17,7 +18,6 @@ using SudokuVS.Server.Infrastructure.Database;
 using SudokuVS.Server.Infrastructure.Database.Models;
 using SudokuVS.Server.Infrastructure.Logging;
 using SudokuVS.Server.Infrastructure.Repositories;
-using SudokuVS.Server.Services;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 Log.Logger = Logging.CreateBootstrapLogger();
