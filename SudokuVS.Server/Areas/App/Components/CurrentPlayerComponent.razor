@@ -195,7 +195,7 @@
             return;
         }
 
-        PlayerState!.TryUseHint(_selectedCell.Value.Row, _selectedCell.Value.Column);
+        PlayerState!.TryUseHint(_selectedCell.Value.Row, _selectedCell.Value.Column, out _);
     }
 
     void UpdateGrid()
