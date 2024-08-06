@@ -156,10 +156,10 @@ public class GameplayController : ControllerBase
 
     async Task<SudokuPlayerGameDto> ComputePlayerGameDto(SudokuGame game, PlayerState playerState)
     {
-        UserIdentity playerIdentity = await playerState.GetUserIdentity(_userManager);
+        UserIdentityDto playerIdentity = await playerState.GetUserIdentity(_userManager);
 
         IHiddenPlayerState? otherPlayerState = game.GetOtherPlayerState(playerState.Username);
-        UserIdentity? opponentIdentity = otherPlayerState == null ? null : await otherPlayerState.GetUserIdentity(_userManager);
+        UserIdentityDto? opponentIdentity = otherPlayerState == null ? null : await otherPlayerState.GetUserIdentity(_userManager);
 
         return game.ToPlayerGameDto(playerState, playerIdentity, opponentIdentity);
     }

@@ -23,10 +23,10 @@ public class SudokuGamePlayerStateDto
 
 static class SudokuGamePlayerStateMappingExtensions
 {
-    public static SudokuGamePlayerStateDto ToPlayerStateDto(this PlayerState state, UserIdentity user) =>
+    public static SudokuGamePlayerStateDto ToPlayerStateDto(this PlayerState state, UserIdentityDto user) =>
         new()
         {
-            User = user.ToDto(),
+            User = user,
             Grid = state.Grid.ToPlayerGridDto(state)
         };
 }

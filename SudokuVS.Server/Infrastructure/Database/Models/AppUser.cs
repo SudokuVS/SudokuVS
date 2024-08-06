@@ -3,6 +3,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SudokuVS.Game;
+using SudokuVS.Server.RestApi.Models;
 
 namespace SudokuVS.Server.Infrastructure.Database.Models;
 
@@ -14,7 +15,7 @@ public class AppUser : IdentityUser
 
 static class UserManagerExtensions
 {
-    public static UserIdentity ToUserIdentity(this AppUser user) => new() { Username = GetUserName(user), DisplayName = GetPublicName(user) };
+    public static UserIdentityDto ToUserIdentity(this AppUser user) => new() { Id = GetUserName(user), Name = GetPublicName(user) };
 
     public static async Task<string?> GetPublicName(this UserManager<AppUser> manager, ClaimsPrincipal claims, CancellationToken cancellationToken = default)
     {
@@ -49,9 +50,9 @@ static class UserManagerExtensions
 
 static class PlayerStateUserExtensions
 {
-    public static async Task<UserIdentity> GetUserIdentity(this IHiddenPlayerState state, UserManager<AppUser> userManager)
+    public static async Task<UserIdentityDto> GetUserIdentity(this IHiddenPlayerState state, UserManager<AppUser> userManager)
     {
         AppUser? opponent = await userManager.GetUserByIdAsync(state.Username);
-        return opponent?.ToUserIdentity() ?? new UserIdentity { Username = state.Username, DisplayName = state.Username };
+        return opponent?.ToUserIdentity() ?? new UserIdentityDto { Id = state.Username, Name = state.Username };
     }
 }

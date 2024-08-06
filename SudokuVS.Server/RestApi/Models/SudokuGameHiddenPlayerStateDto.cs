@@ -23,10 +23,10 @@ public class SudokuGameHiddenPlayerStateDto
 
 static class SudokuGameHiddenPlayerStateMappingExtensions
 {
-    public static SudokuGameHiddenPlayerStateDto ToHiddenPlayerStateDto(this IHiddenPlayerState state, UserIdentity user) =>
+    public static SudokuGameHiddenPlayerStateDto ToHiddenPlayerStateDto(this IHiddenPlayerState state, UserIdentityDto user) =>
         new()
         {
-            User = user.ToDto(),
+            User = user,
             Grid = state.Grid.ToHiddenPlayerGridDto(state)
         };
 }

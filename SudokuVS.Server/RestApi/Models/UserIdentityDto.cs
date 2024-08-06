@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using SudokuVS.Game;
 
 namespace SudokuVS.Server.RestApi.Models;
 
@@ -18,9 +17,4 @@ public class UserIdentityDto
     /// </summary>
     [Required]
     public required string Name { get; init; }
-}
-
-static class UserIdentityMappingExtensions
-{
-    public static UserIdentityDto ToDto(this UserIdentity user) => new() { Id = user.Username, Name = user.DisplayName };
 }
