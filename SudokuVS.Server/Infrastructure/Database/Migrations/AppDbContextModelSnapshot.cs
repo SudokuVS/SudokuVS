@@ -263,8 +263,7 @@ namespace SudokuVS.Server.Infrastructure.Database.Migrations
 
                     b.HasIndex("GameId");
 
-                    b.HasIndex("UserName")
-                        .IsUnique();
+                    b.HasIndex("UserName");
 
                     b.ToTable("PlayerStates");
                 });
@@ -364,8 +363,8 @@ namespace SudokuVS.Server.Infrastructure.Database.Migrations
                         .IsRequired();
 
                     b.HasOne("SudokuVS.Server.Infrastructure.Database.Models.AppUser", "User")
-                        .WithOne()
-                        .HasForeignKey("SudokuVS.Server.Infrastructure.Database.Models.Game.PlayerStateEntity", "UserName")
+                        .WithMany()
+                        .HasForeignKey("UserName")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
