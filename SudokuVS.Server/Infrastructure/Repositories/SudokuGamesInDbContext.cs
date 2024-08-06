@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using SudokuVS.Game;
 using SudokuVS.Game.Infrastructure.Database;
 using SudokuVS.Game.Models;
 using SudokuVS.Game.Utils;
@@ -8,7 +7,7 @@ using SudokuVS.Sudoku.Models;
 using SudokuVS.Sudoku.Serialization;
 using SudokuVS.Sudoku.Utils;
 
-namespace SudokuVS.Game.Persistence;
+namespace SudokuVS.Server.Infrastructure.Repositories;
 
 class SudokuGamesInDbContext : SudokuGameCachedRepository
 {
@@ -81,8 +80,8 @@ class SudokuGamesInDbContext : SudokuGameCachedRepository
             entity.SolvedGrid = _serializer.ToString(game.SolvedGrid);
         }
 
-        await SavePlayerState(context, game, PlayerSide.Player1, entity, cancellationToken);
-        await SavePlayerState(context, game, PlayerSide.Player2, entity, cancellationToken);
+        SavePlayerState(context, game, PlayerSide.Player1, entity, cancellationToken);
+        SavePlayerState(context, game, PlayerSide.Player2, entity, cancellationToken);
 
         entity.StartDate = game.StartDate;
         entity.EndDate = game.EndDate;
@@ -123,7 +122,7 @@ class SudokuGamesInDbContext : SudokuGameCachedRepository
         return result;
     }
 
-    async Task SavePlayerState(GameDbContext context, SudokuGame game, PlayerSide side, SudokuGameEntity entity, CancellationToken _ = default)
+    void SavePlayerState(GameDbContext context, SudokuGame game, PlayerSide side, SudokuGameEntity entity, CancellationToken _ = default)
     {
         PlayerState? state = game.GetPlayerState(side);
         if (state == null)

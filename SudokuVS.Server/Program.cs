@@ -7,6 +7,7 @@ using NSwag;
 using NSwag.AspNetCore;
 using NSwag.Generation.Processors.Security;
 using Serilog;
+using SudokuVS.Game;
 using SudokuVS.Game.Infrastructure.Database;
 using SudokuVS.Game.Utils;
 using SudokuVS.Server;
@@ -15,6 +16,7 @@ using SudokuVS.Server.Exceptions;
 using SudokuVS.Server.Infrastructure.Authentication;
 using SudokuVS.Server.Infrastructure.Database;
 using SudokuVS.Server.Infrastructure.Logging;
+using SudokuVS.Server.Infrastructure.Repositories;
 using SudokuVS.Server.Models;
 using SudokuVS.Server.Services;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
@@ -46,12 +48,13 @@ try
     if (string.IsNullOrWhiteSpace(gameConnectionString))
     {
         bootstrapLogger.LogInformation("No connection string provided for GameDbContext, falling back to in-memory repository.");
-        gameOptions.PersistenceMode = PersistenceMode.InMemory;
+        builder.Services.AddSingleton<ISudokuGamesRepository, SudokuGamesInMemory>();
     }
     else
     {
         builder.Services.AddDbContext<GameDbContext>(options => options.UseSqlServer(gameConnectionString));
         bootstrapLogger.LogInformation("Connection to Game database configured.");
+        builder.Services.AddSingleton<ISudokuGamesRepository, SudokuGamesInDbContext>();
     }
 
     builder.Services.AddDefaultIdentity<AppUser>(

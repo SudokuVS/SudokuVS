@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using SudokuVS.Game;
 using SudokuVS.Game.Models;
 
-namespace SudokuVS.Game.Persistence;
+namespace SudokuVS.Server.Infrastructure.Repositories;
 
 abstract class SudokuGameCachedRepository : ISudokuGamesRepository, IDisposable
 {

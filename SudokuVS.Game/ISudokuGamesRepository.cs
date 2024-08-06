@@ -1,6 +1,6 @@
 ﻿using SudokuVS.Game.Exceptions;
 
-namespace SudokuVS.Game.Persistence;
+namespace SudokuVS.Game;
 
 public interface ISudokuGamesRepository
 {

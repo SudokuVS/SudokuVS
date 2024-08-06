@@ -125,7 +125,7 @@ public class SudokuGame
         return null;
     }
 
-    internal void Restore(PlayerState? player1, PlayerState? player2, DateTime? startDate, DateTime? endDate, PlayerSide? winner)
+    public void Restore(PlayerState? player1, PlayerState? player2, DateTime? startDate, DateTime? endDate, PlayerSide? winner)
     {
         Player1 = player1;
         Player2 = player2;
@@ -186,7 +186,7 @@ public class SudokuGame
         return new SudokuGame(id, name ?? id.ToString(), grid, solvedGrid, options);
     }
 
-    internal static SudokuGame Load(Guid id, string name, SudokuGrid grid, SudokuGrid solvedGrid, SudokuGameOptions options) => new(id, name, grid, solvedGrid, options);
+    public static SudokuGame Load(Guid id, string name, SudokuGrid grid, SudokuGrid solvedGrid, SudokuGameOptions options) => new(id, name, grid, solvedGrid, options);
 }
 
 public static class SudokuGameExtensions

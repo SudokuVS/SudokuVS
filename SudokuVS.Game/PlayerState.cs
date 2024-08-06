@@ -55,7 +55,7 @@ public class PlayerState : IHiddenPlayerState
         return true;
     }
 
-    internal void Restore(IEnumerable<(int, int)> hints)
+    public void Restore(IEnumerable<(int, int)> hints)
     {
         _hints.Clear();
         foreach ((int, int) hint in hints)

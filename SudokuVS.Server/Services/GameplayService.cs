@@ -1,6 +1,5 @@
 ﻿using SudokuVS.Game;
 using SudokuVS.Game.Models;
-using SudokuVS.Game.Persistence;
 using SudokuVS.Server.Exceptions;
 
 namespace SudokuVS.Server.Services;
