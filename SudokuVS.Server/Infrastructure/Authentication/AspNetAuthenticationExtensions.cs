@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SudokuVS.Server.Infrastructure.Authentication;
 
@@ -11,6 +12,25 @@ public static class AspNetAuthenticationExtensions
         AddGoogleAuthentication(builder, logger, authBuilder);
         AddMicrosoftAccountAuthentication(builder, logger, authBuilder);
         AddApiKeyAuthentication(builder, logger, authBuilder);
+    }
+
+    public static void AddAuthorization(this WebApplicationBuilder builder, ILogger? logger = null)
+    {
+        builder.Services.AddAuthorization(
+            options =>
+            {
+                options.AddPolicy(
+                    ApiKeyConstants.AuthenticationScheme,
+                    policy =>
+                    {
+                        policy.AddAuthenticationSchemes(ApiKeyConstants.AuthenticationScheme);
+                        policy.Requirements.Add(new ApiKeyAuthorizationRequirement());
+                    }
+                );
+            }
+        );
+
+        builder.Services.AddScoped<IAuthorizationHandler, ApiKeyAuthorizationHandler>();
     }
 
     static void AddGoogleAuthentication(WebApplicationBuilder builder, ILogger? logger, AuthenticationBuilder authenticationBuilder)
@@ -68,7 +88,7 @@ public static class AspNetAuthenticationExtensions
 
         builder.Services.Configure<ApiKeyOptions>(opt => opt.Secret = secret);
         builder.Services.AddScoped<ApiKeyService>();
-        authenticationBuilder.AddScheme<ApiKeySchemeOptions, ApiKeyAuthenticationHandler>(ApiKeySchemeOptions.Scheme, _ => { });
+        authenticationBuilder.AddScheme<ApiKeySchemeOptions, ApiKeyAuthenticationHandler>(ApiKeyConstants.AuthenticationScheme, _ => { });
 
         logger?.LogInformation("API Key auth configured.");
     }

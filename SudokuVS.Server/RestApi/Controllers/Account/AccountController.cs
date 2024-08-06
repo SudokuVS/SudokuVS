@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SudokuVS.Server.Exceptions;
 using SudokuVS.Server.Infrastructure.Authentication;
@@ -8,6 +9,7 @@ using SudokuVS.Server.RestApi.Models;
 namespace SudokuVS.Server.RestApi.Controllers.Account;
 
 [Route("/api/account")]
+[Authorize(ApiKeyConstants.AuthenticationScheme)]
 [ApiController]
 public class AccountController : ControllerBase
 {

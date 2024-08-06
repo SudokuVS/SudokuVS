@@ -85,6 +85,22 @@ public class ApiKeyService
     /// </summary>
     public async Task<AppUser?> FindUserAsync(string token) => (await GetApiKeyAsync(token))?.User;
 
+    /// <summary>
+    ///     Return true if the provided token is valid: it exists, and it is associated with a user.
+    /// </summary>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    public async Task<bool> ValidateTokenAsync(string token)
+    {
+        Guid? keyId = GetApiKeyIdFromToken(token);
+        if (!keyId.HasValue)
+        {
+            return false;
+        }
+
+        return await _context.ApiKeys.AsNoTracking().AnyAsync(k => k.Id == keyId.Value && k.User != null);
+    }
+
     string GenerateKeyToken(ApiKeyEntity keyEntity)
     {
         List<Claim> claims =
@@ -101,7 +117,18 @@ public class ApiKeyService
         return _tokenHandler.WriteToken(token);
     }
 
-    async Task<ApiKeyEntity?> GetApiKeyAsync(string tokenStr)
+    async Task<ApiKeyEntity?> GetApiKeyAsync(string token)
+    {
+        Guid? keyId = GetApiKeyIdFromToken(token);
+        if (!keyId.HasValue)
+        {
+            return null;
+        }
+
+        return await _context.ApiKeys.AsNoTracking().SingleOrDefaultAsync(k => k.Id == keyId.Value);
+    }
+
+    Guid? GetApiKeyIdFromToken(string tokenStr)
     {
         JwtSecurityToken token = _tokenHandler.ReadJwtToken(tokenStr);
         string? keyIdStr = token.Claims.FirstOrDefault(c => c.Type == ApiKeyConstants.KeyIdClaimType)?.Value;
@@ -110,7 +137,7 @@ public class ApiKeyService
             return null;
         }
 
-        return await _context.ApiKeys.SingleOrDefaultAsync(k => k.Id == keyId);
+        return keyId;
     }
 
     ApiKey ToApiKey(ApiKeyEntity key) => new(key.Id, key.CreationDate, key.Name, GenerateKeyToken(key));
