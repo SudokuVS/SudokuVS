@@ -8,7 +8,6 @@ using NSwag.AspNetCore;
 using NSwag.Generation.Processors.Security;
 using Serilog;
 using SudokuVS.Game.Abstractions;
-using SudokuVS.Game.Services;
 using SudokuVS.Game.Utils;
 using SudokuVS.Server;
 using SudokuVS.Server.Areas.App.Components;
@@ -56,8 +55,6 @@ try
     builder.Services.AddAuthorization();
 
     builder.ConfigureGameServices(gameOptions);
-    builder.Services.AddTransient<GameplayService>();
-    builder.Services.AddTransient<GamesService>();
 
     builder.Services.AddControllers()
         .AddJsonOptions(

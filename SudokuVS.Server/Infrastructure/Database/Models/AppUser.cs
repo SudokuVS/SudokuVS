@@ -7,6 +7,7 @@ using SudokuVS.Server.RestApi.Models;
 
 namespace SudokuVS.Server.Infrastructure.Database.Models;
 
+[Index(nameof(UserName), IsUnique = true)]
 public class AppUser : IdentityUser
 {
     [MaxLength(64)]

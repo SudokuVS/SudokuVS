@@ -11,12 +11,12 @@ public class PlayerStateEntity
     public PlayerStateEntity() { }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-    public PlayerStateEntity(SudokuGameEntity game, PlayerSide side, string username, string grid)
+    public PlayerStateEntity(SudokuGameEntity game, PlayerSide side, AppUser user, string grid)
     {
         GameId = game.Id;
         Game = game;
         Side = side;
-        Username = username;
+        User = user;
         Grid = grid;
     }
 
@@ -41,8 +41,12 @@ public class PlayerStateEntity
     /// <summary>
     ///     The user associated with the state.
     /// </summary>
-    [MaxLength(64)]
-    public string Username { get; set; }
+    public AppUser User { get; set; }
+
+    /// <summary>
+    ///     The username of the user associated with the state.
+    /// </summary>
+    public string UserName => User.GetUserName();
 
     /// <summary>
     ///     The current grid of the player.
