@@ -1,4 +1,4 @@
-﻿namespace SudokuVS.Game.Models;
+﻿namespace SudokuVS.Game;
 
 public enum PlayerSide
 {

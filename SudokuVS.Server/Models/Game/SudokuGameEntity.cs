@@ -1,7 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using SudokuVS.Game;
 using SudokuVS.Sudoku.Serialization;
 
-namespace SudokuVS.Game.Models;
+namespace SudokuVS.Server.Models.Game;
 
 public class SudokuGameEntity
 {

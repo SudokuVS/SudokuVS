@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SudokuVS.Game;
-using SudokuVS.Game.Models;
 using SudokuVS.Game.Utils;
 using SudokuVS.Server.Infrastructure.Database;
+using SudokuVS.Server.Models.Game;
 using SudokuVS.Sudoku.Models;
 using SudokuVS.Sudoku.Serialization;
 using SudokuVS.Sudoku.Utils;

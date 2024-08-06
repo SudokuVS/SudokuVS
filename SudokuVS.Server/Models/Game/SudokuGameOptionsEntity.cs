@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace SudokuVS.Game.Models;
+namespace SudokuVS.Server.Models.Game;
 
 [Owned]
 public class SudokuGameOptionsEntity

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using SudokuVS.Game.Models;
 using SudokuVS.Server.Models;
+using SudokuVS.Server.Models.Game;
 
 namespace SudokuVS.Server.Infrastructure.Database;
 

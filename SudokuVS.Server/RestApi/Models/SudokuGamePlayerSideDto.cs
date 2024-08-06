@@ -1,4 +1,4 @@
-﻿using SudokuVS.Game.Models;
+﻿using SudokuVS.Game;
 
 namespace SudokuVS.Server.RestApi.Models;
 
