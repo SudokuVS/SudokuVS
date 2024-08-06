@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using SudokuVS.Game;
+using SudokuVS.Game.Abstractions;
 
 namespace SudokuVS.Server.Infrastructure.Repositories;
 

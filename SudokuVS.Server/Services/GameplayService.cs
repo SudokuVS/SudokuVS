@@ -1,4 +1,5 @@
 ﻿using SudokuVS.Game;
+using SudokuVS.Game.Abstractions;
 using SudokuVS.Game.Models;
 using SudokuVS.Server.Exceptions;
 

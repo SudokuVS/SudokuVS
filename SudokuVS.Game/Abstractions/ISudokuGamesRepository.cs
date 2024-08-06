@@ -1,6 +1,6 @@
 ﻿using SudokuVS.Game.Exceptions;
 
-namespace SudokuVS.Game;
+namespace SudokuVS.Game.Abstractions;
 
 public interface ISudokuGamesRepository
 {

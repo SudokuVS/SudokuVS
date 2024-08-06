@@ -8,6 +8,7 @@ using NSwag.AspNetCore;
 using NSwag.Generation.Processors.Security;
 using Serilog;
 using SudokuVS.Game;
+using SudokuVS.Game.Abstractions;
 using SudokuVS.Game.Utils;
 using SudokuVS.Server;
 using SudokuVS.Server.Areas.App.Components;
