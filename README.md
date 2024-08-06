@@ -25,7 +25,6 @@ dotnet build --no-restore
 either in the `appsettings.json` 
 ```json
 "ConnectionStrings": {
-    "GameDbContext": "", // required, expects SQL server connection string
     "AppDbContext": "" // required, expects SQL server connection string
 },
 "Authentication": {
@@ -42,7 +41,6 @@ either in the `appsettings.json`
 
 or in the dotnet user-secrets
 ```
-dotnet user-secrets --project SudokuVS.Server set "ConnectionStrings:GameDbContext" "..."
 dotnet user-secrets --project SudokuVS.Server set "ConnectionStrings:AppDbContext" "..."
 ```
 or in any other source supported by the default ASP.NET Core configuration builder
