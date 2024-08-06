@@ -14,20 +14,13 @@ namespace SudokuVS.Server.Infrastructure.Repositories;
 
 class SudokuGamesInDbContext : SudokuGameCachedRepository
 {
-    readonly UserManager<AppUser> _userManager;
     readonly IServiceScopeFactory _scopeFactory;
     readonly SudokuGridStringSerializer _serializer;
 
-    public SudokuGamesInDbContext(
-        UserManager<AppUser> userManager,
-        IServiceScopeFactory scopeFactory,
-        SudokuGridStringSerializer serializer,
-        ILogger<SudokuGamesInDbContext> logger
-    ) : base(logger)
+    public SudokuGamesInDbContext(IServiceScopeFactory scopeFactory, SudokuGridStringSerializer serializer, ILogger<SudokuGamesInDbContext> logger) : base(logger)
     {
         _scopeFactory = scopeFactory;
         _serializer = serializer;
-        _userManager = userManager;
     }
 
     protected override async Task<IReadOnlyList<Guid>> ListIdsAsync(CancellationToken cancellationToken)
@@ -75,6 +68,7 @@ class SudokuGamesInDbContext : SudokuGameCachedRepository
     protected override async Task SaveToDistributedRepositoryAsync(SudokuGame game, CancellationToken cancellationToken)
     {
         using IServiceScope scope = _scopeFactory.CreateScope();
+        UserManager<AppUser> userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
         AppDbContext context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         SudokuGameEntity? entity = await FindGameAsync(context, game.Id, cancellationToken);
@@ -90,8 +84,8 @@ class SudokuGamesInDbContext : SudokuGameCachedRepository
             entity.SolvedGrid = _serializer.ToString(game.SolvedGrid);
         }
 
-        await SavePlayerStateAsync(context, game, PlayerSide.Player1, entity, cancellationToken);
-        await SavePlayerStateAsync(context, game, PlayerSide.Player2, entity, cancellationToken);
+        await SavePlayerStateAsync(userManager, context, game, PlayerSide.Player1, entity, cancellationToken);
+        await SavePlayerStateAsync(userManager, context, game, PlayerSide.Player2, entity, cancellationToken);
 
         entity.StartDate = game.StartDate;
         entity.EndDate = game.EndDate;
@@ -134,7 +128,14 @@ class SudokuGamesInDbContext : SudokuGameCachedRepository
         return result;
     }
 
-    async Task SavePlayerStateAsync(AppDbContext context, SudokuGame game, PlayerSide side, SudokuGameEntity entity, CancellationToken _ = default)
+    async Task SavePlayerStateAsync(
+        UserManager<AppUser> userManager,
+        AppDbContext context,
+        SudokuGame game,
+        PlayerSide side,
+        SudokuGameEntity entity,
+        CancellationToken _ = default
+    )
     {
         PlayerState? state = game.GetPlayerState(side);
         if (state == null)
@@ -149,7 +150,7 @@ class SudokuGamesInDbContext : SudokuGameCachedRepository
         {
             PlayerStateEntity? entityState = entity.GetPlayerState(side);
 
-            AppUser? user = await _userManager.GetUserByIdAsync(state.Username);
+            AppUser? user = await userManager.GetUserByIdAsync(state.Username);
             if (user == null)
             {
                 throw new InternalErrorException($"Could not find user with name {state.Username}");
