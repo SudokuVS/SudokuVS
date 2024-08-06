@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SudokuVS.Server.Exceptions;
@@ -34,6 +35,8 @@ public class ApiKeyService
         SymmetricSecurityKey key = new(secret);
         _credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
     }
+
+    IIncludableQueryable<ApiKeyEntity, AppUser> AllApiKeys => _context.ApiKeys.Include(k => k.User);
 
     /// <summary>
     ///     Create a new api key for the given user and return a valid token for the key.
@@ -98,7 +101,7 @@ public class ApiKeyService
             return false;
         }
 
-        return await _context.ApiKeys.AsNoTracking().AnyAsync(k => k.Id == keyId.Value && k.User != null);
+        return await AllApiKeys.AsNoTracking().AnyAsync(k => k.Id == keyId.Value && k.User != null);
     }
 
     string GenerateKeyToken(ApiKeyEntity keyEntity)
@@ -125,7 +128,7 @@ public class ApiKeyService
             return null;
         }
 
-        return await _context.ApiKeys.AsNoTracking().SingleOrDefaultAsync(k => k.Id == keyId.Value);
+        return await AllApiKeys.AsNoTracking().SingleOrDefaultAsync(k => k.Id == keyId.Value);
     }
 
     Guid? GetApiKeyIdFromToken(string tokenStr)

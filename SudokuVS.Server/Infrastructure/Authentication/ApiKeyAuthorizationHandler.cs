@@ -9,23 +9,23 @@ public class ApiKeyAuthorizationRequirement : IAuthorizationRequirement
 class ApiKeyAuthorizationHandler : AuthorizationHandler<ApiKeyAuthorizationRequirement>
 {
     readonly IHttpContextAccessor _httpContextAccessor;
-    readonly ApiKeyService _apiKeyService;
 
-    public ApiKeyAuthorizationHandler(IHttpContextAccessor httpContextAccessor, ApiKeyService apiKeyService)
+    public ApiKeyAuthorizationHandler(IHttpContextAccessor httpContextAccessor)
     {
         _httpContextAccessor = httpContextAccessor;
-        _apiKeyService = apiKeyService;
     }
 
-    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, ApiKeyAuthorizationRequirement requirement)
+    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ApiKeyAuthorizationRequirement requirement)
     {
         string? apiKey = _httpContextAccessor.HttpContext?.Request.Headers[ApiKeySchemeOptions.HeaderName].ToString();
-        if (string.IsNullOrWhiteSpace(apiKey) || !await _apiKeyService.ValidateTokenAsync(apiKey))
+        if (string.IsNullOrWhiteSpace(apiKey))
         {
             context.Fail(new AuthorizationFailureReason(this, "Bad API key."));
-            return;
+            return Task.CompletedTask;
         }
 
+        // no need to check the actual key, if it was bad authentication would have discarded it.
         context.Succeed(requirement);
+        return Task.CompletedTask;
     }
 }

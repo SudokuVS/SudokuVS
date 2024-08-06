@@ -16,19 +16,19 @@ public class ApiKeySchemeOptions : AuthenticationSchemeOptions
 
 class ApiKeyAuthenticationHandler : AuthenticationHandler<ApiKeySchemeOptions>
 {
-    readonly UserManager<AppUser> _userManager;
     readonly ApiKeyService _apiKeyService;
+    readonly IUserClaimsPrincipalFactory<AppUser> _userClaimsPrincipalFactory;
 
     public ApiKeyAuthenticationHandler(
         ApiKeyService apiKeyService,
-        UserManager<AppUser> userManager,
+        IUserClaimsPrincipalFactory<AppUser> userClaimsPrincipalFactory,
         IOptionsMonitor<ApiKeySchemeOptions> options,
         ILoggerFactory logger,
         UrlEncoder encoder
     ) : base(options, logger, encoder)
     {
         _apiKeyService = apiKeyService;
-        _userManager = userManager;
+        _userClaimsPrincipalFactory = userClaimsPrincipalFactory;
     }
 
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -44,9 +44,7 @@ class ApiKeyAuthenticationHandler : AuthenticationHandler<ApiKeySchemeOptions>
             return AuthenticateResult.Fail("Bad api key.");
         }
 
-        IList<Claim> claims = await _userManager.GetClaimsAsync(user);
-        ClaimsIdentity identity = new(claims, ApiKeyConstants.AuthenticationType);
-        ClaimsPrincipal principal = new(identity);
+        ClaimsPrincipal principal = await _userClaimsPrincipalFactory.CreateAsync(user);
         AuthenticationTicket ticket = new(principal, Scheme.Name);
 
         return AuthenticateResult.Success(ticket);
