@@ -4,7 +4,7 @@ namespace SudokuVS.Game.Abstractions;
 
 public interface ISudokuGamesRepository
 {
-    Task<IReadOnlyList<SudokuGame>> GetAllAsync(CancellationToken cancellationToken = default);
+    IQueryable<SudokuGame> GetAllAsync();
     Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default);
     Task<SudokuGame?> GetAsync(Guid id, CancellationToken cancellationToken = default);
     Task SaveAsync(SudokuGame game, CancellationToken cancellationToken = default);

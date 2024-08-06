@@ -13,5 +13,6 @@ public class GamesService
 
     public async Task<SudokuGame?> GetGameAsync(Guid gameId, CancellationToken cancellationToken = default) => await _repository.GetAsync(gameId, cancellationToken);
 
-    public async Task<IReadOnlyList<SudokuGame>> GetGamesAsync(CancellationToken cancellationToken = default) => await _repository.GetAllAsync(cancellationToken);
+    public IEnumerable<SudokuGame> GetGames(string username) =>
+        _repository.GetAllAsync().Where(g => g.Player1 != null && g.Player1.Username == username || g.Player2 != null && g.Player2.Username == username);
 }

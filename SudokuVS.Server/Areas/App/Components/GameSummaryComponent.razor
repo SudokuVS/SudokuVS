@@ -1,10 +1,11 @@
-﻿@using Microsoft.AspNetCore.Identity
+﻿@using Microsoft.EntityFrameworkCore
 @using SudokuVS.Game
 @using SudokuVS.Game.Services
+@using SudokuVS.Server.Infrastructure.Database
 @using SudokuVS.Server.Infrastructure.Database.Models
 @inject IJSRuntime JsRuntime
 @inject GamesService GamesService
-@inject UserManager<AppUser> UserManager
+@inject IDbContextFactory<AppDbContext> AppContextFactory
 
 <div class="w-100 overflow-hidden">
     @if (_game != null)
@@ -108,6 +109,8 @@
 
     async Task UpdateGame()
     {
+        await using AppDbContext appContext = await AppContextFactory.CreateDbContextAsync();
+
         _game = await GamesService.GetGameAsync(GameId);
 
         if (_game != null)
@@ -115,14 +118,14 @@
             string? player1Username = _game.Player1?.Username;
             if (!string.IsNullOrEmpty(player1Username))
             {
-                AppUser? user = await UserManager.GetUserByIdAsync(player1Username);
+                AppUser? user = await appContext.Users.GetByUserNameAsync(player1Username);
                 _player1Name = user?.GetPublicName() ?? player1Username;
             }
 
             string? player2Username = _game.Player2?.Username;
             if (!string.IsNullOrEmpty(player2Username))
             {
-                AppUser? user = await UserManager.GetUserByIdAsync(player2Username);
+                AppUser? user = await appContext.Users.GetByUserNameAsync(player2Username);
                 _player2Name = user?.GetPublicName() ?? player2Username;
             }
         }

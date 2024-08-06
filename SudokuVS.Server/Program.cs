@@ -39,9 +39,11 @@ try
         throw new InvalidOperationException("No connection string provided for AppDbContext.");
     }
 
+    builder.Services.AddDbContextFactory<AppDbContext>(options => options.UseSqlServer(appConnectionString));
     builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(appConnectionString));
     bootstrapLogger.LogInformation("Connection to AppComponent database configured.");
-    builder.Services.AddSingleton<ISudokuGamesRepository, SudokuGamesInDbContext>();
+    builder.Services.AddSingleton<SudokuGamesInDbContext>();
+    builder.Services.AddSingleton<ISudokuGamesRepository, SudokuGamesInDbContext>(services => services.GetRequiredService<SudokuGamesInDbContext>());
 
     builder.Services.AddDefaultIdentity<AppUser>(
             options =>
@@ -108,6 +110,8 @@ try
     app.MapControllerRoute("areas", "{area:exists}/{controller=Home}/{action=Index}/{id?}");
     app.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
 
+    PreloadGames(app);
+
     app.Run();
 
     Log.Information("Bye!");
@@ -171,4 +175,13 @@ async Task ApplyMigrations<TContext>(WebApplication app) where TContext: DbConte
     using IServiceScope scope = scopeProvider.CreateScope();
     TContext context = scope.ServiceProvider.GetRequiredService<TContext>();
     await context.Database.MigrateAsync();
+}
+
+void PreloadGames(WebApplication app)
+{
+    SudokuGamesInDbContext gamesInDbContext = app.Services.GetRequiredService<SudokuGamesInDbContext>();
+
+    bootstrapLogger.LogInformation("Loading games from DB to memory...");
+    gamesInDbContext.PreloadAsync().GetAwaiter().GetResult();
+    bootstrapLogger.LogInformation("Done loading games to memory.");
 }

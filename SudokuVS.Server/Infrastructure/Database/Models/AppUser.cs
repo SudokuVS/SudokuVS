@@ -18,7 +18,7 @@ static class UserManagerExtensions
 {
     public static UserIdentityDto ToUserIdentity(this AppUser user) => new() { Username = GetUserName(user), PublicName = GetPublicName(user) };
 
-    public static async Task<string?> GetPublicName(this UserManager<AppUser> manager, ClaimsPrincipal claims, CancellationToken cancellationToken = default)
+    public static async Task<string?> GetPublicName(this UserManager<AppUser> manager, ClaimsPrincipal claims)
     {
         AppUser? user = await manager.GetUserAsync(claims);
         return user == null ? null : GetPublicName(user);
@@ -47,6 +47,11 @@ static class UserManagerExtensions
 
     public static async Task<AppUser?> GetUserByIdAsync(this UserManager<AppUser> manager, string username) =>
         await manager.Users.SingleOrDefaultAsync(u => u.UserName == username);
+}
+
+static class AppUserExtensions
+{
+    public static Task<AppUser?> GetByUserNameAsync(this DbSet<AppUser> users, string username) => users.SingleOrDefaultAsync(u => u.UserName == username);
 }
 
 static class PlayerStateUserExtensions
