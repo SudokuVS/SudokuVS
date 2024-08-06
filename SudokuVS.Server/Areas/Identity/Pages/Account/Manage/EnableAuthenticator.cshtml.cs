@@ -10,7 +10,7 @@ using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using SudokuVS.Server.Models;
+using SudokuVS.Server.Infrastructure.Database.Models;
 
 namespace SudokuVS.Server.Areas.Identity.Pages.Account.Manage;
 
@@ -151,7 +151,7 @@ public class EnableAuthenticatorModel : PageModel
 
     string FormatKey(string unformattedKey)
     {
-        StringBuilder result = new StringBuilder();
+        StringBuilder result = new();
         int currentPosition = 0;
         while (currentPosition + 4 < unformattedKey.Length)
         {

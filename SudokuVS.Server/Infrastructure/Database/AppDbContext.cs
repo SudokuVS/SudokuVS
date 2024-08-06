@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using SudokuVS.Server.Models;
-using SudokuVS.Server.Models.Game;
+using SudokuVS.Server.Infrastructure.Database.Models;
+using SudokuVS.Server.Infrastructure.Database.Models.Game;
 
 namespace SudokuVS.Server.Infrastructure.Database;
 
@@ -17,7 +17,7 @@ class AppDbContext : IdentityDbContext<AppUser>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        
+
         modelBuilder.Entity<SudokuGameEntity>().HasMany(e => e.Players).WithOne(s => s.Game).HasForeignKey(s => s.GameId).IsRequired();
     }
 }

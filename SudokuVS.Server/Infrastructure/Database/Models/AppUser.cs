@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using SudokuVS.Game;
 using SudokuVS.Game.Users;
 
-namespace SudokuVS.Server.Models;
+namespace SudokuVS.Server.Infrastructure.Database.Models;
 
 public class AppUser : IdentityUser
 {

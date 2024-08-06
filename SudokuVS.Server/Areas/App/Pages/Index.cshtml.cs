@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SudokuVS.Game;
 using SudokuVS.Server.Exceptions;
-using SudokuVS.Server.Models;
+using SudokuVS.Server.Infrastructure.Database.Models;
 using SudokuVS.Server.Services;
 
 namespace SudokuVS.Server.Areas.App.Pages;

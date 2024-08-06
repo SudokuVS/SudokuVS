@@ -2,7 +2,7 @@
 using SudokuVS.Game;
 using SudokuVS.Sudoku.Serialization;
 
-namespace SudokuVS.Server.Models.Game;
+namespace SudokuVS.Server.Infrastructure.Database.Models.Game;
 
 public class PlayerStateEntity
 {
