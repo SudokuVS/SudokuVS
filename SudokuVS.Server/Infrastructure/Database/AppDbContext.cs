@@ -14,6 +14,10 @@ class AppDbContext : IdentityDbContext<AppUser>
     public DbSet<PlayerStateEntity> PlayerStates { get; private set; }
     public DbSet<SudokuGameEntity> Games { get; private set; }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder) =>
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        
         modelBuilder.Entity<SudokuGameEntity>().HasMany(e => e.Players).WithOne(s => s.Game).HasForeignKey(s => s.GameId).IsRequired();
+    }
 }
