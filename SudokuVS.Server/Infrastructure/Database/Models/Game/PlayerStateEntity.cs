@@ -17,7 +17,6 @@ public class PlayerStateEntity
         Game = game;
         Side = side;
         User = user;
-        UserName = user.GetUserName();
         Grid = grid;
     }
 
@@ -47,8 +46,7 @@ public class PlayerStateEntity
     /// <summary>
     ///     The username of the user associated with the state.
     /// </summary>
-    [MaxLength(256)]
-    public string UserName { get; set; }
+    public string UserName => User.GetUserName();
 
     /// <summary>
     ///     The current grid of the player.

@@ -12,7 +12,7 @@ using SudokuVS.Server.Infrastructure.Database;
 namespace SudokuVS.Server.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240806131938_AddUserNavigatonToPlayerState")]
+    [Migration("20240806132959_AddUserNavigatonToPlayerState")]
     partial class AddUserNavigatonToPlayerState
     {
         /// <inheritdoc />
@@ -257,16 +257,14 @@ namespace SudokuVS.Server.Infrastructure.Database.Migrations
                     b.Property<int>("Side")
                         .HasColumnType("int");
 
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("GameId");
 
-                    b.HasIndex("UserName");
+                    b.HasIndex("UserId");
 
                     b.ToTable("PlayerStates");
                 });
@@ -367,9 +365,7 @@ namespace SudokuVS.Server.Infrastructure.Database.Migrations
 
                     b.HasOne("SudokuVS.Server.Infrastructure.Database.Models.AppUser", "User")
                         .WithMany()
-                        .HasForeignKey("UserName")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Game");
 
