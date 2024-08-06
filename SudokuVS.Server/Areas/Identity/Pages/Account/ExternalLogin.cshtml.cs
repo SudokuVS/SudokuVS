@@ -85,6 +85,7 @@ public class ExternalLoginModel : PageModel
         [EmailAddress]
         public string Email { get; set; }
 
+        [Display(Name="Display name")]
         public string DisplayName { get; set; }
     }
 
