@@ -14,17 +14,17 @@
             <div class="d-flex align-items-center justify-content-center">
                 <GridIconComponent Grid="_game.InitialGrid" HideState="!_game.IsStarted"></GridIconComponent>
             </div>
-            <div class="overflow-hidden flex-grow-1">
+            <div class="overflow-hidden flex-grow-1 d-flex flex-wrap gap-2">
                 @{
                     string player1WinLoseStyle = _game.Winner switch { PlayerSide.Player1 => "text-success", PlayerSide.Player2 => "text-danger", _ => "" };
                     string player2WinLoseStyle = _game.Winner switch { PlayerSide.Player1 => "text-danger", PlayerSide.Player2 => "text-success", _ => "" };
                 }
-                <div class="w-100 text-truncate">
+                <div class="text-truncate">
                     <span class="fs-5 fw-semibold @player1WinLoseStyle" style="padding-left:20px;">
                         @(_player1Name ?? "???")
                     </span>
                 </div>
-                <div class="w-100 text-truncate">
+                <div class="text-truncate">
                     <span style="width:16px;">vs.</span>
                     <span class="fs-5 fw-semibold @player2WinLoseStyle">
                         @(_player2Name ?? "???")
