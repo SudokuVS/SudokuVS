@@ -30,11 +30,11 @@
             // Player is in the game, this side is empty and waiting for an opponent
             <div class="w-100 h-100 d-flex flex-column gap-2 align-items-center justify-content-center">
                 <h3>No opponent has joined yet!</h3>
-                <div class="position-relative d-flex align-items-center gap-4 border border-secondary-subtle rounded px-2 text-nowrap">
-                    <div id="invitation-link-container" class="font-monospace text-secondary">
+                <div class="position-relative d-flex align-items-center border border-secondary-subtle rounded text-nowrap">
+                    <div id="invitation-link-container" class="font-monospace text-secondary px-3">
                         @GetOtherPlayerInvitationLink()
                     </div>
-                    <a class="btn btn-outline-primary my-2 stretched-link" @onclick="CopyInvitationLinkAsync" id="copy-invitation-link-button">
+                    <a class="btn btn-outline-primary my-2 me-2 stretched-link" @onclick="CopyInvitationLinkAsync" id="copy-invitation-link-button">
                         <i class="bi bi-clipboard"></i>
                     </a>
                 </div>
