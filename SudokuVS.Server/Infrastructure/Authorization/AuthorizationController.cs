@@ -9,10 +9,11 @@ using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
 using SudokuVS.Server.Infrastructure.Database.Models;
-using SudokuVS.Server.ViewModels.Authorization;
+using SudokuVS.Server.Views.Authorization;
 
-namespace SudokuVS.Server.RestApi.Controllers.Authorization;
+namespace SudokuVS.Server.Infrastructure.Authorization;
 
+[ApiExplorerSettings(IgnoreApi = true)]
 public class AuthorizationController : Controller
 {
     readonly IOpenIddictApplicationManager _applicationManager;
@@ -144,8 +145,7 @@ public class AuthorizationController : Controller
                 identity.SetClaim(OpenIddictConstants.Claims.Subject, await _userManager.GetUserIdAsync(user))
                     .SetClaim(OpenIddictConstants.Claims.Email, await _userManager.GetEmailAsync(user))
                     .SetClaim(OpenIddictConstants.Claims.Name, await _userManager.GetUserNameAsync(user))
-                    .SetClaim(OpenIddictConstants.Claims.PreferredUsername, await _userManager.GetUserNameAsync(user))
-                    .SetClaims(OpenIddictConstants.Claims.Role, [.. await _userManager.GetRolesAsync(user)]);
+                    .SetClaim(OpenIddictConstants.Claims.PreferredUsername, await _userManager.GetUserNameAsync(user));
 
                 // Note: in this sample, the granted scopes match the requested scope
                 // but you may want to allow the user to uncheck specific scopes.
@@ -251,8 +251,7 @@ public class AuthorizationController : Controller
         identity.SetClaim(OpenIddictConstants.Claims.Subject, await _userManager.GetUserIdAsync(user))
             .SetClaim(OpenIddictConstants.Claims.Email, await _userManager.GetEmailAsync(user))
             .SetClaim(OpenIddictConstants.Claims.Name, await _userManager.GetUserNameAsync(user))
-            .SetClaim(OpenIddictConstants.Claims.PreferredUsername, await _userManager.GetUserNameAsync(user))
-            .SetClaims(OpenIddictConstants.Claims.Role, [.. await _userManager.GetRolesAsync(user)]);
+            .SetClaim(OpenIddictConstants.Claims.PreferredUsername, await _userManager.GetUserNameAsync(user));
 
         // Note: in this sample, the granted scopes match the requested scope
         // but you may want to allow the user to uncheck specific scopes.
@@ -278,8 +277,10 @@ public class AuthorizationController : Controller
         return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
     }
 
-    [Authorize] [FormValueRequired("submit.Deny")]
-    [HttpPost("~/connect/authorize")] [ValidateAntiForgeryToken]
+    [Authorize]
+    [FormValueRequired("submit.Deny")]
+    [HttpPost("~/connect/authorize")]
+    [ValidateAntiForgeryToken]
     // Notify OpenIddict that the authorization grant has been denied by the resource owner
     // to redirect the user agent to the client application using the appropriate response_mode.
     public IActionResult Deny() => Forbid(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
@@ -287,7 +288,9 @@ public class AuthorizationController : Controller
     [HttpGet("~/connect/logout")]
     public IActionResult Logout() => View();
 
-    [ActionName(nameof(Logout))] [HttpPost("~/connect/logout")] [ValidateAntiForgeryToken]
+    [ActionName(nameof(Logout))]
+    [HttpPost("~/connect/logout")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> LogoutPost()
     {
         // Ask ASP.NET Core Identity to delete the local and external cookies created
@@ -366,8 +369,7 @@ public class AuthorizationController : Controller
         identity.SetClaim(OpenIddictConstants.Claims.Subject, await _userManager.GetUserIdAsync(user))
             .SetClaim(OpenIddictConstants.Claims.Email, await _userManager.GetEmailAsync(user))
             .SetClaim(OpenIddictConstants.Claims.Name, await _userManager.GetUserNameAsync(user))
-            .SetClaim(OpenIddictConstants.Claims.PreferredUsername, await _userManager.GetUserNameAsync(user))
-            .SetClaims(OpenIddictConstants.Claims.Role, [.. await _userManager.GetRolesAsync(user)]);
+            .SetClaim(OpenIddictConstants.Claims.PreferredUsername, await _userManager.GetUserNameAsync(user));
 
         identity.SetDestinations(GetDestinations);
 

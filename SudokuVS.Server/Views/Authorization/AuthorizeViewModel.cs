@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SudokuVS.Server.ViewModels.Authorization;
+namespace SudokuVS.Server.Views.Authorization;
 
 public class AuthorizeViewModel
 {

@@ -55,7 +55,13 @@
 
     <ItemGroup>
       <Folder Include="RestApi\" />
+      <Folder Include="Views\" />
       <Folder Include="wwwroot\img\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Views\Authorization\Authorize.cshtml" />
+      <AdditionalFiles Include="Views\Authorization\Logout.cshtml" />
     </ItemGroup>
 
     <PropertyGroup>

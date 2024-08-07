@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 
-namespace SudokuVS.Server.RestApi.Controllers.Authorization;
+namespace SudokuVS.Server.Infrastructure.Authorization;
 
 public sealed class FormValueRequiredAttribute : ActionMethodSelectorAttribute
 {

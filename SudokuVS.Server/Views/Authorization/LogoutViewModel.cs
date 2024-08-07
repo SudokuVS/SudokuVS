@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace SudokuVS.Server.ViewModels.Authorization;
+namespace SudokuVS.Server.Views.Authorization;
 
 public class LogoutViewModel
 {
