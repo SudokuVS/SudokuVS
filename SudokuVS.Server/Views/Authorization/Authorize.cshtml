@@ -1,6 +1,12 @@
 ﻿@using Microsoft.Extensions.Primitives
 @model SudokuVS.Server.Views.Authorization.AuthorizeViewModel
-<div class="jumbotron">
+
+@{
+    ViewBag.Title = "Authorize";
+    Layout = "_EmptyLayout";
+}
+
+<div class="jumbotron text-center my-5">
     <h1>Authorization</h1>
 
     <p class="lead text-left">Do you want to grant <strong>@Model.ApplicationName</strong> access to your data? (scopes requested: @Model.Scope)</p>

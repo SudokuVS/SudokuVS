@@ -1,6 +1,12 @@
 ﻿@using Microsoft.Extensions.Primitives
 @model SudokuVS.Server.Views.Authorization.LogoutViewModel
-<div class="jumbotron">
+
+@{
+    ViewBag.Title = "Authorize";
+    Layout = "_EmptyLayout";
+}
+
+<div class="jumbotron text-center my-5">
     <h1>Log out</h1>
     <p class="lead text-left">Are you sure you want to sign out?</p>
 
