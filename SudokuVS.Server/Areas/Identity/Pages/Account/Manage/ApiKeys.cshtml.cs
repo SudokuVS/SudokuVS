@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SudokuVS.Server.Infrastructure.Authentication;
+using SudokuVS.Server.Infrastructure.Authentication.ApiKey;
 using SudokuVS.Server.Infrastructure.Database.Models;
 
 namespace SudokuVS.Server.Areas.Identity.Pages.Account.Manage;

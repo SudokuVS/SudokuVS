@@ -7,7 +7,7 @@ using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using SudokuVS.Server.Infrastructure.Database.Models;
 
-namespace SudokuVS.Server.Infrastructure.Authentication;
+namespace SudokuVS.Server.Infrastructure.Authentication.ApiKey;
 
 public class ApiKeySchemeOptions : AuthenticationSchemeOptions
 {

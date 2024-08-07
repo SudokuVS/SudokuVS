@@ -10,7 +10,7 @@ using SudokuVS.Server.Exceptions;
 using SudokuVS.Server.Infrastructure.Database;
 using SudokuVS.Server.Infrastructure.Database.Models;
 
-namespace SudokuVS.Server.Infrastructure.Authentication;
+namespace SudokuVS.Server.Infrastructure.Authentication.ApiKey;
 
 public class ApiKeyService
 {
@@ -133,6 +133,11 @@ public class ApiKeyService
 
     Guid? GetApiKeyIdFromToken(string tokenStr)
     {
+        if (!_tokenHandler.CanReadToken(tokenStr))
+        {
+            return null;
+        }
+
         JwtSecurityToken token = _tokenHandler.ReadJwtToken(tokenStr);
         string? keyIdStr = token.Claims.FirstOrDefault(c => c.Type == ApiKeyConstants.KeyIdClaimType)?.Value;
         if (keyIdStr == null || !Guid.TryParse(keyIdStr, out Guid keyId))

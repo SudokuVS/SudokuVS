@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using SudokuVS.Server.Infrastructure.Database.Models;
 
-namespace SudokuVS.Server.Infrastructure.Authentication;
+namespace SudokuVS.Server.Infrastructure.Authentication.ApiKey;
 
 public class ApiKeyEntity
 {

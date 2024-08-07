@@ -32,6 +32,8 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="NSwag.AspNetCore" Version="14.1.0"/>
+        <PackageReference Include="OpenIddict.AspNetCore" Version="5.7.0" />
+        <PackageReference Include="OpenIddict.EntityFrameworkCore" Version="5.7.0" />
         <PackageReference Include="Semver" Version="2.3.0"/>
         <PackageReference Include="Serilog.AspNetCore" Version="8.0.2"/> 
         <PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
@@ -53,7 +55,13 @@
 
     <ItemGroup>
       <Folder Include="RestApi\" />
+      <Folder Include="Views\" />
       <Folder Include="wwwroot\img\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Views\Authorization\Authorize.cshtml" />
+      <AdditionalFiles Include="Views\Authorization\Logout.cshtml" />
     </ItemGroup>
 
     <PropertyGroup>

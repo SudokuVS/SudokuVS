@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SudokuVS.Server.Infrastructure.Authentication;
+using SudokuVS.Server.Infrastructure.Authentication.ApiKey;
 using SudokuVS.Server.Infrastructure.Database.Models;
 using SudokuVS.Server.Infrastructure.Database.Models.Game;
 

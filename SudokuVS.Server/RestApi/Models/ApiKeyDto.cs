@@ -1,4 +1,5 @@
 ﻿using SudokuVS.Server.Infrastructure.Authentication;
+using SudokuVS.Server.Infrastructure.Authentication.ApiKey;
 
 namespace SudokuVS.Server.RestApi.Models;
 

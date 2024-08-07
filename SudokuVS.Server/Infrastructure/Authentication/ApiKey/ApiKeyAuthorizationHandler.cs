@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 
-namespace SudokuVS.Server.Infrastructure.Authentication;
+namespace SudokuVS.Server.Infrastructure.Authentication.ApiKey;
 
-public class ApiKeyAuthorizationRequirement : IAuthorizationRequirement
+public class ApiAuthorizationRequirement : IAuthorizationRequirement
 {
 }
 
-class ApiKeyAuthorizationHandler : AuthorizationHandler<ApiKeyAuthorizationRequirement>
+class ApiKeyAuthorizationHandler : AuthorizationHandler<ApiAuthorizationRequirement>
 {
     readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -15,7 +15,7 @@ class ApiKeyAuthorizationHandler : AuthorizationHandler<ApiKeyAuthorizationRequi
         _httpContextAccessor = httpContextAccessor;
     }
 
-    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ApiKeyAuthorizationRequirement requirement)
+    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ApiAuthorizationRequirement requirement)
     {
         string? apiKey = _httpContextAccessor.HttpContext?.Request.Headers[ApiKeySchemeOptions.HeaderName].ToString();
         if (string.IsNullOrWhiteSpace(apiKey))
