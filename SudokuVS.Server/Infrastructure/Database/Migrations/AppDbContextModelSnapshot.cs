@@ -159,7 +159,7 @@ namespace SudokuVS.Server.Infrastructure.Database.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("SudokuVS.Server.Infrastructure.Authentication.ApiKeyEntity", b =>
+            modelBuilder.Entity("SudokuVS.Server.Infrastructure.Authentication.ApiKey.ApiKeyEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -375,7 +375,7 @@ namespace SudokuVS.Server.Infrastructure.Database.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SudokuVS.Server.Infrastructure.Authentication.ApiKeyEntity", b =>
+            modelBuilder.Entity("SudokuVS.Server.Infrastructure.Authentication.ApiKey.ApiKeyEntity", b =>
                 {
                     b.HasOne("SudokuVS.Server.Infrastructure.Database.Models.AppUser", "User")
                         .WithMany()

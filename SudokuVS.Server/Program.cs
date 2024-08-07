@@ -71,7 +71,7 @@ try
             options =>
             {
                 options.SetTokenEndpointUris("connect/token");
-                options.AllowClientCredentialsFlow();
+                options.AllowAuthorizationCodeFlow();
 
         #if DEBUG
                 options.AddDevelopmentEncryptionCertificate().AddDevelopmentSigningCertificate();
