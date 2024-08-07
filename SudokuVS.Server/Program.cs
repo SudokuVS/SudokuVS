@@ -233,23 +233,20 @@ void ConfigureOpenApiDocument(WebApplicationBuilder builder)
                 Log.Information("Swagger UI API key authentication not configured, please set configurations Authentication:ApiKey:Secret.");
             }
 
-            if (builder.Environment.IsDevelopment())
-            {
-                const string devOidcAppSchemaName = "OIDC Application (dev)";
-                settings.AddSecurity(
-                    devOidcAppSchemaName,
-                    new OpenApiSecurityScheme
-                    {
-                        Description = "Use the OIDC DEV application to authenticate.",
-                        In = OpenApiSecurityApiKeyLocation.Header,
-                        Name = HeaderNames.Authorization,
-                        Type = OpenApiSecuritySchemeType.OpenIdConnect,
-                        OpenIdConnectUrl = "/.well-known/openid-configuration"
-                    }
-                );
-                settings.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor(devOidcAppSchemaName));
-                Log.Information("Swagger UI OIDC authentication configured (dev).");
-            }
+            const string devOidcAppSchemaName = "OIDC";
+            settings.AddSecurity(
+                devOidcAppSchemaName,
+                new OpenApiSecurityScheme
+                {
+                    Description = "Use an OIDC application to authenticate.",
+                    In = OpenApiSecurityApiKeyLocation.Header,
+                    Name = HeaderNames.Authorization,
+                    Type = OpenApiSecuritySchemeType.OpenIdConnect,
+                    OpenIdConnectUrl = "/.well-known/openid-configuration"
+                }
+            );
+            settings.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor(devOidcAppSchemaName));
+            Log.Information("Swagger UI OIDC authentication configured (dev).");
         }
     );
 }

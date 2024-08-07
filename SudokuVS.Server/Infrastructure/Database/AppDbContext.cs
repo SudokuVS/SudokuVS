@@ -23,5 +23,6 @@ public class AppDbContext : IdentityDbContext<AppUser>
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<SudokuGameEntity>().HasMany(e => e.Players).WithOne(s => s.Game).HasForeignKey(s => s.GameId).IsRequired();
+        modelBuilder.Entity<UserOpenIdApplicationEntity>().HasOne(a => a.Owner).WithMany().IsRequired();
     }
 }
