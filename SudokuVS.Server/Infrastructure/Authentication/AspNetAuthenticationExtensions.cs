@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using SudokuVS.Server.Infrastructure.Authentication.ApiKey;
 
 namespace SudokuVS.Server.Infrastructure.Authentication;
 

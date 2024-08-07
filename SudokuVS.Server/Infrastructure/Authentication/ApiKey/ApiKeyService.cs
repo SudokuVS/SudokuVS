@@ -10,7 +10,7 @@ using SudokuVS.Server.Exceptions;
 using SudokuVS.Server.Infrastructure.Database;
 using SudokuVS.Server.Infrastructure.Database.Models;
 
-namespace SudokuVS.Server.Infrastructure.Authentication;
+namespace SudokuVS.Server.Infrastructure.Authentication.ApiKey;
 
 public class ApiKeyService
 {

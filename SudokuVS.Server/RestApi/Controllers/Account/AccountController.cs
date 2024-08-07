@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SudokuVS.Server.Exceptions;
 using SudokuVS.Server.Infrastructure.Authentication;
+using SudokuVS.Server.Infrastructure.Authentication.ApiKey;
 using SudokuVS.Server.Infrastructure.Database.Models;
 using SudokuVS.Server.RestApi.Models;
 

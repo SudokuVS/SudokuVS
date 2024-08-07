@@ -1,4 +1,4 @@
-﻿namespace SudokuVS.Server.Infrastructure.Authentication;
+﻿namespace SudokuVS.Server.Infrastructure.Authentication.ApiKey;
 
 public class ApiKey
 {

@@ -12,6 +12,7 @@ using SudokuVS.Server;
 using SudokuVS.Server.Areas.App.Components;
 using SudokuVS.Server.Exceptions;
 using SudokuVS.Server.Infrastructure.Authentication;
+using SudokuVS.Server.Infrastructure.Authentication.ApiKey;
 using SudokuVS.Server.Infrastructure.Database;
 using SudokuVS.Server.Infrastructure.Database.Models;
 using SudokuVS.Server.Infrastructure.Logging;
