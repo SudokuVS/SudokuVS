@@ -181,11 +181,7 @@ try
     app.MapControllerRoute("areas", "{area:exists}/{controller=Home}/{action=Index}/{id?}");
     app.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
 
-    if (app.Environment.IsDevelopment())
-    {
-        await RegisterSwaggerOidcApplication(app);
-    }
-
+    await RegisterSwaggerOidcApplication(app);
     PreloadGames(app);
 
     app.Run();
@@ -265,6 +261,11 @@ async Task RegisterSwaggerOidcApplication(WebApplication app)
     if (application is not null)
     {
         await manager.DeleteAsync(application);
+    }
+    
+    if (app.Environment.IsDevelopment())
+    {
+        return;
     }
 
     await manager.CreateAsync(
