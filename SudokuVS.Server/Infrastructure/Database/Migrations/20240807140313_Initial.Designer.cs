@@ -12,8 +12,8 @@ using SudokuVS.Server.Infrastructure.Database;
 namespace SudokuVS.Server.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240805154010_SwitchUserModel")]
-    partial class SwitchUserModel
+    [Migration("20240807140313_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -77,7 +77,7 @@ namespace SudokuVS.Server.Infrastructure.Database.Migrations
                     b.ToTable("AspNetRoleClaims", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.AppUserClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -102,7 +102,7 @@ namespace SudokuVS.Server.Infrastructure.Database.Migrations
                     b.ToTable("AspNetUserClaims", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.AppUserLogin<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
                         .HasMaxLength(128)
@@ -126,7 +126,7 @@ namespace SudokuVS.Server.Infrastructure.Database.Migrations
                     b.ToTable("AspNetUserLogins", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.AppUserRole<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
@@ -141,7 +141,7 @@ namespace SudokuVS.Server.Infrastructure.Database.Migrations
                     b.ToTable("AspNetUserRoles", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.AppUserToken<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
@@ -162,7 +162,30 @@ namespace SudokuVS.Server.Infrastructure.Database.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("SudokuVS.Server.Models.AppUser", b =>
+            modelBuilder.Entity("SudokuVS.Server.Infrastructure.Authentication.ApiKey.ApiKeyEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ApiKeys");
+                });
+
+            modelBuilder.Entity("SudokuVS.Server.Infrastructure.Database.Models.AppUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -228,7 +251,80 @@ namespace SudokuVS.Server.Infrastructure.Database.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
+                    b.HasIndex("UserName")
+                        .IsUnique()
+                        .HasFilter("[UserName] IS NOT NULL");
+
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("SudokuVS.Server.Infrastructure.Database.Models.Game.PlayerStateEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("GameId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Grid")
+                        .IsRequired()
+                        .HasMaxLength(1053)
+                        .HasColumnType("nvarchar(1053)");
+
+                    b.Property<string>("Hints")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<int>("Side")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GameId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PlayerStates");
+                });
+
+            modelBuilder.Entity("SudokuVS.Server.Infrastructure.Database.Models.Game.SudokuGameEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("InitialGrid")
+                        .IsRequired()
+                        .HasMaxLength(1053)
+                        .HasColumnType("nvarchar(1053)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("SolvedGrid")
+                        .IsRequired()
+                        .HasMaxLength(1053)
+                        .HasColumnType("nvarchar(1053)");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("Winner")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Games");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -240,25 +336,25 @@ namespace SudokuVS.Server.Infrastructure.Database.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.AppUserClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("SudokuVS.Server.Models.AppUser", null)
+                    b.HasOne("SudokuVS.Server.Infrastructure.Database.Models.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.AppUserLogin<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("SudokuVS.Server.Models.AppUser", null)
+                    b.HasOne("SudokuVS.Server.Infrastructure.Database.Models.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.AppUserRole<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
                         .WithMany()
@@ -266,20 +362,73 @@ namespace SudokuVS.Server.Infrastructure.Database.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SudokuVS.Server.Models.AppUser", null)
+                    b.HasOne("SudokuVS.Server.Infrastructure.Database.Models.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.AppUserToken<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("SudokuVS.Server.Models.AppUser", null)
+                    b.HasOne("SudokuVS.Server.Infrastructure.Database.Models.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("SudokuVS.Server.Infrastructure.Authentication.ApiKey.ApiKeyEntity", b =>
+                {
+                    b.HasOne("SudokuVS.Server.Infrastructure.Database.Models.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SudokuVS.Server.Infrastructure.Database.Models.Game.PlayerStateEntity", b =>
+                {
+                    b.HasOne("SudokuVS.Server.Infrastructure.Database.Models.Game.SudokuGameEntity", "Game")
+                        .WithMany("Players")
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SudokuVS.Server.Infrastructure.Database.Models.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Game");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SudokuVS.Server.Infrastructure.Database.Models.Game.SudokuGameEntity", b =>
+                {
+                    b.OwnsOne("SudokuVS.Server.Infrastructure.Database.Models.Game.SudokuGameOptionsEntity", "Options", b1 =>
+                        {
+                            b1.Property<Guid>("SudokuGameEntityId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<int>("MaxHints")
+                                .HasColumnType("int");
+
+                            b1.HasKey("SudokuGameEntityId");
+
+                            b1.ToTable("Games");
+
+                            b1.WithOwner()
+                                .HasForeignKey("SudokuGameEntityId");
+                        });
+
+                    b.Navigation("Options")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("SudokuVS.Server.Infrastructure.Database.Models.Game.SudokuGameEntity", b =>
+                {
+                    b.Navigation("Players");
                 });
 #pragma warning restore 612, 618
         }
