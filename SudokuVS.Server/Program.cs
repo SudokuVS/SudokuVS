@@ -86,16 +86,24 @@ try
 
                 options.AllowAuthorizationCodeFlow().AllowRefreshTokenFlow();
 
-                string secretString = builder.Configuration.GetValue<string>("Authentication:OpenIdConnect:Secret")
-                                      ?? throw new InvalidOperationException("OpenId Connect secret not provided");
-                byte[] secretBytes = Encoding.UTF8.GetBytes(secretString);
-                byte[] secret = SHA512.HashData(secretBytes);
-
-                options.AddSigningKey(new SymmetricSecurityKey(secret));
-
-                if (builder.Environment.IsDevelopment())
+                string signingCertificateString = builder.Configuration.GetValue<string>("Authentication:OpenIdConnect:SigningKey")
+                                                  ?? throw new InvalidOperationException("Signing key not configured");
+                byte[] signingCertificateDecoded = Convert.FromBase64String(signingCertificateString);
+                string signingCertificateDecodedString = Encoding.UTF8.GetString(signingCertificateDecoded);
+                using (RSA rsa = RSA.Create())
                 {
-                    options.AddDevelopmentEncryptionCertificate().AddDevelopmentSigningCertificate();
+                    rsa.ImportFromPem(signingCertificateDecodedString);
+                    options.AddSigningKey(new RsaSecurityKey(rsa.ExportParameters(true)));
+                }
+
+                string encryptionCertificateString = builder.Configuration.GetValue<string>("Authentication:OpenIdConnect:EncryptionKey")
+                                                     ?? throw new InvalidOperationException("Encryption key not configured");
+                byte[] encryptionCertificateDecoded = Convert.FromBase64String(encryptionCertificateString);
+                string encryptionCertificateDecodedString = Encoding.UTF8.GetString(encryptionCertificateDecoded);
+                using (RSA rsa = RSA.Create())
+                {
+                    rsa.ImportFromPem(encryptionCertificateDecodedString);
+                    options.AddEncryptionKey(new RsaSecurityKey(rsa.ExportParameters(true)));
                 }
 
                 options.UseAspNetCore().EnableAuthorizationEndpointPassthrough().EnableLogoutEndpointPassthrough().EnableTokenEndpointPassthrough();
