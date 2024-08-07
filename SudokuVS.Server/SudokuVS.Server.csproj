@@ -54,6 +54,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Infrastructure\Authentication\OpenIdConnect\Models\" />
       <Folder Include="RestApi\" />
       <Folder Include="Views\" />
       <Folder Include="wwwroot\img\" />

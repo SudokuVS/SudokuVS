@@ -18,6 +18,7 @@ using SudokuVS.Server.Areas.App.Components;
 using SudokuVS.Server.Exceptions;
 using SudokuVS.Server.Infrastructure.Authentication;
 using SudokuVS.Server.Infrastructure.Authentication.ApiKey;
+using SudokuVS.Server.Infrastructure.Authentication.OpenIdConnect.Services;
 using SudokuVS.Server.Infrastructure.Authorization;
 using SudokuVS.Server.Infrastructure.Database;
 using SudokuVS.Server.Infrastructure.Database.Models;
@@ -122,6 +123,7 @@ try
                 options.UseAspNetCore();
             }
         );
+    builder.Services.AddScoped<OidcApplicationsService>();
 
     builder.Services.AddCors();
     builder.AddAuthentication(bootstrapLogger);
@@ -262,7 +264,7 @@ async Task RegisterSwaggerOidcApplication(WebApplication app)
     {
         await manager.DeleteAsync(application);
     }
-    
+
     if (app.Environment.IsDevelopment())
     {
         return;
