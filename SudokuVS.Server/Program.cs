@@ -39,8 +39,15 @@ try
     }
 
     builder.Services.AddDbContextFactory<AppDbContext>(options => options.UseSqlServer(appConnectionString));
-    builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(appConnectionString));
+    builder.Services.AddDbContext<AppDbContext>(
+        options =>
+        {
+            options.UseSqlServer(appConnectionString);
+            options.UseOpenIddict();
+        }
+    );
     bootstrapLogger.LogInformation("Connection to AppComponent database configured.");
+
     builder.Services.AddSingleton<SudokuGamesInDbContext>();
     builder.Services.AddSingleton<ISudokuGamesRepository, SudokuGamesInDbContext>(services => services.GetRequiredService<SudokuGamesInDbContext>());
 
@@ -55,6 +62,22 @@ try
 
     builder.AddAuthentication(bootstrapLogger);
     builder.AddAuthorization(bootstrapLogger);
+
+    builder.Services.AddOpenIddict()
+        .AddCore(options => options.UseEntityFrameworkCore().UseDbContext<AppDbContext>())
+        .AddServer(
+            options =>
+            {
+                options.SetTokenEndpointUris("connect/token");
+                options.AllowClientCredentialsFlow();
+
+        #if DEBUG
+                options.AddDevelopmentEncryptionCertificate().AddDevelopmentSigningCertificate();
+        #endif
+
+                options.UseAspNetCore().EnableTokenEndpointPassthrough();
+            }
+        );
 
     builder.ConfigureGameServices(gameOptions);
 
@@ -101,12 +124,14 @@ try
 
     app.UseStaticFiles();
     app.UseRouting();
+    app.UseCors();
     app.UseAuthentication();
     app.UseAuthorization();
     app.UseAntiforgery();
 
     app.MapRazorPages();
     app.MapRazorComponents<AppComponent>().AddInteractiveServerRenderMode();
+    app.MapControllers();
     app.MapControllerRoute("areas", "{area:exists}/{controller=Home}/{action=Index}/{id?}");
     app.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
 
