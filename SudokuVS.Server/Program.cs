@@ -65,9 +65,6 @@ try
         )
         .AddEntityFrameworkStores<AppDbContext>();
 
-    builder.AddAuthentication(bootstrapLogger);
-    builder.AddAuthorization(bootstrapLogger);
-
     builder.Services.AddOpenIddict()
         .AddCore(options => options.UseEntityFrameworkCore().UseDbContext<AppDbContext>())
         .AddServer(
@@ -82,9 +79,10 @@ try
 
                 options.AllowAuthorizationCodeFlow().AllowRefreshTokenFlow();
 
-        #if DEBUG
-                options.AddDevelopmentEncryptionCertificate().AddDevelopmentSigningCertificate();
-        #endif
+                if (builder.Environment.IsDevelopment())
+                {
+                    options.AddDevelopmentEncryptionCertificate().AddDevelopmentSigningCertificate();
+                }
 
                 options.UseAspNetCore().EnableAuthorizationEndpointPassthrough().EnableLogoutEndpointPassthrough().EnableTokenEndpointPassthrough();
             }
@@ -95,10 +93,17 @@ try
                 // Import the configuration from the local OpenIddict server instance.
                 options.UseLocalServer();
 
+                // Register the System.Net.Http integration.
+                options.UseSystemNetHttp();
+
                 // Register the ASP.NET Core host.
                 options.UseAspNetCore();
             }
         );
+
+    builder.Services.AddCors();
+    builder.AddAuthentication(bootstrapLogger);
+    builder.AddAuthorization(bootstrapLogger);
 
     builder.ConfigureGameServices(gameOptions);
 
@@ -153,6 +158,7 @@ try
     app.MapControllers();
     app.MapControllerRoute("areas", "{area:exists}/{controller=Home}/{action=Index}/{id?}");
     app.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
+    app.MapIdentityApi<AppUser>();
 
     if (app.Environment.IsDevelopment())
     {

@@ -2,10 +2,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
+using OpenIddict.Validation.AspNetCore;
 using SudokuVS.Game;
 using SudokuVS.Game.Services;
 using SudokuVS.Server.Exceptions;
-using SudokuVS.Server.Infrastructure.Authorization;
 using SudokuVS.Server.Infrastructure.Database.Models;
 using SudokuVS.Server.RestApi.Controllers.Games.Requests;
 using SudokuVS.Server.RestApi.Models;
@@ -17,7 +17,7 @@ namespace SudokuVS.Server.RestApi.Controllers.Games;
 /// </summary>
 [Route("/api/games")]
 [OpenApiTag("Gameplay")]
-[Authorize(AuthorizationConstants.ApiAuthorizationPolicy)]
+[Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
 [ApiController]
 public class GameplayController : ControllerBase
 {

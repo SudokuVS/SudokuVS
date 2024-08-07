@@ -1,16 +1,16 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using OpenIddict.Validation.AspNetCore;
 using SudokuVS.Server.Exceptions;
 using SudokuVS.Server.Infrastructure.Authentication.ApiKey;
-using SudokuVS.Server.Infrastructure.Authorization;
 using SudokuVS.Server.Infrastructure.Database.Models;
 using SudokuVS.Server.RestApi.Models;
 
 namespace SudokuVS.Server.RestApi.Controllers.Account;
 
 [Route("/api/account")]
-[Authorize(AuthorizationConstants.ApiAuthorizationPolicy)]
+[Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
 [ApiController]
 public class AccountController : ControllerBase
 {

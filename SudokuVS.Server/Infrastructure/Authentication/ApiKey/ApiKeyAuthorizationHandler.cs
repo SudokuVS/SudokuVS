@@ -2,11 +2,11 @@
 
 namespace SudokuVS.Server.Infrastructure.Authentication.ApiKey;
 
-public class AuthorizationHeaderRequirement : IAuthorizationRequirement
+public class ApiAuthorizationRequirement : IAuthorizationRequirement
 {
 }
 
-class ApiKeyAuthorizationHandler : AuthorizationHandler<AuthorizationHeaderRequirement>
+class ApiKeyAuthorizationHandler : AuthorizationHandler<ApiAuthorizationRequirement>
 {
     readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -15,7 +15,7 @@ class ApiKeyAuthorizationHandler : AuthorizationHandler<AuthorizationHeaderRequi
         _httpContextAccessor = httpContextAccessor;
     }
 
-    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AuthorizationHeaderRequirement requirement)
+    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ApiAuthorizationRequirement requirement)
     {
         string? apiKey = _httpContextAccessor.HttpContext?.Request.Headers[ApiKeySchemeOptions.HeaderName].ToString();
         if (string.IsNullOrWhiteSpace(apiKey))

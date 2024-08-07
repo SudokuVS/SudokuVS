@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using OpenIddict.Server.AspNetCore;
+using OpenIddict.Validation.AspNetCore;
 using SudokuVS.Server.Infrastructure.Authentication.ApiKey;
 
 namespace SudokuVS.Server.Infrastructure.Authorization;
@@ -21,8 +21,8 @@ public static class AspNetAuthorizationExtensions
                     policy =>
                     {
                         policy.AddAuthenticationSchemes(ApiKeyConstants.AuthenticationScheme);
-                        policy.AddAuthenticationSchemes(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
-                        policy.Requirements.Add(new AuthorizationHeaderRequirement());
+                        policy.AddAuthenticationSchemes(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+                        policy.Requirements.Add(new ApiAuthorizationRequirement());
                     }
                 );
             }
