@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Logging;
 using NSwag;
 using NSwag.AspNetCore;
 using NSwag.Generation.Processors.Security;
+using OpenIddict.Abstractions;
 using Serilog;
 using SudokuVS.Game.Abstractions;
 using SudokuVS.Game.Utils;
@@ -13,7 +14,6 @@ using SudokuVS.Server.Areas.App.Components;
 using SudokuVS.Server.Exceptions;
 using SudokuVS.Server.Infrastructure.Authentication;
 using SudokuVS.Server.Infrastructure.Authentication.ApiKey;
-using SudokuVS.Server.Infrastructure.Authentication.Oidc;
 using SudokuVS.Server.Infrastructure.Database;
 using SudokuVS.Server.Infrastructure.Database.Models;
 using SudokuVS.Server.Infrastructure.Logging;
@@ -44,7 +44,10 @@ try
     builder.Services.AddDbContext<AppDbContext>(
         options =>
         {
+            bootstrapLogger.LogDebug("Configuring connection to SQL Server...");
             options.UseSqlServer(appConnectionString);
+
+            bootstrapLogger.LogDebug("Configuring OpenID Dict entities...");
             options.UseOpenIddict();
         }
     );
@@ -70,17 +73,32 @@ try
         .AddServer(
             options =>
             {
-                options.SetTokenEndpointUris("connect/token");
-                options.AllowAuthorizationCodeFlow();
+                options.SetAuthorizationEndpointUris("connect/authorize")
+                    .SetLogoutEndpointUris("connect/logout")
+                    .SetTokenEndpointUris("connect/token")
+                    .SetUserinfoEndpointUris("connect/userinfo");
+
+                options.RegisterScopes(OpenIddictConstants.Scopes.Email, OpenIddictConstants.Scopes.Profile, OpenIddictConstants.Scopes.Roles);
+
+                options.AllowAuthorizationCodeFlow().AllowRefreshTokenFlow();
 
         #if DEBUG
                 options.AddDevelopmentEncryptionCertificate().AddDevelopmentSigningCertificate();
         #endif
 
-                options.UseAspNetCore().EnableTokenEndpointPassthrough();
+                options.UseAspNetCore().EnableAuthorizationEndpointPassthrough().EnableLogoutEndpointPassthrough().EnableTokenEndpointPassthrough();
+            }
+        )
+        .AddValidation(
+            options =>
+            {
+                // Import the configuration from the local OpenIddict server instance.
+                options.UseLocalServer();
+
+                // Register the ASP.NET Core host.
+                options.UseAspNetCore();
             }
         );
-    builder.Services.AddHostedService<OidcApplicationsWorker>();
 
     builder.ConfigureGameServices(gameOptions);
 
@@ -100,8 +118,6 @@ try
     ConfigureOpenApiDocument(builder);
 
     WebApplication app = builder.Build();
-
-    await ApplyMigrations<AppDbContext>(app);
 
     if (app.Environment.IsDevelopment())
     {
@@ -138,6 +154,7 @@ try
     app.MapControllerRoute("areas", "{area:exists}/{controller=Home}/{action=Index}/{id?}");
     app.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
 
+    await RegisterOidcApplication(app, "test-app", "388D45FA-B36B-4988-BA59-B187D329C207");
     PreloadGames(app);
 
     app.Run();
@@ -190,14 +207,27 @@ void ConfigureOpenApiDocument(WebApplicationBuilder builder)
     );
 }
 
-async Task ApplyMigrations<TContext>(WebApplication app) where TContext: DbContext
+async Task RegisterOidcApplication(WebApplication app, string clientId, string clientSecret)
 {
-    bootstrapLogger.LogInformation("Applying migrations to {ctx}", typeof(TContext).Name);
+    using IServiceScope scope = app.Services.CreateScope();
+    IOpenIddictApplicationManager manager = scope.ServiceProvider.GetRequiredService<IOpenIddictApplicationManager>();
 
-    IServiceScopeFactory scopeProvider = app.Services.GetRequiredService<IServiceScopeFactory>();
-    using IServiceScope scope = scopeProvider.CreateScope();
-    TContext context = scope.ServiceProvider.GetRequiredService<TContext>();
-    await context.Database.MigrateAsync();
+    if (await manager.FindByClientIdAsync(clientId) is null)
+    {
+        await manager.CreateAsync(
+            new OpenIddictApplicationDescriptor
+            {
+                ClientId = clientId,
+                ClientSecret = clientSecret,
+                Permissions =
+                {
+                    OpenIddictConstants.Permissions.Endpoints.Token,
+                    OpenIddictConstants.Permissions.GrantTypes.ClientCredentials
+                }
+            }
+        );
+        bootstrapLogger.LogInformation("Registered application {clientId}.", clientId);
+    }
 }
 
 void PreloadGames(WebApplication app)
