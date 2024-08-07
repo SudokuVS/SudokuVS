@@ -29,7 +29,7 @@
 <ul class="list-group">
     @if (Model.Keys.Count == 0)
     {
-        <li class="list-group-item text-muted text-center">No API keys.</li>
+        <li class="list-group-item text-muted text-center">No API key.</li>
     }
     else
     {
@@ -53,7 +53,7 @@
                             <i class="bi bi-eye"></i>
                         </button>
 
-                        <form id="@($"remove-login-{keyName}")" asp-page-handler="RevokeKey" method="post">
+                        <form id="@($"remove-api-key-{keyName}")" asp-page-handler="RevokeKey" method="post">
                             <input asp-for="@key.Token" name="token" type="hidden"/>
                             <button type="submit" class="btn btn-outline-danger" title="Revoke this API key.">
                                 <i class="bi bi-trash"></i>

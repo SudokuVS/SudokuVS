@@ -1,0 +1,126 @@
+﻿@page
+@using System.Globalization
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using SudokuVS.Server.Areas.Identity.Pages.Account.Manage
+@using SudokuVS.Server.Infrastructure.Authentication.OpenIdConnect.Services
+@model SudokuVS.Server.Areas.Identity.Pages.Account.Manage.OidcApplications
+@{
+    ViewData["Title"] = "Manage your OIDC applications";
+    ViewData["ActivePage"] = ManageNavPages.OidcApplications;
+}
+
+<partial name="_StatusMessage" for="StatusMessage"/>
+
+<div class="mb-4">
+    <form asp-page-handler="CreateApplication" method="post">
+        <h3>New OIDC application key</h3>
+
+        <div class="form-floating mb-3">
+            <input asp-for="CreateNewApplication.Name" class="form-control" placeholder="My awesome app" required/>
+            <label asp-for="CreateNewApplication.Name"></label>
+            <span asp-validation-for="CreateNewApplication.Name" class="text-danger"></span>
+        </div>
+
+        <div class="form-floating mb-3">
+            <select asp-for="CreateNewApplication.ApplicationType" class="form-select" asp-items="Html.GetEnumSelectList<OpenIdApplicationType>()">
+            </select>
+            <label asp-for="CreateNewApplication.ApplicationType"></label>
+            <span asp-validation-for="CreateNewApplication.ApplicationType" class="text-danger"></span>
+        </div>
+
+        <div class="form-floating mb-3">
+            <select asp-for="CreateNewApplication.ConsentType" class="form-select" asp-items="Html.GetEnumSelectList<OpenIdConsentType>()">
+            </select>
+            <label asp-for="CreateNewApplication.ConsentType"></label>
+            <span asp-validation-for="CreateNewApplication.ConsentType" class="text-danger"></span>
+        </div>
+
+        <div class="form-floating mb-3">
+            <input asp-for="CreateNewApplication.RedirectUri" class="form-control" placeholder="https://www.example.com/signin-oidc" required/>
+            <label asp-for="CreateNewApplication.RedirectUri"></label>
+            <span asp-validation-for="CreateNewApplication.RedirectUri" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-outline-primary" title="Create new application.">Create</button>
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    </form>
+</div>
+
+<h3>Applications</h3>
+<ul class="list-group">
+    @if (Model.Applications.Count == 0)
+    {
+        <li class="list-group-item text-muted text-center">No application.</li>
+    }
+    else
+    {
+        @foreach (UserOpenIdApplicationEntity app in Model.Applications)
+        {
+            string keyDate = app.CreationDate.ToString("f", CultureInfo.InvariantCulture);
+
+            <li class="list-group-item">
+                <div class="lead fw-semibold">
+                    @app.Name
+                </div>
+
+                <div class="text-muted small mb-2">
+                    Created on @keyDate
+                </div>
+
+                <div class="row mb-2">
+                    <label asp-for="@app.ClientId" class="col-3 col-form-label">Client ID</label>
+                    <div class="col">
+                        <div class="input-group">
+                            <input asp-for="@app.ClientId" class="form-control" readonly/>
+                            <button class="btn btn-outline-secondary" onclick="copy(this, '@app.ClientId')">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-2">
+                    <label asp-for="@app.ApplicationType" class="col-3 col-form-label">Application type</label>
+                    <div class="col">
+                        <select asp-for="@app.ApplicationType" class="form-select" asp-items="Html.GetEnumSelectList<OpenIdApplicationType>()" disabled>
+                            <option selected="selected" value="">Please select</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mb-2">
+                    <label asp-for="@app.ConsentType" class="col-3 col-form-label">Consent type</label>
+                    <div class="col">
+                        <select asp-for="@app.ConsentType" class="form-select" asp-items="Html.GetEnumSelectList<OpenIdConsentType>()" disabled>
+                            <option selected="selected" value="">Please select</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mb-2">
+                    <label asp-for="@app.RedirectUris" class="col-3 col-form-label"></label>
+                    <div class="col">
+                        <input asp-for="@app.RedirectUris" class="form-control" readonly></input>
+                    </div>
+                </div>
+
+                <div class="mb-2">
+                    <form id="@($"remove-application-{app.Name}")" asp-page-handler="RemoveApplication" method="post">
+                        <input asp-for="@app.ClientId" name="clientId" type="hidden"/>
+                        <button type="submit" class="btn btn-outline-danger" title="Revoke this application.">
+                            <i class="bi bi-trash"></i> Delete
+                        </button>
+                    </form>
+                </div>
+            </li>
+        }
+    }
+</ul>
+
+<script>    
+    window.copy = (button, text) =>
+        navigator.clipboard.writeText(text).then(() => {
+            button.innerText = "Copied!";
+        })
+</script>

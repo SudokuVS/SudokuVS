@@ -18,6 +18,7 @@ using SudokuVS.Server.Areas.App.Components;
 using SudokuVS.Server.Exceptions;
 using SudokuVS.Server.Infrastructure.Authentication;
 using SudokuVS.Server.Infrastructure.Authentication.ApiKey;
+using SudokuVS.Server.Infrastructure.Authentication.OpenIdConnect.Services;
 using SudokuVS.Server.Infrastructure.Authorization;
 using SudokuVS.Server.Infrastructure.Database;
 using SudokuVS.Server.Infrastructure.Database.Models;
@@ -122,6 +123,7 @@ try
                 options.UseAspNetCore();
             }
         );
+    builder.Services.AddScoped<OidcApplicationsService>();
 
     builder.Services.AddCors();
     builder.AddAuthentication(bootstrapLogger);
@@ -181,11 +183,7 @@ try
     app.MapControllerRoute("areas", "{area:exists}/{controller=Home}/{action=Index}/{id?}");
     app.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
 
-    if (app.Environment.IsDevelopment())
-    {
-        await RegisterSwaggerOidcApplication(app);
-    }
-
+    await RegisterSwaggerOidcApplication(app);
     PreloadGames(app);
 
     app.Run();
@@ -235,23 +233,20 @@ void ConfigureOpenApiDocument(WebApplicationBuilder builder)
                 Log.Information("Swagger UI API key authentication not configured, please set configurations Authentication:ApiKey:Secret.");
             }
 
-            if (builder.Environment.IsDevelopment())
-            {
-                const string devOidcAppSchemaName = "OIDC Application (dev)";
-                settings.AddSecurity(
-                    devOidcAppSchemaName,
-                    new OpenApiSecurityScheme
-                    {
-                        Description = "Use the OIDC DEV application to authenticate.",
-                        In = OpenApiSecurityApiKeyLocation.Header,
-                        Name = HeaderNames.Authorization,
-                        Type = OpenApiSecuritySchemeType.OpenIdConnect,
-                        OpenIdConnectUrl = "/.well-known/openid-configuration"
-                    }
-                );
-                settings.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor(devOidcAppSchemaName));
-                Log.Information("Swagger UI OIDC authentication configured (dev).");
-            }
+            const string devOidcAppSchemaName = "OIDC";
+            settings.AddSecurity(
+                devOidcAppSchemaName,
+                new OpenApiSecurityScheme
+                {
+                    Description = "Use an OIDC application to authenticate.",
+                    In = OpenApiSecurityApiKeyLocation.Header,
+                    Name = HeaderNames.Authorization,
+                    Type = OpenApiSecuritySchemeType.OpenIdConnect,
+                    OpenIdConnectUrl = "/.well-known/openid-configuration"
+                }
+            );
+            settings.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor(devOidcAppSchemaName));
+            Log.Information("Swagger UI OIDC authentication configured (dev).");
         }
     );
 }
@@ -265,6 +260,11 @@ async Task RegisterSwaggerOidcApplication(WebApplication app)
     if (application is not null)
     {
         await manager.DeleteAsync(application);
+    }
+
+    if (app.Environment.IsDevelopment())
+    {
+        return;
     }
 
     await manager.CreateAsync(

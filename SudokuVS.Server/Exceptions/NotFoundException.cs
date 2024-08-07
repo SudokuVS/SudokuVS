@@ -2,7 +2,6 @@
 
 class NotFoundException : ApiException
 {
-    public NotFoundException(Exception? innerException = null) : base(StatusCodes.Status404NotFound, innerException)
-    {
-    }
+    public NotFoundException(string? message) : base(StatusCodes.Status404NotFound, message) { }
+    public NotFoundException(Exception? innerException = null) : base(StatusCodes.Status404NotFound, innerException) { }
 }

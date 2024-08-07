@@ -63,6 +63,8 @@ public static class ManageNavPages
 
     public static string ApiKeys => "ApiKeys";
 
+    public static string OidcApplications => "OidcApplications";
+
     /// <summary>
     ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
     ///     directly from your code. This API may change or be removed in future releases.
@@ -112,6 +114,8 @@ public static class ManageNavPages
     public static string TwoFactorAuthenticationNavClass(ViewContext viewContext) => PageNavClass(viewContext, TwoFactorAuthentication);
 
     public static string ApiKeysNavClass(ViewContext viewContext) => PageNavClass(viewContext, ApiKeys);
+
+    public static string OidcApplicationsNavClass(ViewContext viewContext) => PageNavClass(viewContext, OidcApplications);
 
     /// <summary>
     ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
