@@ -24,7 +24,7 @@ public static class AspNetAuthenticationExtensions
                     policy =>
                     {
                         policy.AddAuthenticationSchemes(ApiKeyConstants.AuthenticationScheme);
-                        policy.Requirements.Add(new ApiKeyAuthorizationRequirement());
+                        policy.Requirements.Add(new AuthorizationHeaderRequirement());
                     }
                 );
             }
