@@ -61,6 +61,10 @@ try
             {
                 // FIXME: enable when email sender configured properly
                 options.SignIn.RequireConfirmedAccount = false;
+                options.ClaimsIdentity.UserIdClaimType = OpenIddictConstants.Claims.Subject;
+                options.ClaimsIdentity.UserNameClaimType = OpenIddictConstants.Claims.Name;
+                options.ClaimsIdentity.EmailClaimType = OpenIddictConstants.Claims.Email;
+                options.ClaimsIdentity.RoleClaimType = OpenIddictConstants.Claims.Role;
             }
         )
         .AddEntityFrameworkStores<AppDbContext>();
