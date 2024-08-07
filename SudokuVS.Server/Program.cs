@@ -1,7 +1,10 @@
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using NSwag;
 using NSwag.AspNetCore;
@@ -82,6 +85,13 @@ try
                 options.RegisterScopes(OpenIddictConstants.Scopes.Email, OpenIddictConstants.Scopes.Profile, OpenIddictConstants.Scopes.Roles);
 
                 options.AllowAuthorizationCodeFlow().AllowRefreshTokenFlow();
+
+                string secretString = builder.Configuration.GetValue<string>("Authentication:OpenIdConnect:Secret")
+                                      ?? throw new InvalidOperationException("OpenId Connect secret not provided");
+                byte[] secretBytes = Encoding.UTF8.GetBytes(secretString);
+                byte[] secret = SHA512.HashData(secretBytes);
+
+                options.AddSigningKey(new SymmetricSecurityKey(secret));
 
                 if (builder.Environment.IsDevelopment())
                 {
