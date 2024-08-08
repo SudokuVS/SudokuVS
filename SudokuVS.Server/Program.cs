@@ -121,6 +121,7 @@ try
 
                 // Register the ASP.NET Core host.
                 options.UseAspNetCore();
+                options.UseDataProtection();
             }
         );
     builder.Services.AddScoped<OidcApplicationsService>();

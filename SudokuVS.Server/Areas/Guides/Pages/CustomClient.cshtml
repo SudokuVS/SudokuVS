@@ -9,12 +9,12 @@
     ViewData["Title"] = $"Tutorial: {CustomClientGuideConstants.Title.ToLower()}";
 }
 
-<component type="typeof(CustomClientComponent)" render-mode="ServerPrerendered"/>
+<component type="typeof(CustomClientComponent)" render-mode="Server"/>
 
 @section Head {
     <link href="/SudokuVS.Server.styles.css" rel="stylesheet">
     <base href="/"/>
-    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered"/>
+    <component type="typeof(HeadOutlet)" render-mode="Server"/>
 }
 
 @section Scripts {

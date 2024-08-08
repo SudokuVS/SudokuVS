@@ -1,4 +1,5 @@
-﻿@using System.Text
+﻿@using System.Security.Cryptography
+@using System.Text
 @using System.Text.Json
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Identity
@@ -47,20 +48,31 @@
     <h6>Configure the user and the OIDC application</h6>
     <p>
         The first step is to create an account and sign in. <br/>
-        @if (User == null)
+        @if (User == null && Code == null)
         {
             <a href="identity/account/login?returnUrl=@thisPageUrl">Sign in</a>
         }
         else
         {
-            <span class="text-success">
-                <i class="bi bi-check-circle-fill"></i> Signed in as @User.GetPublicName().
-            </span>
+            @if (User == null)
+            {
+                <span class="text-success">
+                    <i class="bi bi-check-circle-fill"></i>
+                    Signed in.
+                </span>
+            }
+            else
+            {
+                <span class="text-success">
+                    <i class="bi bi-check-circle-fill"></i>
+                    Signed in as @User.GetPublicName().
+                </span>
+            }
         }
     </p>
 </section>
 
-@if (User == null)
+@if (User == null && Code == null)
 {
     return;
 }
@@ -216,8 +228,8 @@
                 }
                 else
                 {
-                    <div class="ps-4">
-                        <pre><code>@TokenResponse</code></pre>
+                    <div>
+                        <pre class="ps-4"><code>@TokenResponse</code></pre>
                     </div>
                 }
 
@@ -324,7 +336,7 @@
             // nothing to do
         }
 
-        TokenResponse = parsedResponse != null ? JsonSerializer.Serialize(parsedResponse, new JsonSerializerOptions { WriteIndented = true }) : responseContent;
+        TokenResponse = parsedResponse != null ? JsonSerializer.Serialize(parsedResponse, new JsonSerializerOptions { WriteIndented = true, }) : responseContent;
 
         if (parsedResponse == null || !parsedResponse.TryGetValue("access_token", out object? accessToken))
         {
@@ -338,15 +350,6 @@
     async Task<string> GetOrCreateInternalApplication()
     {
         const string appClientId = "CustomClientGuideApplication";
-
-#if DEBUG
-        // In DEBUG, recreate the app each time to allow for changes during development
-        object? app = await OpenIddictApplicationManager.FindByClientIdAsync(appClientId);
-        if (app != null)
-        {
-            await OpenIddictApplicationManager.DeleteAsync(app);
-        }
-#endif
 
         if (await OpenIddictApplicationManager.FindByClientIdAsync(appClientId) == null)
         {
@@ -391,8 +394,9 @@
         queryBuilder.Append($"&client_id={(useInternalClientId ? InternalApplicationClientId : "{Your Client Id}")}");
         queryBuilder.Append($"&redirect_uri={_thisPageUri!.AbsoluteUri}");
         queryBuilder.Append("&scope=openid");
+        queryBuilder.Append("&realm=realm");
         queryBuilder.Append($"&code_challenge={codeChallenge}");
-        queryBuilder.Append("&code_challenge_method=plain");
+        queryBuilder.Append("&code_challenge_method=S256");
 
         return $"{NavigationManager.BaseUri}connect/authorize?{queryBuilder}";
     }
@@ -409,6 +413,12 @@
             ["code_verifier"] = CodeVerifier
         };
 
-    static string ComputeCodeChallenge(string code) => Base64UrlEncoder.Encode(code);
+    static string ComputeCodeChallenge(string code)
+    {
+        byte[] codeBytes = Encoding.UTF8.GetBytes(code);
+        byte[] hashed = SHA256.HashData(codeBytes);
+        return Base64UrlEncoder.Encode(hashed);
+    }
 
 }
+
