@@ -1,0 +1,44 @@
+﻿@page
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using SudokuVS.Server.Areas.Guides
+@model SudokuVS.Server.Areas.Guides.Pages.Index
+
+@{
+    Guide[] guides =
+    [
+        new Guide
+        {
+            Page = "/CustomClient",
+            Title = CustomClientGuideConstants.Title,
+            Summary = CustomClientGuideConstants.Summary,
+            Interactive = true
+        }
+    ];
+}
+
+<h3 class="mt-4">Guides</h3>
+
+@foreach (Guide guide in guides)
+{
+    <div class="mt-4 mb-2">
+        <div class="w-100 card">
+            <div class="card-body">
+                <h5 class="card-title d-flex">
+                    <a class="stretched-link" asp-page="@guide.Page">
+                        @guide.Title
+                    </a>
+
+                    <div class="flex-grow-1"></div>
+
+                    @if (guide.Interactive)
+                    {
+                        <span class="badge text-bg-secondary">Interactive</span>
+                    }
+                </h5>
+                <p class="card-text">
+                    @guide.Summary
+                </p>
+            </div>
+        </div>
+    </div>
+}

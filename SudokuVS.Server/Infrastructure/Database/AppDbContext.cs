@@ -11,13 +11,14 @@ public class AppDbContext : IdentityDbContext<AppUser>
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
     }
 
     public DbSet<PlayerStateEntity> PlayerStates { get; private set; }
     public DbSet<SudokuGameEntity> Games { get; private set; }
     public DbSet<ApiKeyEntity> ApiKeys { get; private set; }
     public DbSet<UserOpenIdApplicationEntity> OpenIdApplications { get; set; }
-
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

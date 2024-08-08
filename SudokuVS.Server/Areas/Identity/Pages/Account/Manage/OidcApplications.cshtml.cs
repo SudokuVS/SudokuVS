@@ -29,10 +29,13 @@ public class OidcApplications : PageModel
     [TempData]
     public string StatusMessage { get; set; }
 
+    public string ReturnUrl { get; set; }
+
     public CreateNewApplicationModel CreateNewApplication;
 
-    public async Task<IActionResult> OnGetAsync()
+    public async Task<IActionResult> OnGetAsync(string returnUrl = null)
     {
+        ReturnUrl = returnUrl;
         CreateNewApplication ??= new CreateNewApplicationModel();
 
         AppUser user = await _userManager.GetUserAsync(User);
@@ -46,7 +49,7 @@ public class OidcApplications : PageModel
         return Page();
     }
 
-    public async Task<IActionResult> OnPostCreateApplicationAsync(CreateNewApplicationModel createNewApplication)
+    public async Task<IActionResult> OnPostCreateApplicationAsync(CreateNewApplicationModel createNewApplication, string returnUrl = null)
     {
         if (!ModelState.IsValid)
         {
@@ -72,6 +75,11 @@ public class OidcApplications : PageModel
         );
 
         StatusMessage = $"The OIDC application {application.Name} has been created.";
+
+        if (returnUrl != null)
+        {
+            return LocalRedirect(returnUrl);
+        }
 
         return RedirectToPage();
     }
