@@ -6,8 +6,8 @@ namespace SudokuVS.Server.Infrastructure.Logging;
 
 public static class Logging
 {
-    const LogEventLevel DefaultLoggingLevel = LogEventLevel.Debug;
-    const LogEventLevel InfrastructureLoggingLevel = LogEventLevel.Debug;
+    const LogEventLevel DefaultLoggingLevel = LogEventLevel.Information;
+    const LogEventLevel InfrastructureLoggingLevel = LogEventLevel.Information;
     public const string OutputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} ({SourceContext}){NewLine}{Exception}";
 
     public static ReloadableLogger CreateBootstrapLogger() =>
