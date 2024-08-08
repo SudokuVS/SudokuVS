@@ -163,90 +163,133 @@
         <span class="text-info small"><i class="bi bi-exclamation-circle"></i> In this guide, the code verifier is not actually random, but in real applications it must be.</span>
     </p>
     <p>
-        Then we navigate to the authorization endpoint.
+        Then we use that challenge in a GET request that will ask the user for their credentials (click the request below).
 
-        @if (Code == null)
+        <div class="ps-4 small position-relative">
+            <div class="row">
+                <div class="col-2 fw-semibold">
+                    Request URL
+                </div>
+                <div class="col">
+                    @if (AccessTokenSuccess)
+                    {
+                        @AuthorizeRequestUrl()
+                    }
+                    else
+                    {
+                        <a href="@InternalApplicationAuthorizePath(true)" class="text-body stretched-link">@AuthorizeRequestUrl()</a>
+                    }
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-2 fw-semibold">
+                    Request Method
+                </div>
+                <div class="col">
+                    GET
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-2 fw-semibold">
+                    Query params
+                </div>
+                <div class="col">
+                    @foreach ((string? key, string? value) in AuthorizeRequestQueryParams(false))
+                    {
+                        <div class="row">
+                            <div class="col-2">
+                                @key
+                            </div>
+                            <div class="col">
+                                @value
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @if (Code != null)
         {
-            <br/>
-            <a href="@InternalApplicationAuthorizePath(true)" class="wrap-anywhere">@InternalApplicationAuthorizePath(false)</a>
-            <br/>
+            <span class="text-success">
+                <i class="bi bi-check-circle-fill"></i> The server responded with the following authorization code: <code>@Code</code>.
+            </span>
         }
-        else
-        {
-            <br/>
-            <a href="@InternalApplicationAuthorizePath(true)" class="text-body wrap-anywhere">@InternalApplicationAuthorizePath(false)</a>
-            <br/>
-            <div>
-                <span class="text-success">
-                    <i class="bi bi-check-circle-fill"></i> The server responded with the following authorization code: <code>@Code</code>.
-                </span>
-                <br/>
+    </p>
+</section>
 
-                The code was then used to query an access token from the server using the following request:
-                <div class="ps-4 small">
-                    <div class="row">
-                        <div class="col-2 fw-semibold">
-                            Request URL
-                        </div>
-                        <div class="col">
-                            @AccessTokenRequestUrl()
-                        </div>
+@if (Code == null)
+{
+    return;
+}
+
+<section class="my-4">
+    <p>
+        <div>
+            The code can then be exchanged with an access token by sending a POST request to the token endpoint:
+            <div class="ps-4 small">
+                <div class="row">
+                    <div class="col-2 fw-semibold">
+                        Request URL
                     </div>
-                    <div class="row">
-                        <div class="col-2 fw-semibold">
-                            Request Method
-                        </div>
-                        <div class="col">
-                            POST
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-2 fw-semibold">
-                            Form data
-                        </div>
-                        <div class="col">
-                            @foreach ((string? key, string? value) in AccessTokenRequestFormData(false))
-                            {
-                                <div class="row">
-                                    <div class="col-2">
-                                        @key
-                                    </div>
-                                    <div class="col">
-                                        @value
-                                    </div>
-                                </div>
-                            }
-                        </div>
+                    <div class="col">
+                        @AccessTokenRequestUrl()
                     </div>
                 </div>
-
-                And got the following response:
-
-                @if (string.IsNullOrWhiteSpace(TokenResponse))
-                {
-                    <span class="text-muted">(empty)</span>
-                }
-                else
-                {
-                    <div>
-                        <pre class="ps-4"><code>@TokenResponse</code></pre>
+                <div class="row">
+                    <div class="col-2 fw-semibold">
+                        Request Method
                     </div>
-                }
-
-                @if (AccessTokenSuccess)
-                {
-                    <span class="text-success">
-                        <i class="bi bi-check-circle-fill"></i> The access token request succeeded and returned the following access token: <code>@AccessToken</code>.
-                    </span>
-                }
-                else
-                {
-                    <span class="text-danger">
-                        <i class="bi bi-x-circle-fill"></i> The access token request failed. Please click the authorization link above to try again.
-                    </span>
-                }
+                    <div class="col">
+                        POST
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-2 fw-semibold">
+                        Form data
+                    </div>
+                    <div class="col">
+                        @foreach ((string? key, string? value) in AccessTokenRequestFormData(false))
+                        {
+                            <div class="row">
+                                <div class="col-2">
+                                    @key
+                                </div>
+                                <div class="col">
+                                    @value
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
             </div>
-        }
+
+            Which returned the following response:
+
+            @if (string.IsNullOrWhiteSpace(TokenResponse))
+            {
+                <span class="text-muted">(empty)</span>
+            }
+            else
+            {
+                <div>
+                    <pre class="ps-4"><code>@TokenResponse</code></pre>
+                </div>
+            }
+
+            @if (AccessTokenSuccess)
+            {
+                <span class="text-success">
+                    <i class="bi bi-check-circle-fill"></i> The access token request succeeded and returned the following access token: <code>@AccessToken</code>.
+                </span>
+            }
+            else
+            {
+                <span class="text-danger">
+                    <i class="bi bi-x-circle-fill"></i> The access token request failed. Please click the authorization link above to try again.
+                </span>
+            }
+        </div>
     </p>
 </section>
 
@@ -257,12 +300,7 @@
 
 <section class="my-4">
     <p>
-        In the custom client, start by authenticating users. They will be able to create an account in the SudokuVS login page.
-    </p>
-    <p>
-        Once the user is authenticated, the custom client receives their access token. The token can be used to call <a href="/swagger" target="_blank">the SudokuVS API endpoints</a> on behalf
-        of the user.
-        The access token must be sent in the <code>Authorization</code> header of the API calls with <code>Bearer</code> scheme.
+        WIP
     </p>
 </section>
 
@@ -336,7 +374,7 @@
             // nothing to do
         }
 
-        TokenResponse = parsedResponse != null ? JsonSerializer.Serialize(parsedResponse, new JsonSerializerOptions { WriteIndented = true, }) : responseContent;
+        TokenResponse = parsedResponse != null ? JsonSerializer.Serialize(parsedResponse, new JsonSerializerOptions { WriteIndented = true }) : responseContent;
 
         if (parsedResponse == null || !parsedResponse.TryGetValue("access_token", out object? accessToken))
         {
@@ -386,20 +424,23 @@
 
     string InternalApplicationAuthorizePath(bool useInternalClientId)
     {
-        StringBuilder queryBuilder = new();
-
-        string codeChallenge = ComputeCodeChallenge(CodeVerifier);
-
-        queryBuilder.Append("response_type=code");
-        queryBuilder.Append($"&client_id={(useInternalClientId ? InternalApplicationClientId : "{Your Client Id}")}");
-        queryBuilder.Append($"&redirect_uri={_thisPageUri!.AbsoluteUri}");
-        queryBuilder.Append("&scope=openid");
-        queryBuilder.Append("&realm=realm");
-        queryBuilder.Append($"&code_challenge={codeChallenge}");
-        queryBuilder.Append("&code_challenge_method=S256");
-
-        return $"{NavigationManager.BaseUri}connect/authorize?{queryBuilder}";
+        string path = AuthorizeRequestUrl();
+        string query = string.Join("&", AuthorizeRequestQueryParams(useInternalClientId).Select(e => $"{e.Key}={e.Value}"));
+        return $"{path}?{query}";
     }
+
+    string AuthorizeRequestUrl() => $"{NavigationManager.BaseUri}connect/authorize";
+
+    Dictionary<string, string> AuthorizeRequestQueryParams(bool useInternalClientId) =>
+        new()
+        {
+            ["response_type"] = "code",
+            ["client_id"] = useInternalClientId ? InternalApplicationClientId ?? "" : "{Your Client ID}",
+            ["redirect_uri"] = _thisPageUri!.AbsoluteUri,
+            ["scope"] = "openid",
+            ["code_challenge"] = ComputeCodeChallenge(CodeVerifier),
+            ["code_challenge_method"] = "S256"
+        };
 
     string AccessTokenRequestUrl() => $"{NavigationManager.BaseUri}connect/token";
 
@@ -421,4 +462,3 @@
     }
 
 }
-
