@@ -1,6 +1,8 @@
-﻿@using System.Security.Cryptography
+﻿@using System.Net.Http.Headers
+@using System.Security.Cryptography
 @using System.Text
 @using System.Text.Json
+@using Microsoft.AspNetCore.Authentication.JwtBearer
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.IdentityModel.Tokens
@@ -264,15 +266,11 @@
                 </div>
             </div>
 
-            Which returned the following response:
 
-            @if (string.IsNullOrWhiteSpace(TokenResponse))
-            {
-                <span class="text-muted">(empty)</span>
-            }
-            else
+            @if (!string.IsNullOrWhiteSpace(TokenResponse))
             {
                 <div>
+                    Which returned the following response:
                     <pre class="ps-4"><code>@TokenResponse</code></pre>
                 </div>
             }
@@ -280,8 +278,14 @@
             @if (AccessTokenSuccess)
             {
                 <span class="text-success">
-                    <i class="bi bi-check-circle-fill"></i> The access token request succeeded and returned the following access token: <code>@AccessToken</code>.
+                    <i class="bi bi-check-circle-fill"></i> The access token request succeeded and returned the following access token:
                 </span>
+                <div class="w-100 input-group">
+                    <input class="form-control" value="@AccessToken" readonly/>
+                    <button class="btn btn-outline-secondary" onclick="copy(this, '@AccessToken')">
+                        <i class="bi bi-clipboard"></i>
+                    </button>
+                </div>
             }
             else
             {
@@ -299,8 +303,72 @@
 }
 
 <section class="my-4">
+    <h6 class="mt-2">Use the access token to authenticate API requests</h6>
     <p>
-        WIP
+        Finally, we can use the access token to call the SudokuVS API endpoints. For example we can create a new Sudoku game for the player:
+
+        <div class="ps-4 small position-relative">
+            <div class="row">
+                <div class="col-2 fw-semibold">
+                    Request URL
+                </div>
+                <div class="col">
+                    @GetGamesRequestUrl()
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-2 fw-semibold">
+                    Request Method
+                </div>
+                <div class="col">
+                    GET
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-2 fw-semibold">
+                    Headers
+                </div>
+                <div class="col">
+                    <div class="row">
+                        <div class="col-2">
+                            Authorization
+                        </div>
+                        <div class="col-10 text-truncate">
+                            Bearer @AccessToken
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-link stretched-link" @onclick="PostCreateGameAsync"></button>
+        </div>
+
+        @if (GetGamesSuccess.HasValue)
+        {
+            @if (GetGamesSuccess.Value)
+            {
+                <span class="text-success">
+                    <i class="bi bi-check-circle-fill"></i> The request succeeded and returned the following result:
+                </span>
+            }
+            else
+            {
+                <span class="text-danger">
+                    <i class="bi bi-x-circle-fill"></i> The access token request failed. Please click the request link above to try again.
+                </span>
+            }
+
+            <div>
+                <pre class="ps-4"><code>@GetGamesResponse</code></pre>
+            </div>
+
+            @if (GetGamesSuccess.Value)
+            {
+                <div>
+                    Create games using <a href="/app" target="_blank">the Web application</a> or <a href="/swagger" target="_blank">the Swagger UI</a> and click the link again.
+                </div>
+            }
+        }
     </p>
 </section>
 
@@ -312,12 +380,17 @@
     [SupplyParameterFromQuery]
     public string? Code { get; set; }
 
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "access_token")]
+    public string? AccessToken { get; set; }
+
     public AppUser? User { get; set; }
     public UserOpenIdApplicationEntity? UserApplication { get; set; }
     public string? InternalApplicationClientId { get; set; }
     public bool AccessTokenSuccess { get; set; }
     public string? TokenResponse { get; set; }
-    public string? AccessToken { get; set; }
+    public bool? GetGamesSuccess { get; set; }
+    public string? GetGamesResponse { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -353,6 +426,12 @@
             return;
         }
 
+        if (AccessToken != null)
+        {
+            AccessTokenSuccess = true;
+            return;
+        }
+
         string tokenUrl = AccessTokenRequestUrl();
         Dictionary<string, string> formDataValues = AccessTokenRequestFormData(true);
 
@@ -363,18 +442,7 @@
 
         AccessTokenSuccess = response.IsSuccessStatusCode;
         string responseContent = await response.Content.ReadAsStringAsync();
-
-        Dictionary<string, object>? parsedResponse = null;
-        try
-        {
-            parsedResponse = JsonSerializer.Deserialize<Dictionary<string, object>>(responseContent);
-        }
-        catch (Exception)
-        {
-            // nothing to do
-        }
-
-        TokenResponse = parsedResponse != null ? JsonSerializer.Serialize(parsedResponse, new JsonSerializerOptions { WriteIndented = true }) : responseContent;
+        TokenResponse = PrettyPrintJson(responseContent, out Dictionary<string, object>? parsedResponse);
 
         if (parsedResponse == null || !parsedResponse.TryGetValue("access_token", out object? accessToken))
         {
@@ -383,6 +451,7 @@
         }
 
         AccessToken = accessToken.ToString();
+        NavigationManager.NavigateTo(_thisPageUri!.AbsoluteUri + $"?code={Code}&access_token={AccessToken}");
     }
 
     async Task<string> GetOrCreateInternalApplication()
@@ -454,11 +523,43 @@
             ["code_verifier"] = CodeVerifier
         };
 
+    string GetGamesRequestUrl() => $"{NavigationManager.BaseUri}api/games";
+
+    async Task PostCreateGameAsync()
+    {
+        string getGames = GetGamesRequestUrl();
+
+        using HttpClient client = HttpClientFactory.CreateClient("Custom client guide");
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(JwtBearerDefaults.AuthenticationScheme, AccessToken);
+
+        HttpResponseMessage response = await client.GetAsync(getGames);
+        GetGamesSuccess = response.IsSuccessStatusCode;
+        string responseString = await response.Content.ReadAsStringAsync();
+        GetGamesResponse = PrettyPrintJson<Dictionary<string, object>[]>(responseString, out _);
+
+        StateHasChanged();
+    }
+
     static string ComputeCodeChallenge(string code)
     {
         byte[] codeBytes = Encoding.UTF8.GetBytes(code);
         byte[] hashed = SHA256.HashData(codeBytes);
         return Base64UrlEncoder.Encode(hashed);
+    }
+
+    static string PrettyPrintJson<TValue>(string responseContent, out TValue? parsedResponse)
+    {
+        parsedResponse = default;
+        try
+        {
+            parsedResponse = JsonSerializer.Deserialize<TValue>(responseContent);
+        }
+        catch (Exception)
+        {
+            // nothing to do
+        }
+
+        return parsedResponse != null ? JsonSerializer.Serialize(parsedResponse, new JsonSerializerOptions { WriteIndented = true }) : responseContent;
     }
 
 }
