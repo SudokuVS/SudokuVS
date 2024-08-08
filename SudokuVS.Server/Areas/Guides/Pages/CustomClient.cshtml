@@ -1,0 +1,22 @@
+﻿@page
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using SudokuVS.Server.Areas.Guides
+@using SudokuVS.Server.Areas.Guides.Components
+@model SudokuVS.Server.Areas.Guides.Pages.CustomClient
+
+@{
+    ViewData["Title"] = $"Tutorial: {CustomClientGuideConstants.Title.ToLower()}";
+}
+
+<component type="typeof(CustomClientComponent)" render-mode="ServerPrerendered"/>
+
+@section Head {
+    <link href="/SudokuVS.Server.styles.css" rel="stylesheet">
+    <base href="/"/>
+    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered"/>
+}
+
+@section Scripts {
+    <script src="/_framework/blazor.web.js"></script>
+}

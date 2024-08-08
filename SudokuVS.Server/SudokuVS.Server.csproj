@@ -65,6 +65,13 @@
       <AdditionalFiles Include="Views\Authorization\Logout.cshtml" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Areas\Tutorials\ExternalClient\Pages\_ViewImports.cshtml" />
+      <_ContentIncludedByDefault Remove="Areas\Tutorials\ExternalClient\Pages\_ViewStart.cshtml" />
+      <_ContentIncludedByDefault Remove="Areas\Tutorials\Components\ExternalClientComponent.razor" />
+      <_ContentIncludedByDefault Remove="Areas\Tutorials\ExternalClient\Components\ExternalClientComponent.razor" />
+    </ItemGroup>
+
     <PropertyGroup>
         <MinVerTagPrefix>v</MinVerTagPrefix>
         <MinVerBuildMetadata Condition="'$(Configuration)' == 'Debug'">DEBUG</MinVerBuildMetadata>

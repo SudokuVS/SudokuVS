@@ -6,6 +6,7 @@ namespace SudokuVS.Server.Infrastructure.Logging;
 
 public static class Logging
 {
+    const LogEventLevel DefaultLoggingLevel = LogEventLevel.Information;
     const LogEventLevel InfrastructureLoggingLevel = LogEventLevel.Information;
     public const string OutputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} ({SourceContext}){NewLine}{Exception}";
 
@@ -15,7 +16,7 @@ public static class Logging
     public static LoggerConfiguration ConfigureLogger(WebApplicationBuilder builder, LoggerConfiguration configuration) =>
         configuration.WriteTo.Console(outputTemplate: OutputTemplate)
             .Enrich.WithProperty("SourceContext", "Bootstrap")
-            .MinimumLevel.Is(LogEventLevel.Information)
+            .MinimumLevel.Is(DefaultLoggingLevel)
             .MinimumLevel.Override("System.Net.Http.HttpClient", InfrastructureLoggingLevel)
             .MinimumLevel.Override("Microsoft.Extensions.Http", InfrastructureLoggingLevel)
             .MinimumLevel.Override("Microsoft.AspNetCore", InfrastructureLoggingLevel)
