@@ -15,7 +15,7 @@ public static class Logging
     public static LoggerConfiguration ConfigureLogger(WebApplicationBuilder builder, LoggerConfiguration configuration) =>
         configuration.WriteTo.Console(outputTemplate: OutputTemplate)
             .Enrich.WithProperty("SourceContext", "Bootstrap")
-            .MinimumLevel.Is(LogEventLevel.Information)
+            .MinimumLevel.Is(LogEventLevel.Debug)
             .MinimumLevel.Override("System.Net.Http.HttpClient", InfrastructureLoggingLevel)
             .MinimumLevel.Override("Microsoft.Extensions.Http", InfrastructureLoggingLevel)
             .MinimumLevel.Override("Microsoft.AspNetCore", InfrastructureLoggingLevel)

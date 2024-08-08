@@ -41,82 +41,92 @@
             <span asp-validation-for="CreateNewApplication.RedirectUri" class="text-danger"></span>
         </div>
 
-        <button type="submit" class="btn btn-outline-primary" title="Create new application.">Create</button>
+        <input asp-for="ReturnUrl" name="returnUrl" hidden/>
+
+        <div class="d-flex gap-2 align-items-center">
+            <button type="submit" class="btn btn-outline-primary" title="Create new application.">Create</button>
+            @if (Model.ReturnUrl != null)
+            {
+                <div class="text-muted small">You will be redirected to <a href="@Model.ReturnUrl">@Model.ReturnUrl</a> after creation</div>
+            }
+        </div>
 
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     </form>
 </div>
 
 <h3>Applications</h3>
-<ul class="list-group">
-    @if (Model.Applications.Count == 0)
+@if (Model.Applications.Count == 0)
+{
+    <div class="text-center text-muted text-center">No application.</div>
+}
+else
+{
+    @foreach (UserOpenIdApplicationEntity app in Model.Applications)
     {
-        <li class="list-group-item text-muted text-center">No application.</li>
-    }
-    else
-    {
-        @foreach (UserOpenIdApplicationEntity app in Model.Applications)
-        {
-            string keyDate = app.CreationDate.ToString("f", CultureInfo.InvariantCulture);
+        string keyDate = app.CreationDate.ToString("f", CultureInfo.InvariantCulture);
 
-            <li class="list-group-item">
-                <div class="lead fw-semibold">
-                    @app.Name
-                </div>
+        <div class="my-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        @app.Name
+                    </h5>
 
-                <div class="text-muted small mb-2">
-                    Created on @keyDate
-                </div>
+                    <div class="card-subtitle text-body-secondary small mb-4">
+                        Created on @keyDate
+                    </div>
 
-                <div class="row mb-2">
-                    <label asp-for="@app.ClientId" class="col-3 col-form-label">Client ID</label>
-                    <div class="col">
-                        <div class="input-group">
-                            <input asp-for="@app.ClientId" class="form-control" readonly/>
-                            <button class="btn btn-outline-secondary" onclick="copy(this, '@app.ClientId')">
-                                <i class="bi bi-clipboard"></i>
-                            </button>
+                    <div class="row mb-2">
+                        <label asp-for="@app.ClientId" class="col-3 col-form-label">Client ID</label>
+                        <div class="col">
+                            <div class="input-group">
+                                <input asp-for="@app.ClientId" class="form-control" readonly/>
+                                <button class="btn btn-outline-secondary" onclick="copy(this, '@app.ClientId')">
+                                    <i class="bi bi-clipboard"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="row mb-2">
-                    <label asp-for="@app.ApplicationType" class="col-3 col-form-label">Application type</label>
-                    <div class="col">
-                        <select asp-for="@app.ApplicationType" class="form-select" asp-items="Html.GetEnumSelectList<OpenIdApplicationType>()" disabled>
-                            <option selected="selected" value="">Please select</option>
-                        </select>
+                    <div class="row mb-2">
+                        <label asp-for="@app.ApplicationType" class="col-3 col-form-label">Application type</label>
+                        <div class="col">
+                            <select asp-for="@app.ApplicationType" class="form-select" asp-items="Html.GetEnumSelectList<OpenIdApplicationType>()" disabled>
+                                <option selected="selected" value="">Please select</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <label asp-for="@app.ConsentType" class="col-3 col-form-label">Consent type</label>
+                        <div class="col">
+                            <select asp-for="@app.ConsentType" class="form-select" asp-items="Html.GetEnumSelectList<OpenIdConsentType>()" disabled>
+                                <option selected="selected" value="">Please select</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <label asp-for="@app.RedirectUris" class="col-3 col-form-label"></label>
+                        <div class="col">
+                            <input asp-for="@app.RedirectUris" class="form-control" readonly></input>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <form id="@($"remove-application-{app.Name}")" asp-page-handler="RemoveApplication" method="post">
+                            <input asp-for="@app.ClientId" name="clientId" type="hidden"/>
+                            <button type="submit" class="btn btn-outline-danger" title="Revoke this application.">
+                                <i class="bi bi-trash"></i> Delete
+                            </button>
+                        </form>
                     </div>
                 </div>
-
-                <div class="row mb-2">
-                    <label asp-for="@app.ConsentType" class="col-3 col-form-label">Consent type</label>
-                    <div class="col">
-                        <select asp-for="@app.ConsentType" class="form-select" asp-items="Html.GetEnumSelectList<OpenIdConsentType>()" disabled>
-                            <option selected="selected" value="">Please select</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="row mb-2">
-                    <label asp-for="@app.RedirectUris" class="col-3 col-form-label"></label>
-                    <div class="col">
-                        <input asp-for="@app.RedirectUris" class="form-control" readonly></input>
-                    </div>
-                </div>
-
-                <div class="mb-2">
-                    <form id="@($"remove-application-{app.Name}")" asp-page-handler="RemoveApplication" method="post">
-                        <input asp-for="@app.ClientId" name="clientId" type="hidden"/>
-                        <button type="submit" class="btn btn-outline-danger" title="Revoke this application.">
-                            <i class="bi bi-trash"></i> Delete
-                        </button>
-                    </form>
-                </div>
-            </li>
-        }
+            </div>
+        </div>
     }
-</ul>
+}
 
 <script>    
     window.copy = (button, text) =>

@@ -262,7 +262,7 @@ async Task RegisterSwaggerOidcApplication(WebApplication app)
         await manager.DeleteAsync(application);
     }
 
-    if (app.Environment.IsDevelopment())
+    if (app.Environment.IsProduction())
     {
         return;
     }

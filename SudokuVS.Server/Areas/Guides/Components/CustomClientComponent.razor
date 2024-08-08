@@ -1,0 +1,414 @@
+﻿@using System.Text
+@using System.Text.Json
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.IdentityModel.Tokens
+@using OpenIddict.Abstractions
+@using SudokuVS.Server.Infrastructure.Authentication.OpenIdConnect.Services
+@using SudokuVS.Server.Infrastructure.Database.Models
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<AppUser> UserManager
+@inject IOpenIddictApplicationManager OpenIddictApplicationManager
+@inject OidcApplicationsService ApplicationsService
+@inject IHttpClientFactory HttpClientFactory
+
+@{
+    string thisPageUrl = $"/{NavigationManager.ToBaseRelativePath(NavigationManager.Uri)}";
+}
+
+<script>
+    window.copy = (button, text) =>
+        navigator.clipboard.writeText(text).then(() => {
+            button.innerText = "Copied!";
+        });
+</script>
+
+<section>
+    <h3>Implement a custom client for the SudokuVS game</h3>
+
+    <p>
+        @CustomClientGuideConstants.Summary
+    </p>
+</section>
+
+<section class="my-4">
+    <h5 class="fw-semibold">What are we going to do?</h5>
+
+    <ol>
+        <li>Create a SudokuVS account for the owner of the custom client</li>
+        <li>Register an OpenID Connect application that will be used to authenticate the users of the custom client</li>
+        <li>Call the SudokuVS endpoints on behalf of the authenticated users</li>
+    </ol>
+</section>
+
+<h5 class="fw-semibold">Let's do it</h5>
+<section class="my-4">
+    <h6>Configure the user and the OIDC application</h6>
+    <p>
+        The first step is to create an account and sign in. <br/>
+        @if (User == null)
+        {
+            <a href="identity/account/login?returnUrl=@thisPageUrl">Sign in</a>
+        }
+        else
+        {
+            <span class="text-success">
+                <i class="bi bi-check-circle-fill"></i> Signed in as @User.GetPublicName().
+            </span>
+        }
+    </p>
+</section>
+
+@if (User == null)
+{
+    return;
+}
+
+<section class="my-4">
+    <p>
+        Then create an OpenId Connect application that will be used to authenticate users with the SudokuVS server. <br/>
+
+        @if (UserApplication == null)
+        {
+            <a href="/identity/account/manage/oidcapplications?returnUrl=@thisPageUrl">Create an OpenId Connect application</a>
+        }
+        else
+        {
+            <span class="text-success">
+                <i class="bi bi-check-circle-fill"></i> Found application @UserApplication.Name.
+            </span>
+            <br/>
+            <span class="d-inline-block w-100 ps-4 small">
+                <span class="fw-semibold">Configuration</span>
+                <span class="row">
+                    <span class="col-2">
+                        Client ID
+                    </span>
+                    <span class="col d-flex gap-1 align-items-center position-relative">
+                        @UserApplication.ClientId
+
+                        <button class="btn btn-link btn-sm stretched-link text-decoration-none text-muted p-0 m-0" onclick="copy(this, '@UserApplication.ClientId')">
+                            <i class="bi bi-clipboard"></i>
+                        </button>
+                    </span>
+                </span>
+                <span class="row">
+                    <span class="col-2">
+                        Redirect URIs
+                    </span>
+                    <span class="col">
+                        @UserApplication.RedirectUris
+                    </span>
+                </span>
+            </span>
+
+        }
+    </p>
+</section>
+
+@if (UserApplication == null)
+{
+    return;
+}
+
+<section class="my-4">
+    <p>
+        The only flow that is supported is the Authorization code flow with PKCE.
+        Configure the OIDC application in your custom client.
+        All major platforms have turnkey libraries that handle OIDC authentication.
+        <br/>
+        <span class="fw-bold">The recommended way of using the OIDC application that has been created is through an existing library of your language of choice, doing it manually can lead to security issues.</span>
+        However, for the sake of completeness, here is how it can be done manually.
+        <br/>
+        <span class="text-muted">Note: the following interactions will NOT use your application but an internal one that has been set up with this page as redirect URI.</span>
+        <br/>
+    </p>
+
+    <h6 class="mt-2">Authenticate users using the OIDC application</h6>
+    <p>
+        First we need to generate a code challenge from a random code.
+
+        <span class="d-inline-block w-100 ps-4 small">
+            <span class="row">
+                <span class="col-2">
+                    Code verifier
+                </span>
+                <span class="col d-flex gap-1 align-items-center position-relative">
+                    @CodeVerifier
+                </span>
+            </span>
+            <span class="row">
+                <span class="col-2">
+                    Code challenge
+                </span>
+                <span class="col">
+                    @ComputeCodeChallenge(CodeVerifier)
+                </span>
+            </span>
+        </span>
+
+        <span class="text-info small"><i class="bi bi-exclamation-circle"></i> In this guide, the code verifier is not actually random, but in real applications it must be.</span>
+    </p>
+    <p>
+        Then we navigate to the authorization endpoint.
+
+        @if (Code == null)
+        {
+            <br/>
+            <a href="@InternalApplicationAuthorizePath(true)" class="wrap-anywhere">@InternalApplicationAuthorizePath(false)</a>
+            <br/>
+        }
+        else
+        {
+            <br/>
+            <a href="@InternalApplicationAuthorizePath(true)" class="text-body wrap-anywhere">@InternalApplicationAuthorizePath(false)</a>
+            <br/>
+            <div>
+                <span class="text-success">
+                    <i class="bi bi-check-circle-fill"></i> The server responded with the following authorization code: <code>@Code</code>.
+                </span>
+                <br/>
+
+                The code was then used to query an access token from the server using the following request:
+                <div class="ps-4 small">
+                    <div class="row">
+                        <div class="col-2 fw-semibold">
+                            Request URL
+                        </div>
+                        <div class="col">
+                            @AccessTokenRequestUrl()
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2 fw-semibold">
+                            Request Method
+                        </div>
+                        <div class="col">
+                            POST
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2 fw-semibold">
+                            Form data
+                        </div>
+                        <div class="col">
+                            @foreach ((string? key, string? value) in AccessTokenRequestFormData(false))
+                            {
+                                <div class="row">
+                                    <div class="col-2">
+                                        @key
+                                    </div>
+                                    <div class="col">
+                                        @value
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                And got the following response:
+
+                @if (string.IsNullOrWhiteSpace(TokenResponse))
+                {
+                    <span class="text-muted">(empty)</span>
+                }
+                else
+                {
+                    <div class="ps-4">
+                        <pre><code>@TokenResponse</code></pre>
+                    </div>
+                }
+
+                @if (AccessTokenSuccess)
+                {
+                    <span class="text-success">
+                        <i class="bi bi-check-circle-fill"></i> The access token request succeeded and returned the following access token: <code>@AccessToken</code>.
+                    </span>
+                }
+                else
+                {
+                    <span class="text-danger">
+                        <i class="bi bi-x-circle-fill"></i> The access token request failed. Please click the authorization link above to try again.
+                    </span>
+                }
+            </div>
+        }
+    </p>
+</section>
+
+@if (AccessToken == null)
+{
+    return;
+}
+
+<section class="my-4">
+    <p>
+        In the custom client, start by authenticating users. They will be able to create an account in the SudokuVS login page.
+    </p>
+    <p>
+        Once the user is authenticated, the custom client receives their access token. The token can be used to call <a href="/swagger" target="_blank">the SudokuVS API endpoints</a> on behalf
+        of the user.
+        The access token must be sent in the <code>Authorization</code> header of the API calls with <code>Bearer</code> scheme.
+    </p>
+</section>
+
+@code {
+    const string CodeVerifier = "Lux4pCbjpmczcRVc1UypI8mSj9ingsAF";
+    Uri? _thisPageUri;
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? Code { get; set; }
+
+    public AppUser? User { get; set; }
+    public UserOpenIdApplicationEntity? UserApplication { get; set; }
+    public string? InternalApplicationClientId { get; set; }
+    public bool AccessTokenSuccess { get; set; }
+    public string? TokenResponse { get; set; }
+    public string? AccessToken { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _thisPageUri = new Uri(new Uri(NavigationManager.Uri).GetLeftPart(UriPartial.Path));
+        InternalApplicationClientId = await GetOrCreateInternalApplication();
+
+        await LoadAuthenticatedUser();
+        await LoadUserApplication();
+        await GetAccessToken();
+    }
+
+    async Task LoadAuthenticatedUser()
+    {
+        AuthenticationState authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        User = await UserManager.GetUserAsync(authState.User);
+    }
+
+    async Task LoadUserApplication()
+    {
+        if (User == null)
+        {
+            return;
+        }
+
+        IReadOnlyList<UserOpenIdApplicationEntity> applications = await ApplicationsService.GetApplicationsAsync(User);
+        UserApplication = applications.FirstOrDefault();
+    }
+
+    async Task GetAccessToken()
+    {
+        if (Code == null)
+        {
+            return;
+        }
+
+        string tokenUrl = AccessTokenRequestUrl();
+        Dictionary<string, string> formDataValues = AccessTokenRequestFormData(true);
+
+        using HttpClient client = HttpClientFactory.CreateClient("Custom client guide");
+        using FormUrlEncodedContent formData = new(formDataValues);
+
+        HttpResponseMessage response = await client.PostAsync(tokenUrl, formData);
+
+        AccessTokenSuccess = response.IsSuccessStatusCode;
+        string responseContent = await response.Content.ReadAsStringAsync();
+
+        Dictionary<string, object>? parsedResponse = null;
+        try
+        {
+            parsedResponse = JsonSerializer.Deserialize<Dictionary<string, object>>(responseContent);
+        }
+        catch (Exception)
+        {
+            // nothing to do
+        }
+
+        TokenResponse = parsedResponse != null ? JsonSerializer.Serialize(parsedResponse, new JsonSerializerOptions { WriteIndented = true }) : responseContent;
+
+        if (parsedResponse == null || !parsedResponse.TryGetValue("access_token", out object? accessToken))
+        {
+            AccessToken = null;
+            return;
+        }
+
+        AccessToken = accessToken.ToString();
+    }
+
+    async Task<string> GetOrCreateInternalApplication()
+    {
+        const string appClientId = "CustomClientGuideApplication";
+
+#if DEBUG
+        // In DEBUG, recreate the app each time to allow for changes during development
+        object? app = await OpenIddictApplicationManager.FindByClientIdAsync(appClientId);
+        if (app != null)
+        {
+            await OpenIddictApplicationManager.DeleteAsync(app);
+        }
+#endif
+
+        if (await OpenIddictApplicationManager.FindByClientIdAsync(appClientId) == null)
+        {
+            await OpenIddictApplicationManager.CreateAsync(
+                new OpenIddictApplicationDescriptor
+                {
+                    DisplayName = "Custom Client Guide Application",
+                    ClientId = appClientId,
+                    ClientType = OpenIddictConstants.ClientTypes.Public,
+                    ConsentType = OpenIddictConstants.ConsentTypes.Explicit,
+                    RedirectUris = { _thisPageUri! },
+                    Permissions =
+                    {
+                        OpenIddictConstants.Permissions.Endpoints.Authorization,
+                        OpenIddictConstants.Permissions.Endpoints.Logout,
+                        OpenIddictConstants.Permissions.Endpoints.Token,
+                        OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
+                        OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
+                        OpenIddictConstants.Permissions.ResponseTypes.Code,
+                        OpenIddictConstants.Permissions.Scopes.Email,
+                        OpenIddictConstants.Permissions.Scopes.Profile,
+                        OpenIddictConstants.Permissions.Scopes.Roles
+                    },
+                    Requirements =
+                    {
+                        OpenIddictConstants.Requirements.Features.ProofKeyForCodeExchange
+                    }
+                }
+            );
+        }
+
+        return appClientId;
+    }
+
+    string InternalApplicationAuthorizePath(bool useInternalClientId)
+    {
+        StringBuilder queryBuilder = new();
+
+        string codeChallenge = ComputeCodeChallenge(CodeVerifier);
+
+        queryBuilder.Append("response_type=code");
+        queryBuilder.Append($"&client_id={(useInternalClientId ? InternalApplicationClientId : "{Your Client Id}")}");
+        queryBuilder.Append($"&redirect_uri={_thisPageUri!.AbsoluteUri}");
+        queryBuilder.Append("&scope=openid");
+        queryBuilder.Append($"&code_challenge={codeChallenge}");
+        queryBuilder.Append("&code_challenge_method=plain");
+
+        return $"{NavigationManager.BaseUri}connect/authorize?{queryBuilder}";
+    }
+
+    string AccessTokenRequestUrl() => $"{NavigationManager.BaseUri}connect/token";
+
+    Dictionary<string, string> AccessTokenRequestFormData(bool useInternalClientId) =>
+        new()
+        {
+            ["grant_type"] = "authorization_code",
+            ["code"] = Code ?? "",
+            ["client_id"] = useInternalClientId ? InternalApplicationClientId ?? "" : "{Your Client ID}",
+            ["redirect_uri"] = _thisPageUri?.ToString() ?? "",
+            ["code_verifier"] = CodeVerifier
+        };
+
+    static string ComputeCodeChallenge(string code) => Base64UrlEncoder.Encode(code);
+
+}

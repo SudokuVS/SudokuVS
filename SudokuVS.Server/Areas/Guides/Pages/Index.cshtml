@@ -1,0 +1,21 @@
+﻿@page
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using SudokuVS.Server.Areas.Guides
+@model SudokuVS.Server.Areas.Guides.Pages.Index
+
+<h3 class="mt-4">Guides</h3>
+
+<div class="mt-4 mb-2">
+    <div class="w-100 card">
+        <div class="card-body">
+            <h5 class="card-title">
+                <a class="stretched-link" asp-page="/CustomClient">
+                    @CustomClientGuideConstants.Title
+                </a>
+            </h5>
+            <p class="card-text">
+                @CustomClientGuideConstants.Summary
+            </p>
+        </div>
+    </div>
+</div>
