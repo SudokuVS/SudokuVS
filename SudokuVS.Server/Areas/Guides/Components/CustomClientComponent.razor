@@ -40,36 +40,27 @@
 
     <ol>
         <li>Create a SudokuVS account for the owner of the custom client</li>
-        <li>Register an OpenID Connect application that will be used to authenticate the users of the custom client</li>
+        <li>Register an OpenID Connect application</li>
+        <li>Authenticate a user using the application</li>
         <li>Call the SudokuVS endpoints on behalf of the authenticated users</li>
     </ol>
 </section>
 
 <h5 class="fw-semibold">Let's do it</h5>
-<section class="my-4">
+<section class="mb-4">
     <h6>Configure the user and the OIDC application</h6>
     <p>
         The first step is to create an account and sign in. <br/>
-        @if (User == null && Code == null)
+        @if (User == null)
         {
             <a href="identity/account/login?returnUrl=@thisPageUrl">Sign in</a>
         }
         else
         {
-            @if (User == null)
-            {
-                <span class="text-success">
-                    <i class="bi bi-check-circle-fill"></i>
-                    Signed in.
-                </span>
-            }
-            else
-            {
-                <span class="text-success">
-                    <i class="bi bi-check-circle-fill"></i>
-                    Signed in as @User.GetPublicName().
-                </span>
-            }
+            <span class="text-success">
+                <i class="bi bi-check-circle-fill"></i>
+                Signed in as @User.GetPublicName().
+            </span>
         }
     </p>
 </section>
@@ -165,7 +156,7 @@
         <span class="text-info small"><i class="bi bi-exclamation-circle"></i> In this guide, the code verifier is not actually random, but in real applications it must be.</span>
     </p>
     <p>
-        Then we use that challenge in a GET request that will ask the user for their credentials (click the request below).
+        Then we use that challenge in a GET request that will ask the user for their credentials.
 
         <div class="ps-4 small position-relative">
             <div class="row">
@@ -179,7 +170,7 @@
                     }
                     else
                     {
-                        <a href="@InternalApplicationAuthorizePath(true)" class="text-body stretched-link">@AuthorizeRequestUrl()</a>
+                        <a href="@InternalApplicationAuthorizePath(true)" class="stretched-link">@AuthorizeRequestUrl()</a>
                     }
                 </div>
             </div>
@@ -214,7 +205,13 @@
         @if (Code != null)
         {
             <span class="text-success">
-                <i class="bi bi-check-circle-fill"></i> The server responded with the following authorization code: <code>@Code</code>.
+                <i class="bi bi-check-circle-fill"></i> The server responded with the following <span class="fw-semibold">authorization code</span>:
+                <div class="input-group">
+                    <input class="form-control" value="@Code" readonly/>
+                    <button class="btn btn-outline-secondary" onclick="copy(this, '@Code')">
+                        <i class="bi bi-clipboard"></i>
+                    </button>
+                </div>
             </span>
         }
     </p>
@@ -278,7 +275,7 @@
             @if (AccessTokenSuccess)
             {
                 <span class="text-success">
-                    <i class="bi bi-check-circle-fill"></i> The access token request succeeded and returned the following access token:
+                    <i class="bi bi-check-circle-fill"></i> The access token request succeeded and returned the following <span class="fw-semibold">access token</span>:
                 </span>
                 <div class="w-100 input-group">
                     <input class="form-control" value="@AccessToken" readonly/>
@@ -312,8 +309,8 @@
                 <div class="col-2 fw-semibold">
                     Request URL
                 </div>
-                <div class="col">
-                    @GetGamesRequestUrl()
+                <div class="col d-flex align-items-center">
+                    <button class="btn btn-link btn-sm stretched-link p-0 m-0 lh-1" @onclick="PostCreateGameAsync">@GetGamesRequestUrl()</button>
                 </div>
             </div>
             <div class="row">
@@ -328,7 +325,7 @@
                 <div class="col-2 fw-semibold">
                     Headers
                 </div>
-                <div class="col">
+                <div class="col-10">
                     <div class="row">
                         <div class="col-2">
                             Authorization
@@ -340,7 +337,7 @@
                 </div>
             </div>
 
-            <button class="btn btn-link stretched-link" @onclick="PostCreateGameAsync"></button>
+
         </div>
 
         @if (GetGamesSuccess.HasValue)
@@ -354,18 +351,27 @@
             else
             {
                 <span class="text-danger">
-                    <i class="bi bi-x-circle-fill"></i> The access token request failed. Please click the request link above to try again.
+                    <i class="bi bi-x-circle-fill"></i> The request failed. Please click the request link above to try again.
                 </span>
             }
 
-            <div>
+            if (LoadingGames)
+            {
+                <div class="d-flex justify-content-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            }
+
+            <div class="@(LoadingGames ? "invisible" : "")">
                 <pre class="ps-4"><code>@GetGamesResponse</code></pre>
             </div>
 
             @if (GetGamesSuccess.Value)
             {
                 <div>
-                    Create games using <a href="/app" target="_blank">the Web application</a> or <a href="/swagger" target="_blank">the Swagger UI</a> and click the link again.
+                    Create games using <a href="/app" target="_blank">the Web application</a> or <a href="/swagger" target="_blank">the Swagger UI</a> and click the link again to get more results.
                 </div>
             }
         }
@@ -391,6 +397,7 @@
     public string? TokenResponse { get; set; }
     public bool? GetGamesSuccess { get; set; }
     public string? GetGamesResponse { get; set; }
+    public bool LoadingGames { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -442,7 +449,7 @@
 
         AccessTokenSuccess = response.IsSuccessStatusCode;
         string responseContent = await response.Content.ReadAsStringAsync();
-        TokenResponse = PrettyPrintJson(responseContent, out Dictionary<string, object>? parsedResponse);
+        TokenResponse = DeserializeAndPrettyPrint(responseContent, out Dictionary<string, object>? parsedResponse);
 
         if (parsedResponse == null || !parsedResponse.TryGetValue("access_token", out object? accessToken))
         {
@@ -527,6 +534,9 @@
 
     async Task PostCreateGameAsync()
     {
+        LoadingGames = true;
+        StateHasChanged();
+
         string getGames = GetGamesRequestUrl();
 
         using HttpClient client = HttpClientFactory.CreateClient("Custom client guide");
@@ -535,8 +545,9 @@
         HttpResponseMessage response = await client.GetAsync(getGames);
         GetGamesSuccess = response.IsSuccessStatusCode;
         string responseString = await response.Content.ReadAsStringAsync();
-        GetGamesResponse = PrettyPrintJson<Dictionary<string, object>[]>(responseString, out _);
+        GetGamesResponse = DeserializeAndPrettyPrint<Dictionary<string, object>[]>(responseString, out _);
 
+        LoadingGames = false;
         StateHasChanged();
     }
 
@@ -547,19 +558,25 @@
         return Base64UrlEncoder.Encode(hashed);
     }
 
-    static string PrettyPrintJson<TValue>(string responseContent, out TValue? parsedResponse)
+    static string DeserializeAndPrettyPrint<TValue>(string responseContent, out TValue? parsedResponse)
     {
-        parsedResponse = default;
         try
         {
             parsedResponse = JsonSerializer.Deserialize<TValue>(responseContent);
+            return JsonSerializer.Serialize(parsedResponse, new JsonSerializerOptions { WriteIndented = true });
         }
         catch (Exception)
         {
             // nothing to do
         }
 
-        return parsedResponse != null ? JsonSerializer.Serialize(parsedResponse, new JsonSerializerOptions { WriteIndented = true }) : responseContent;
+        parsedResponse = default;
+        JsonDocument parsedUntyped = JsonDocument.Parse(responseContent);
+        using MemoryStream stream = new();
+        using Utf8JsonWriter writer = new(stream, new JsonWriterOptions { Indented = true });
+        parsedUntyped.WriteTo(writer);
+        writer.Flush();
+        return Encoding.UTF8.GetString(stream.ToArray());
     }
 
 }
