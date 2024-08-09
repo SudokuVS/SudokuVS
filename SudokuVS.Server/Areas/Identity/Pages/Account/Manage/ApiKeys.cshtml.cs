@@ -87,6 +87,9 @@ public class ApiKeys : PageModel
         }
 
         await _apiKeyService.RevokeApiKeyAsync(user, token);
+
+        StatusMessage = "The API key has been removed.";
+        
         return RedirectToPage();
     }
 }
