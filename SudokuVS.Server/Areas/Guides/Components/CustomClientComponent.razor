@@ -364,9 +364,20 @@
                 </span>
             }
 
-            <div>
-                <pre class="ps-4"><code>@GetGamesResponse</code></pre>
-            </div>
+            if (LoadingGames)
+            {
+                <div class="d-flex justify-content-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div>
+                    <pre class="ps-4"><code>@GetGamesResponse</code></pre>
+                </div>
+            }
 
             @if (GetGamesSuccess.Value)
             {
@@ -397,6 +408,7 @@
     public string? TokenResponse { get; set; }
     public bool? GetGamesSuccess { get; set; }
     public string? GetGamesResponse { get; set; }
+    public bool LoadingGames { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -533,6 +545,9 @@
 
     async Task PostCreateGameAsync()
     {
+        LoadingGames = true;
+        StateHasChanged();
+
         string getGames = GetGamesRequestUrl();
 
         using HttpClient client = HttpClientFactory.CreateClient("Custom client guide");
@@ -543,6 +558,7 @@
         string responseString = await response.Content.ReadAsStringAsync();
         GetGamesResponse = DeserializeAndPrettyPrint<Dictionary<string, object>[]>(responseString, out _);
 
+        LoadingGames = false;
         StateHasChanged();
     }
 
