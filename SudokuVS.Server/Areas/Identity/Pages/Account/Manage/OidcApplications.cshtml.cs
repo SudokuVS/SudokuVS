@@ -93,6 +93,9 @@ public class OidcApplications : PageModel
         }
 
         await _oidcApplicationsService.RemoveApplicationAsync(user, clientId);
+        
+        StatusMessage = "The OIDC application has been removed.";
+        
         return RedirectToPage();
     }
 
