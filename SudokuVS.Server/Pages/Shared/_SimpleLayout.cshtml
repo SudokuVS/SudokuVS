@@ -64,16 +64,35 @@
         <div class="d-flex align-items-center gap-4 pe-4 position-relative">
             @if (isAuthenticated)
             {
-                <a id="manage" class="h-100 p-1 btn btn-link text-white text-decoration-none" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">@(await UserManager.GetPublicName(User))</a>
-                <div>
-                    <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                        <button id="logout" type="submit" class="h-100 p-1 btn btn-link text-white text-decoration-none">Sign out</button>
-                    </form>
+                <div class="dropdown">
+                    <button class="h-100 p-1 btn btn-link text-white text-decoration-none dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        @(await UserManager.GetPublicName(User))
+                        <i class="bi bi-person-circle ps-2"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
+                                <i class="bi bi-gear"></i>
+                                Settings
+                            </a>
+                        </li>
+                        <li>
+                            <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                                <button id="logout" type="submit" class="btn btn-link text-decoration-none dropdown-item">
+                                    <i class="bi bi-box-arrow-left"></i>
+                                    Sign out
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
                 </div>
             }
             else
             {
-                <a id="login" class="h-100 p-1 btn btn-link text-white text-decoration-none" asp-area="Identity" asp-page="/Account/Login">Sign in</a>
+                <a id="login" class="h-100 p-1 btn btn-link text-white text-decoration-none" asp-area="Identity" asp-page="/Account/Login">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                    Sign in
+                </a>
             }
         </div>
     </nav>
@@ -105,3 +124,4 @@
 @section Scripts {
     @await RenderSectionAsync("Scripts", false)
 }
+
