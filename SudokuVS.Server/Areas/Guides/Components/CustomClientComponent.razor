@@ -362,17 +362,15 @@
                     </div>
                 </div>
             }
-            else
-            {
-                <div>
-                    <pre class="ps-4"><code>@GetGamesResponse</code></pre>
-                </div>
-            }
+
+            <div class="@(LoadingGames ? "invisible" : "")">
+                <pre class="ps-4"><code>@GetGamesResponse</code></pre>
+            </div>
 
             @if (GetGamesSuccess.Value)
             {
                 <div>
-                    Create games using <a href="/app" target="_blank">the Web application</a> or <a href="/swagger" target="_blank">the Swagger UI</a> and click the link again.
+                    Create games using <a href="/app" target="_blank">the Web application</a> or <a href="/swagger" target="_blank">the Swagger UI</a> and click the link again to get more results.
                 </div>
             }
         }
