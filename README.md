@@ -35,6 +35,9 @@ either in the `appsettings.json`
    "Microsoft": {
       "ClientId": "", // optional, enables microsoft auth
       "ClientSecret": "" // optional, enables microsoft auth
+   },
+   "ApiKey": {
+      "Secret": "", // optional, enables api key auth
    }
 }, 
 ```

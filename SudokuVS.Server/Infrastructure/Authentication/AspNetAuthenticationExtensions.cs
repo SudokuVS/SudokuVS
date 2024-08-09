@@ -20,7 +20,7 @@ public static class AspNetAuthenticationExtensions
         string? googleClientSecret = builder.Configuration.GetValue<string>("Authentication:Google:ClientSecret");
         if (string.IsNullOrWhiteSpace(googleClientId) || string.IsNullOrWhiteSpace(googleClientSecret))
         {
-            logger?.LogInformation("Google Auth not configured.");
+            logger?.LogInformation("Google authentication not configured.");
             return;
         }
 
@@ -33,7 +33,7 @@ public static class AspNetAuthenticationExtensions
             }
         );
 
-        logger?.LogInformation("Google auth configured.");
+        logger?.LogInformation("Google authentication configured.");
     }
 
     static void AddMicrosoftAccountAuthentication(WebApplicationBuilder builder, ILogger? logger, AuthenticationBuilder authenticationBuilder)
@@ -42,7 +42,7 @@ public static class AspNetAuthenticationExtensions
         string? microsoftClientSecret = builder.Configuration.GetValue<string>("Authentication:Microsoft:ClientSecret");
         if (string.IsNullOrWhiteSpace(microsoftClientId) || string.IsNullOrWhiteSpace(microsoftClientSecret))
         {
-            logger?.LogInformation("Microsoft Auth not configured.");
+            logger?.LogInformation("Microsoft authentication not configured.");
             return;
         }
 
@@ -55,7 +55,7 @@ public static class AspNetAuthenticationExtensions
             }
         );
 
-        logger?.LogInformation("Microsoft Account auth configured.");
+        logger?.LogInformation("Microsoft authentication configured.");
     }
 
     static void AddApiKeyAuthentication(WebApplicationBuilder builder, ILogger? logger, AuthenticationBuilder authenticationBuilder)
@@ -63,7 +63,7 @@ public static class AspNetAuthenticationExtensions
         string? secret = builder.Configuration.GetValue<string>("Authentication:ApiKey:Secret");
         if (string.IsNullOrWhiteSpace(secret))
         {
-            logger?.LogInformation("API Key not configured.");
+            logger?.LogInformation("API Key authentication not configured.");
             return;
         }
 
