@@ -50,26 +50,16 @@
     <h6>Configure the user and the OIDC application</h6>
     <p>
         The first step is to create an account and sign in. <br/>
-        @if (User == null && Code == null)
+        @if (User == null)
         {
             <a href="identity/account/login?returnUrl=@thisPageUrl">Sign in</a>
         }
         else
         {
-            @if (User == null)
-            {
-                <span class="text-success">
-                    <i class="bi bi-check-circle-fill"></i>
-                    Signed in.
-                </span>
-            }
-            else
-            {
-                <span class="text-success">
-                    <i class="bi bi-check-circle-fill"></i>
-                    Signed in as @User.GetPublicName().
-                </span>
-            }
+            <span class="text-success">
+                <i class="bi bi-check-circle-fill"></i>
+                Signed in as @User.GetPublicName().
+            </span>
         }
     </p>
 </section>
