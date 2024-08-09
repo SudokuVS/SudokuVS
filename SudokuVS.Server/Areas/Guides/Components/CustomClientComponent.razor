@@ -214,7 +214,13 @@
         @if (Code != null)
         {
             <span class="text-success">
-                <i class="bi bi-check-circle-fill"></i> The server responded with the following authorization code: <code>@Code</code>.
+                <i class="bi bi-check-circle-fill"></i> The server responded with the following <span class="fw-semibold">authorization code</span>:
+                <div class="input-group">
+                    <input class="form-control" value="@Code" readonly/>
+                    <button class="btn btn-outline-secondary" onclick="copy(this, '@Code')">
+                        <i class="bi bi-clipboard"></i>
+                    </button>
+                </div>
             </span>
         }
     </p>
@@ -278,7 +284,7 @@
             @if (AccessTokenSuccess)
             {
                 <span class="text-success">
-                    <i class="bi bi-check-circle-fill"></i> The access token request succeeded and returned the following access token:
+                    <i class="bi bi-check-circle-fill"></i> The access token request succeeded and returned the following <span class="fw-semibold">access token</span>:
                 </span>
                 <div class="w-100 input-group">
                     <input class="form-control" value="@AccessToken" readonly/>
