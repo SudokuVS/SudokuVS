@@ -2,5 +2,6 @@
 
 public class ApiKeyOptions
 {
+    public bool Enabled { get; set; }
     public string? Secret { get; set; }
 }
