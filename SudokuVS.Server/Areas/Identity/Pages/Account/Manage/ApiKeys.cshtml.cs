@@ -3,7 +3,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using SudokuVS.Server.Infrastructure.Authentication;
+using Microsoft.Extensions.Options;
 using SudokuVS.Server.Infrastructure.Authentication.ApiKey;
 using SudokuVS.Server.Infrastructure.Database.Models;
 
@@ -13,13 +13,16 @@ public class ApiKeys : PageModel
 {
     UserManager<AppUser> _userManager;
     ApiKeyService _apiKeyService;
+    IOptions<ApiKeyOptions> _options;
 
-    public ApiKeys(ApiKeyService apiKeyService, UserManager<AppUser> userManager)
+    public ApiKeys(ApiKeyService apiKeyService, UserManager<AppUser> userManager, IOptions<ApiKeyOptions> options)
     {
         _apiKeyService = apiKeyService;
         _userManager = userManager;
+        _options = options;
     }
 
+    public bool Enabled => _options.Value.Enabled;
     public IReadOnlyList<ApiKey> Keys { get; set; } = [];
 
     /// <summary>
@@ -31,6 +34,12 @@ public class ApiKeys : PageModel
 
     public async Task<IActionResult> OnGetAsync()
     {
+        if (!Enabled)
+        {
+            StatusMessage = "Api Key authentication is disabled.";
+            return Page();
+        }
+
         AppUser user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
@@ -44,6 +53,12 @@ public class ApiKeys : PageModel
 
     public async Task<IActionResult> OnPostCreateKeyAsync(string name)
     {
+        if (!Enabled)
+        {
+            StatusMessage = "Api Key authentication is disabled.";
+            return RedirectToPage();
+        }
+
         AppUser user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
@@ -59,6 +74,12 @@ public class ApiKeys : PageModel
 
     public async Task<IActionResult> OnPostRevokeKeyAsync(string token)
     {
+        if (!Enabled)
+        {
+            StatusMessage = "Api Key authentication is disabled.";
+            return RedirectToPage();
+        }
+
         AppUser user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
@@ -66,6 +87,9 @@ public class ApiKeys : PageModel
         }
 
         await _apiKeyService.RevokeApiKeyAsync(user, token);
+
+        StatusMessage = "The API key has been removed.";
+        
         return RedirectToPage();
     }
 }

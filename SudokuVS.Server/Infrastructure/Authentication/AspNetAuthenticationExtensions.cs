@@ -67,7 +67,13 @@ public static class AspNetAuthenticationExtensions
             return;
         }
 
-        builder.Services.Configure<ApiKeyOptions>(opt => opt.Secret = secret);
+        builder.Services.Configure<ApiKeyOptions>(
+            opt =>
+            {
+                opt.Enabled = true;
+                opt.Secret = secret;
+            }
+        );
         builder.Services.AddScoped<ApiKeyService>();
         authenticationBuilder.AddScheme<ApiKeySchemeOptions, ApiKeyAuthenticationHandler>(ApiKeyConstants.AuthenticationScheme, _ => { });
 

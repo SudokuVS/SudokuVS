@@ -1,8 +1,11 @@
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.Extensions.Options
 @using SudokuVS.Server.Areas.Identity.Pages.Account.Manage
+@using SudokuVS.Server.Infrastructure.Authentication.ApiKey
 @using SudokuVS.Server.Infrastructure.Database.Models
 @inject SignInManager<AppUser> SignInManager
+@inject IOptions<ApiKeyOptions> ApiKeyOptions
 @{
     bool hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
 }
@@ -25,9 +28,12 @@
     <li class="nav-item">
         <a class="nav-link @ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)" id="two-factor" asp-page="./TwoFactorAuthentication">Two-factor authentication</a>
     </li>
-    <li class="nav-item">
-        <a class="nav-link @ManageNavPages.ApiKeysNavClass(ViewContext)" id="api-keys" asp-page="./ApiKeys">API keys</a>
-    </li>
+    @if (ApiKeyOptions.Value.Enabled)
+    {
+        <li class="nav-item">
+            <a class="nav-link @ManageNavPages.ApiKeysNavClass(ViewContext)" id="api-keys" asp-page="./ApiKeys">API keys</a>
+        </li>
+    }
     <li class="nav-item">
         <a class="nav-link @ManageNavPages.OidcApplicationsNavClass(ViewContext)" id="oidc-applications" asp-page="./OidcApplications">OIDC applications</a>
     </li>
