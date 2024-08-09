@@ -104,7 +104,7 @@ html, body {
     position: absolute;
     top: 0;
     width: 100%;
-    overflow: hidden;
+    overflow: visible;
     white-space: nowrap;
     height: 64px;
 }
@@ -115,7 +115,6 @@ html, body {
     overflow: hidden;
     padding-top: 64px;
     padding-bottom: 32px;
-    z-index: -9999;
 }
 
 .footer {
