@@ -165,7 +165,7 @@
         <span class="text-info small"><i class="bi bi-exclamation-circle"></i> In this guide, the code verifier is not actually random, but in real applications it must be.</span>
     </p>
     <p>
-        Then we use that challenge in a GET request that will ask the user for their credentials (click the request below).
+        Then we use that challenge in a GET request that will ask the user for their credentials.
 
         <div class="ps-4 small position-relative">
             <div class="row">
@@ -179,7 +179,7 @@
                     }
                     else
                     {
-                        <a href="@InternalApplicationAuthorizePath(true)" class="text-body stretched-link">@AuthorizeRequestUrl()</a>
+                        <a href="@InternalApplicationAuthorizePath(true)" class="stretched-link">@AuthorizeRequestUrl()</a>
                     }
                 </div>
             </div>
@@ -318,8 +318,8 @@
                 <div class="col-2 fw-semibold">
                     Request URL
                 </div>
-                <div class="col">
-                    @GetGamesRequestUrl()
+                <div class="col d-flex align-items-center">
+                    <button class="btn btn-link btn-sm stretched-link p-0 m-0 lh-1" @onclick="PostCreateGameAsync">@GetGamesRequestUrl()</button>
                 </div>
             </div>
             <div class="row">
@@ -334,7 +334,7 @@
                 <div class="col-2 fw-semibold">
                     Headers
                 </div>
-                <div class="col">
+                <div class="col-10">
                     <div class="row">
                         <div class="col-2">
                             Authorization
@@ -346,7 +346,7 @@
                 </div>
             </div>
 
-            <button class="btn btn-link stretched-link" @onclick="PostCreateGameAsync"></button>
+
         </div>
 
         @if (GetGamesSuccess.HasValue)
@@ -360,7 +360,7 @@
             else
             {
                 <span class="text-danger">
-                    <i class="bi bi-x-circle-fill"></i> The access token request failed. Please click the request link above to try again.
+                    <i class="bi bi-x-circle-fill"></i> The API request failed. Please click the request link above to try again.
                 </span>
             }
 
@@ -448,7 +448,7 @@
 
         AccessTokenSuccess = response.IsSuccessStatusCode;
         string responseContent = await response.Content.ReadAsStringAsync();
-        TokenResponse = PrettyPrintJson(responseContent, out Dictionary<string, object>? parsedResponse);
+        TokenResponse = DeserializeAndPrettyPrint(responseContent, out Dictionary<string, object>? parsedResponse);
 
         if (parsedResponse == null || !parsedResponse.TryGetValue("access_token", out object? accessToken))
         {
@@ -541,7 +541,7 @@
         HttpResponseMessage response = await client.GetAsync(getGames);
         GetGamesSuccess = response.IsSuccessStatusCode;
         string responseString = await response.Content.ReadAsStringAsync();
-        GetGamesResponse = PrettyPrintJson<Dictionary<string, object>[]>(responseString, out _);
+        GetGamesResponse = DeserializeAndPrettyPrint<Dictionary<string, object>[]>(responseString, out _);
 
         StateHasChanged();
     }
@@ -553,19 +553,25 @@
         return Base64UrlEncoder.Encode(hashed);
     }
 
-    static string PrettyPrintJson<TValue>(string responseContent, out TValue? parsedResponse)
+    static string DeserializeAndPrettyPrint<TValue>(string responseContent, out TValue? parsedResponse)
     {
-        parsedResponse = default;
         try
         {
             parsedResponse = JsonSerializer.Deserialize<TValue>(responseContent);
+            return JsonSerializer.Serialize(parsedResponse, new JsonSerializerOptions { WriteIndented = true });
         }
         catch (Exception)
         {
             // nothing to do
         }
 
-        return parsedResponse != null ? JsonSerializer.Serialize(parsedResponse, new JsonSerializerOptions { WriteIndented = true }) : responseContent;
+        parsedResponse = default;
+        JsonDocument parsedUntyped = JsonDocument.Parse(responseContent);
+        using MemoryStream stream = new();
+        using Utf8JsonWriter writer = new(stream, new JsonWriterOptions { Indented = true });
+        parsedUntyped.WriteTo(writer);
+        writer.Flush();
+        return Encoding.UTF8.GetString(stream.ToArray());
     }
 
 }
